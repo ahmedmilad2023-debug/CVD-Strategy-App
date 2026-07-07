@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+<title>تحليل الفيوتشر – العرض والطلب + CVD</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#0b0e14;color:#e0e6ed;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:12px;}
+#app{max-width:1400px;width:100%;background:#151e2a;border-radius:24px;padding:20px 20px 16px;box-shadow:0 12px 40px rgba(0,0,0,0.7);border:1px solid #2a3649;}
+header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;margin-bottom:18px;}
+header h1{font-size:1.6rem;font-weight:600;background:linear-gradient(135deg,#f0b90b,#f7d44a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:-0.5px;}
+.symbol-selector{display:flex;flex-wrap:wrap;align-items:center;gap:10px;background:#1f2a3a;padding:6px 14px 6px 18px;border-radius:40px;border:1px solid #32415a;}
+.symbol-selector label{font-weight:500;font-size:0.95rem;color:#b4c7e0;}
+.symbol-selector select{background:#0b0e14;color:#e0e6ed;border:1px solid #3a4b66;border-radius:30px;padding:6px 16px 6px 12px;font-weight:500;font-size:0.95rem;outline:none;cursor:pointer;}
+.symbol-selector button{background:#f0b90b;border:none;border-radius:30px;padding:6px 18px;font-weight:700;font-size:0.9rem;color:#0b0e14;cursor:pointer;transition:background 0.2s,transform 0.1s;border:1px solid #f0b90b;}
+.symbol-selector button:hover{background:#dba40a;}
+.symbol-selector button:active{transform:scale(0.96);}
+#stopBtn{background:#4a5a72;border-color:#4a5a72;color:#e0e6ed;}
+#stopBtn:hover{background:#5f7290;}
+main{display:flex;flex-direction:column;gap:22px;}
+.chart-section{background:#0f1622;border-radius:20px;padding:12px 12px 4px;border:1px solid #263244;min-height:300px;}
+#tradingview-widget{width:100%;height:420px;border-radius:16px;overflow:hidden;background:#0b0e14;}
+.signals-section{background:#0f1622;border-radius:20px;padding:14px 10px 10px;border:1px solid #263244;}
+.signals-section h2{font-size:1.2rem;font-weight:500;margin-bottom:12px;color:#d4e0f0;padding-right:6px;}
+.table-wrapper{overflow-x:auto;border-radius:14px;}
+table{width:100%;border-collapse:collapse;font-size:0.85rem;min-width:700px;}
+thead{background:#1a2638;}
+th{padding:12px 10px;text-align:right;font-weight:600;color:#b8cbe0;border-bottom:2px solid #2f405a;white-space:nowrap;}
+td{padding:12px 10px;border-bottom:1px solid #253141;vertical-align:middle;word-break:break-word;}
+tbody tr:hover{background:#1a2538;}
+.buy-signal{background:#0f2a1f;border-right:4px solid #2ecc71;}
+.sell-signal{background:#2a1518;border-right:4px solid #e74c3c;}
+.signal-type{font-weight:700;}
+.buy-signal .signal-type{color:#2ecc71;}
+.sell-signal .signal-type{color:#e74c3c;}
+.signal-price{font-weight:600;color:#f0f4fa;}
+.signal-target{color:#5bde9a;}
+.signal-stop{color:#f28b82;}
+.signal-reason{font-size:0.8rem;color:#b0c8e0;max-width:240px;}
+.no-signals{text-align:center;color:#6a7f9a;padding:28px 0;font-style:italic;}
+footer{margin-top:16px;text-align:center;font-size:0.75rem;color:#5a6f8a;border-top:1px solid #1f2b3d;padding-top:14px;letter-spacing:0.3px;}
+@media (max-width:640px){#app{padding:12px;}header h1{font-size:1.3rem;}.symbol-selector{padding:6px 12px;gap:6px;}#tradingview-widget{height:280px;}table{font-size:0.75rem;min-width:550px;}th,td{padding:8px 6px;}}
+</style>
+</head>
+<body>
+<div id="app">
+<header>
+<h1>📊 تحليل الفيوتشر</h1>
+<div class="symbol-selector">
+<label for="symbolSelect">العملة:</label>
+<select id="symbolSelect">
+<option value="BTCUSDT">BTCUSDT</option>
+<option value="ETHUSDT">ETHUSDT</option>
+<option value="BNBUSDT">BNBUSDT</option>
+<option value="SOLUSDT">SOLUSDT</option>
+<option value="XRPUSDT">XRPUSDT</option>
+</select>
+<button id="startBtn">▶ تشغيل</button>
+<button id="stopBtn">⏹ إيقاف</button>
+</div>
+</header>
+<main>
+<section class="chart-section">
+<div id="tradingview-widget"></div>
+</section>
+<section class="signals-section">
+<h2>جدول الإشارات الحية</h2>
+<div class="table-wrapper">
+<table id="signalsTable">
+<thead>
+<tr>
+<th>التاريخ والوقت</th>
+<th>السعر الحقيقي</th>
+<th>نوع الإشارة</th>
+<th>هدف الربح</th>
+<th>وقف الخسارة</th>
+<th>التحليل المنطقي</th>
+</tr>
+</thead>
+<tbody id="signalsBody">
+<tr><td colspan="6" class="no-signals">⏳ في انتظار الإشارات...</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+</main>
+<footer>
+<p>بيانات حية من Binance Futures • مناطق العرض والطلب + CVD</p>
+</footer>
+</div>
+<script>
+(function(){
+const BINANCE_FUTURES_BASE='https://fapi.binance.com';
+const SYMBOL_SELECT=document.getElementById('symbolSelect');
+const START_BTN=document.getElementById('startBtn');
+const STOP_BTN=document.getElementById('stopBtn');
+const SIGNALS_BODY=document.getElementById('signalsBody');
+let INTERVAL_ID=null;
+let CURRENT_SYMBOL='BTCUSDT';
+let SUPPLY_ZONES=[];
+let DEMAND_ZONES=[];
+const ZONE_LOOKBACK=20;
+function getKlinesUrl(symbol,limit=100){
+return BINANCE_FUTURES_BASE+'/fapi/v1/klines?symbol='+symbol+'&interval=1m&limit='+limit;
+}
+async function fetchKlines(symbol){
+const url=getKlinesUrl(symbol);
+const response=await fetch(url);
+if(!response.ok)throw new Error('Binance API error: '+response.status);
+const data=await response.json();
+return data.map(c=>({
+open:parseFloat(c[1]),
+high:parseFloat(c[2]),
+low:parseFloat(c[3]),
+close:parseFloat(c[4]),
+volume:parseFloat(c[5]),
+closeTime:c[6]
+}));
+}
+function calculateCVD(klines){
+let cvd=0;
+const deltas=[];
+for(let i=0;i<klines.length;i++){
+const k=klines[i];
+const delta=(k.close-k.open)*k.volume/1000;
+cvd+=delta;
+deltas.push(cvd);
+}
+return deltas;
+}
+function detectSupplyDemandZones(klines){
+const zones={supply:[],demand:[]};
+if(klines.length<ZONE_LOOKBACK*2)return zones;
+for(let i=ZONE_LOOKBACK;i<klines.length-ZONE_LOOKBACK;i++){
+const left=klines.slice(i-ZONE_LOOKBACK,i);
+const right=klines.slice(i+1,i+1+ZONE_LOOKBACK);
+const current=klines[i];
+const leftHigh=Math.max(...left.map(c=>c.high));
+const leftLow=Math.min(...left.map(c=>c.low));
+const rightHigh=Math.max(...right.map(c=>c.high));
+const rightLow=Math.min(...right.map(c=>c.low));
+if(current.high>leftHigh&&current.high>rightHigh){
+zones.supply.push({price:current.high,strength:Math.min(100,50+(current.high-leftHigh)*10),index:i});
+}
+if(current.low<leftLow&&current.low<rightLow){
+zones.demand.push({price:current.low,strength:Math.min(100,50+(leftLow-current.low)*10),index:i});
+}
+}
+return zones;
+}
+function generateSignal(klines,cvdValues,supplyZones,demandZones){
+if(klines.length<3||cvdValues.length<3)return null;
+const last=klines[klines.length-1];
+const prev=klines[klines.length-2];
+const lastCvd=cvdValues[cvdValues.length-1];
+const prevCvd=cvdValues[cvdValues.length-2];
+const price=last.close;
+const cvdChange=lastCvd-prevCvd;
+let signal=null;
+let reason='';
+let target=0;
+let stopLoss=0;
+const nearestSupply=supplyZones.length>0?supplyZones.reduce((a,b)=>Math.abs(a.price-price)<Math.abs(b.price-price)?a:b):null;
+const nearestDemand=demandZones.length>0?demandZones.reduce((a,b)=>Math.abs(a.price-price)<Math.abs(b.price-price)?a:b):null;
+if(nearestDemand&&price>nearestDemand.price&&price<nearestDemand.price*1.02&&cvdChange>0){
+signal='BUY';
+target=nearestDemand.price*1.015;
+stopLoss=nearestDemand.price*0.985;
+reason='السعر فوق منطقة الطلب ('+nearestDemand.price.toFixed(2)+') مع CVD موجب ('+cvdChange.toFixed(2)+')، ضغط شرائي.';
+}else if(nearestSupply&&price<nearestSupply.price&&price>nearestSupply.price*0.98&&cvdChange<0){
+signal='SELL';
+target=nearestSupply.price*0.985;
+stopLoss=nearestSupply.price*1.015;
+reason='السعر تحت منطقة العرض ('+nearestSupply.price.toFixed(2)+') مع CVD سالب ('+cvdChange.toFixed(2)+')، ضغط بيعي.';
+}else if(cvdChange>0.5&&price>prev.close){
+signal='BUY';
+target=price*1.008;
+stopLoss=price*0.992;
+reason='CVD موجب قوي ('+cvdChange.toFixed(2)+') مع ارتفاع السعر، زخم صاعد.';
+}else if(cvdChange<-0.5&&price<prev.close){
+signal='SELL';
+target=price*0.992;
+stopLoss=price*1.008;
+reason='CVD سالب قوي ('+cvdChange.toFixed(2)+') مع انخفاض السعر، زخم هابط.';
+}
+if(signal){
+return {
+time:new Date(last.closeTime).toLocaleString('ar-EG'),
+price:price.toFixed(2),
+type:signal,
+target:target.toFixed(2),
+stopLoss:stopLoss.toFixed(2),
+reason:reason
+};
+}
+return null;
+}
+function renderSignals(signals){
+if(!signals||signals.length===0){
+SIGNALS_BODY.innerHTML='<tr><td colspan="6" class="no-signals">⏳ في انتظار الإشارات...</td></tr>';
+return;
+}
+let html='';
+for(let s of signals.slice(0,20)){
+const rowClass=s.type==='BUY'?'buy-signal':'sell-signal';
+html+='<tr class="'+rowClass+'">'+
+'<td>'+s.time+'</td>'+
+'<td class="signal-price">'+s.price+'</td>'+
+'<td class="signal-type">'+s.type+'</td>'+
+'<td class="signal-target">'+s.target+'</td>'+
+'<td class="signal-stop">'+s.stopLoss+'</td>'+
+'<td class="signal-reason">'+s.reason+'</td>'+
+'</tr>';
+}
+SIGNALS_BODY.innerHTML=html;
+}
+async function updateSignals(){
+try{
+const klines=await fetchKlines(CURRENT_SYMBOL);
+if(klines.length<10)return;
+const cvdValues=calculateCVD(klines);
+const zones=detectSupplyDemandZones(klines);
+SUPPLY_ZONES=zones.supply;
+DEMAND_ZONES=zones.demand;
+const signal=generateSignal(klines,cvdValues,SUPPLY_ZONES,DEMAND_ZONES);
+if(signal){
+const existing=JSON.parse(localStorage.getItem('signalsHistory')||'[]');
+existing.unshift(signal);
+if(existing.length>100)existing.length=100;
+localStorage.setItem('signalsHistory',JSON.stringify(existing));
+renderSignals(existing);
+}else{
+const stored=JSON.parse(localStorage.getItem('signalsHistory')||'[]');
+if(stored.length>0){
+renderSignals(stored);
+}else{
+SIGNALS_BODY.innerHTML='<tr><td colspan="6" class="no-signals">⏳ لا توجد إشارات جديدة...</td></tr>';
+}
+}
+}catch(err){
+console.warn('Update error:',err);
+SIGNALS_BODY.innerHTML='<tr><td colspan="6" class="no-signals">⚠️ خطأ في جلب البيانات: '+err.message+'</td></tr>';
+}
+}
+function loadTradingViewWidget(symbol){
+const container=document.getElementById('tradingview-widget');
+container.innerHTML='';
+const script=document.createElement('script');
+script.type='text/javascript';
+script.src='https://s3.tradingview.com/tv.js';
+script.async=true;
+script.onload=function(){
+if(typeof TradingView!=='undefined'){
+new TradingView.widget({
+"width":'100%',
+"height":'100%',
+"symbol":'BINANCE:'+symbol,
+"interval":'5',
+"timezone":"Etc/UTC",
+"theme":"dark",
+"style":"1",
+"locale":"ar",
+"toolbar_bg":"#0b0e14",
+"enable_publishing":false,
+"allow_symbol_change":true,
+"container_id":"tradingview-widget",
+"hide_side_toolbar":false,
+"details":true,
+"hotlist":true,
+"calendar":false,
+"news":[],
+"studies":["MASimple@tv-basicstudies","RSI@tv-basicstudies"]
+});
+}else{
+container.innerHTML='<p style="color:#8aa;padding:40px;text-align:center;">جاري تحميل TradingView...</p>';
+}
+};
+script.onerror=function(){
+container.innerHTML='<p style="color:#e74c3c;padding:40px;text-align:center;">فشل تحميل TradingView</p>';
+};
+document.head.appendChild(script);
+}
+function startMonitoring(){
+if(INTERVAL_ID)clearInterval(INTERVAL_ID);
+CURRENT_SYMBOL=SYMBOL_SELECT.value;
+loadTradingViewWidget(CURRENT_SYMBOL);
+updateSignals();
+INTERVAL_ID=setInterval(updateSignals,8000);
+START_BTN.disabled=true;
+STOP_BTN.disabled=false;
+}
+function stopMonitoring(){
+if(INTERVAL_ID){
+clearInterval(INTERVAL_ID);
+INTERVAL_ID=null;
+}
+START_BTN.disabled=false;
+STOP_BTN.disabled=true;
+}
+START_BTN.addEventListener('click',startMonitoring);
+STOP_BTN.addEventListener('click',stopMonitoring);
+SYMBOL_SELECT.addEventListener('change',function(){
+if(INTERVAL_ID){
+stopMonitoring();
+startMonitoring();
+}
+});
+window.addEventListener('load',function(){
+const stored=JSON.parse(localStorage.getItem('signalsHistory')||'[]');
+if(stored.length>0)renderSignals(stored);
+loadTradingViewWidget(CURRENT_SYMBOL);
+START_BTN.disabled=false;
+STOP_BTN.disabled=true;
+});
+// إنشاء manifest و service worker ديناميكياً لـ PWA
+const manifestData={
+name:"Crypto Futures Analyzer",
+short_name:"Futures Analyzer",
+description:"تحليل الفيوتشر – العرض والطلب + CVD",
+start_url:".",
+display:"standalone",
+background_color:"#0b0e14",
+theme_color:"#0b0e14",
+icons:[
+{src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23151e2a'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='%23f0b90b' font-family='Arial'%3E📊%3C/text%3E%3C/svg%3E",sizes:"192x192",type:"image/svg+xml"},
+{src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23151e2a'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='%23f0b90b' font-family='Arial'%3E📊%3C/text%3E%3C/svg%3E",sizes:"512x512",type:"image/svg+xml"}
+]
+};
+const manifestBlob=new Blob([JSON.stringify(manifestData)],{type:'application/json'});
+const manifestURL=URL.createObjectURL(manifestBlob);
+const linkManifest=document.createElement('link');
+linkManifest.rel='manifest';
+linkManifest.href=manifestURL;
+document.head.appendChild(linkManifest);
+// Service worker inline via blob
+const swCode=
+'self.addEventListener("install",function(e){'+
+'e.waitUntil('+
+'caches.open("futures-analyzer-v1").then(function(cache){'+
+'return cache.addAll(["/","index.html","style.css","script.js"]);'+
+'})'+
+');'+
+'});'+
+'self.addEventListener("fetch",function(e){'+
+'e.respondWith('+
+'caches.match(e.request).then(function(response){'+
+'return response||fetch(e.request);'+
+'})'+
+');'+
+'});';
+const swBlob=new Blob([swCode],{type:'application/javascript'});
+const swURL=URL.createObjectURL(swBlob);
+if('serviceWorker' in navigator){
+navigator.serviceWorker.register(swURL).then(function(reg){
+console.log('SW registered');
+}).catch(function(err){
+console.warn('SW registration failed:',err);
+});
+}
+})();
+</script>
+</body>
+</html><!DOCTYPE html>
+
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+<title>تحليل الفيوتشر – العرض والطلب + CVD</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#0b0e14;color:#e0e6ed;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:12px;}
+#app{max-width:1400px;width:100%;background:#151e2a;border-radius:24px;padding:20px 20px 16px;box-shadow:0 12px 40px rgba(0,0,0,0.7);border:1px solid #2a3649;}
+header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;margin-bottom:18px;}
+header h1{font-size:1.6rem;font-weight:600;background:linear-gradient(135deg,#f0b90b,#f7d44a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:-0.5px;}
+.symbol-selector{display:flex;flex-wrap:wrap;align-items:center;gap:10px;background:#1f2a3a;padding:6px 14px 6px 18px;border-radius:40px;border:1px solid #32415a;}
+.symbol-selector label{font-weight:500;font-size:0.95rem;color:#b4c7e0;}
+.symbol-selector select{background:#0b0e14;color:#e0e6ed;border:1px solid #3a4b66;border-radius:30px;padding:6px 16px 6px 12px;font-weight:500;font-size:0.95rem;outline:none;cursor:pointer;}
+.symbol-selector button{background:#f0b90b;border:none;border-radius:30px;padding:6px 18px;font-weight:700;font-size:0.9rem;color:#0b0e14;cursor:pointer;transition:background 0.2s,transform 0.1s;border:1px solid #f0b90b;}
+.symbol-selector button:hover{background:#dba40a;}
+.symbol-selector button:active{transform:scale(0.96);}
+#stopBtn{background:#4a5a72;border-color:#4a5a72;color:#e0e6ed;}
+#stopBtn:hover{background:#5f7290;}
+main{display:flex;flex-direction:column;gap:22px;}
+.chart-section{background:#0f1622;border-radius:20px;padding:12px 12px 4px;border:1px solid #263244;min-height:300px;}
+#tradingview-widget{width:100%;height:420px;border-radius:16px;overflow:hidden;background:#0b0e14;}
+.signals-section{background:#0f1622;border-radius:20px;padding:14px 10px 10px;border:1px solid #263244;}
+.signals-section h2{font-size:1.2rem;font-weight:500;margin-bottom:12px;color:#d4e0f0;padding-right:6px;}
+.table-wrapper{overflow-x:auto;border-radius:14px;}
+table{width:100%;border-collapse:collapse;font-size:0.85rem;min-width:700px;}
+thead{background:#1a2638;}
+th{padding:12px 10px;text-align:right;font-weight:600;color:#b8cbe0;border-bottom:2px solid #2f405a;white-space:nowrap;}
+td{padding:12px 10px;border-bottom:1px solid #253141;vertical-align:middle;word-break:break-word;}
+tbody tr:hover{background:#1a2538;}
+.buy-signal{background:#0f2a1f;border-right:4px solid #2ecc71;}
+.sell-signal{background:#2a1518;border-right:4px solid #e74c3c;}
+.signal-type{font-weight:700;}
+.buy-signal .signal-type{color:#2ecc71;}
+.sell-signal .signal-type{color:#e74c3c;}
+.signal-price{font-weight:600;color:#f0f4fa;}
+.signal-target{color:#5bde9a;}
+.signal-stop{color:#f28b82;}
+.signal-reason{font-size:0.8rem;color:#b0c8e0;max-width:240px;}
+.no-signals{text-align:center;color:#6a7f9a;padding:28px 0;font-style:italic;}
+footer{margin-top:16px;text-align:center;font-size:0.75rem;color:#5a6f8a;border-top:1px solid #1f2b3d;padding-top:14px;letter-spacing:0.3px;}
+@media (max-width:640px){#app{padding:12px;}header h1{font-size:1.3rem;}.symbol-selector{padding:6px 12px;gap:6px;}#tradingview-widget{height:280px;}table{font-size:0.75rem;min-width:550px;}th,td{padding:8px 6px;}}
+</style>
+</head>
+<body>
+<div id="app">
+<header>
+<h1>📊 تحليل الفيوتشر</h1>
+<div class="symbol-selector">
+<label for="symbolSelect">العملة:</label>
+<select id="symbolSelect">
+<option value="BTCUSDT">BTCUSDT</option>
+<option value="ETHUSDT">ETHUSDT</option>
+<option value="BNBUSDT">BNBUSDT</option>
+<option value="SOLUSDT">SOLUSDT</option>
+<option value="XRPUSDT">XRPUSDT</option>
+</select>
+<button id="startBtn">▶ تشغيل</button>
+<button id="stopBtn">⏹ إيقاف</button>
+</div>
+</header>
+<main>
+<section class="chart-section">
+<div id="tradingview-widget"></div>
+</section>
+<section class="signals-section">
+<h2>جدول الإشارات الحية</h2>
+<div class="table-wrapper">
+<table id="signalsTable">
+<thead>
+<tr>
+<th>التاريخ والوقت</th>
+<th>السعر الحقيقي</th>
+<th>نوع الإشارة</th>
+<th>هدف الربح</th>
+<th>وقف الخسارة</th>
+<th>التحليل المنطقي</th>
+</tr>
+</thead>
+<tbody id="signalsBody">
+<tr><td colspan="6" class="no-signals">⏳ في انتظار الإشارات...</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+</main>
+<footer>
+<p>بيانات حية من Binance Futures • مناطق العرض والطلب + CVD</p>
+</footer>
+</div>
+<script>
+(function(){
+const BINANCE_FUTURES_BASE='https://fapi.binance.com';
+const SYMBOL_SELECT=document.getElementById('symbolSelect');
+const START_BTN=document.getElementById('startBtn');
+const STOP_BTN=document.getElementById('stopBtn');
+const SIGNALS_BODY=document.getElementById('signalsBody');
+let INTERVAL_ID=null;
+let CURRENT_SYMBOL='BTCUSDT';
+let SUPPLY_ZONES=[];
+let DEMAND_ZONES=[];
+const ZONE_LOOKBACK=20;
+function getKlinesUrl(symbol,limit=100){
+return BINANCE_FUTURES_BASE+'/fapi/v1/klines?symbol='+symbol+'&interval=1m&limit='+limit;
+}
+async function fetchKlines(symbol){
+const url=getKlinesUrl(symbol);
+const response=await fetch(url);
+if(!response.ok)throw new Error('Binance API error: '+response.status);
+const data=await response.json();
+return data.map(c=>({
+open:parseFloat(c[1]),
+high:parseFloat(c[2]),
+low:parseFloat(c[3]),
+close:parseFloat(c[4]),
+volume:parseFloat(c[5]),
+closeTime:c[6]
+}));
+}
+function calculateCVD(klines){
+let cvd=0;
+const deltas=[];
+for(let i=0;i<klines.length;i++){
+const k=klines[i];
+const delta=(k.close-k.open)*k.volume/1000;
+cvd+=delta;
+deltas.push(cvd);
+}
+return deltas;
+}
+function detectSupplyDemandZones(klines){
+const zones={supply:[],demand:[]};
+if(klines.length<ZONE_LOOKBACK*2)return zones;
+for(let i=ZONE_LOOKBACK;i<klines.length-ZONE_LOOKBACK;i++){
+const left=klines.slice(i-ZONE_LOOKBACK,i);
+const right=klines.slice(i+1,i+1+ZONE_LOOKBACK);
+const current=klines[i];
+const leftHigh=Math.max(...left.map(c=>c.high));
+const leftLow=Math.min(...left.map(c=>c.low));
+const rightHigh=Math.max(...right.map(c=>c.high));
+const rightLow=Math.min(...right.map(c=>c.low));
+if(current.high>leftHigh&&current.high>rightHigh){
+zones.supply.push({price:current.high,strength:Math.min(100,50+(current.high-leftHigh)*10),index:i});
+}
+if(current.low<leftLow&&current.low<rightLow){
+zones.demand.push({price:current.low,strength:Math.min(100,50+(leftLow-current.low)*10),index:i});
+}
+}
+return zones;
+}
+function generateSignal(klines,cvdValues,supplyZones,demandZones){
+if(klines.length<3||cvdValues.length<3)return null;
+const last=klines[klines.length-1];
+const prev=klines[klines.length-2];
+const lastCvd=cvdValues[cvdValues.length-1];
+const prevCvd=cvdValues[cvdValues.length-2];
+const price=last.close;
+const cvdChange=lastCvd-prevCvd;
+let signal=null;
+let reason='';
+let target=0;
+let stopLoss=0;
+const nearestSupply=supplyZones.length>0?supplyZones.reduce((a,b)=>Math.abs(a.price-price)<Math.abs(b.price-price)?a:b):null;
+const nearestDemand=demandZones.length>0?demandZones.reduce((a,b)=>Math.abs(a.price-price)<Math.abs(b.price-price)?a:b):null;
+if(nearestDemand&&price>nearestDemand.price&&price<nearestDemand.price*1.02&&cvdChange>0){
+signal='BUY';
+target=nearestDemand.price*1.015;
+stopLoss=nearestDemand.price*0.985;
+reason='السعر فوق منطقة الطلب ('+nearestDemand.price.toFixed(2)+') مع CVD موجب ('+cvdChange.toFixed(2)+')، ضغط شرائي.';
+}else if(nearestSupply&&price<nearestSupply.price&&price>nearestSupply.price*0.98&&cvdChange<0){
+signal='SELL';
+target=nearestSupply.price*0.985;
+stopLoss=nearestSupply.price*1.015;
+reason='السعر تحت منطقة العرض ('+nearestSupply.price.toFixed(2)+') مع CVD سالب ('+cvdChange.toFixed(2)+')، ضغط بيعي.';
+}else if(cvdChange>0.5&&price>prev.close){
+signal='BUY';
+target=price*1.008;
+stopLoss=price*0.992;
+reason='CVD موجب قوي ('+cvdChange.toFixed(2)+') مع ارتفاع السعر، زخم صاعد.';
+}else if(cvdChange<-0.5&&price<prev.close){
+signal='SELL';
+target=price*0.992;
+stopLoss=price*1.008;
+reason='CVD سالب قوي ('+cvdChange.toFixed(2)+') مع انخفاض السعر، زخم هابط.';
+}
+if(signal){
+return {
+time:new Date(last.closeTime).toLocaleString('ar-EG'),
+price:price.toFixed(2),
+type:signal,
+target:target.toFixed(2),
+stopLoss:stopLoss.toFixed(2),
+reason:reason
+};
+}
+return null;
+}
+function renderSignals(signals){
+if(!signals||signals.length===0){
+SIGNALS_BODY.innerHTML='<tr><td colspan="6" class="no-signals">⏳ في انتظار الإشارات...</td></tr>';
+return;
+}
+let html='';
+for(let s of signals.slice(0,20)){
+const rowClass=s.type==='BUY'?'buy-signal':'sell-signal';
+html+='<tr class="'+rowClass+'">'+
+'<td>'+s.time+'</td>'+
+'<td class="signal-price">'+s.price+'</td>'+
+'<td class="signal-type">'+s.type+'</td>'+
+'<td class="signal-target">'+s.target+'</td>'+
+'<td class="signal-stop">'+s.stopLoss+'</td>'+
+'<td class="signal-reason">'+s.reason+'</td>'+
+'</tr>';
+}
+SIGNALS_BODY.innerHTML=html;
+}
+async function updateSignals(){
+try{
+const klines=await fetchKlines(CURRENT_SYMBOL);
+if(klines.length<10)return;
+const cvdValues=calculateCVD(klines);
+const zones=detectSupplyDemandZones(klines);
+SUPPLY_ZONES=zones.supply;
+DEMAND_ZONES=zones.demand;
+const signal=generateSignal(klines,cvdValues,SUPPLY_ZONES,DEMAND_ZONES);
+if(signal){
+const existing=JSON.parse(localStorage.getItem('signalsHistory')||'[]');
+existing.unshift(signal);
+if(existing.length>100)existing.length=100;
+localStorage.setItem('signalsHistory',JSON.stringify(existing));
+renderSignals(existing);
+}else{
+const stored=JSON.parse(localStorage.getItem('signalsHistory')||'[]');
+if(stored.length>0){
+renderSignals(stored);
+}else{
+SIGNALS_BODY.innerHTML='<tr><td colspan="6" class="no-signals">⏳ لا توجد إشارات جديدة...</td></tr>';
+}
+}
+}catch(err){
+console.warn('Update error:',err);
+SIGNALS_BODY.innerHTML='<tr><td colspan="6" class="no-signals">⚠️ خطأ في جلب البيانات: '+err.message+'</td></tr>';
+}
+}
+function loadTradingViewWidget(symbol){
+const container=document.getElementById('tradingview-widget');
+container.innerHTML='';
+const script=document.createElement('script');
+script.type='text/javascript';
+script.src='https://s3.tradingview.com/tv.js';
+script.async=true;
+script.onload=function(){
+if(typeof TradingView!=='undefined'){
+new TradingView.widget({
+"width":'100%',
+"height":'100%',
+"symbol":'BINANCE:'+symbol,
+"interval":'5',
+"timezone":"Etc/UTC",
+"theme":"dark",
+"style":"1",
+"locale":"ar",
+"toolbar_bg":"#0b0e14",
+"enable_publishing":false,
+"allow_symbol_change":true,
+"container_id":"tradingview-widget",
+"hide_side_toolbar":false,
+"details":true,
+"hotlist":true,
+"calendar":false,
+"news":[],
+"studies":["MASimple@tv-basicstudies","RSI@tv-basicstudies"]
+});
+}else{
+container.innerHTML='<p style="color:#8aa;padding:40px;text-align:center;">جاري تحميل TradingView...</p>';
+}
+};
+script.onerror=function(){
+container.innerHTML='<p style="color:#e74c3c;padding:40px;text-align:center;">فشل تحميل TradingView</p>';
+};
+document.head.appendChild(script);
+}
+function startMonitoring(){
+if(INTERVAL_ID)clearInterval(INTERVAL_ID);
+CURRENT_SYMBOL=SYMBOL_SELECT.value;
+loadTradingViewWidget(CURRENT_SYMBOL);
+updateSignals();
+INTERVAL_ID=setInterval(updateSignals,8000);
+START_BTN.disabled=true;
+STOP_BTN.disabled=false;
+}
+function stopMonitoring(){
+if(INTERVAL_ID){
+clearInterval(INTERVAL_ID);
+INTERVAL_ID=null;
+}
+START_BTN.disabled=false;
+STOP_BTN.disabled=true;
+}
+START_BTN.addEventListener('click',startMonitoring);
+STOP_BTN.addEventListener('click',stopMonitoring);
+SYMBOL_SELECT.addEventListener('change',function(){
+if(INTERVAL_ID){
+stopMonitoring();
+startMonitoring();
+}
+});
+window.addEventListener('load',function(){
+const stored=JSON.parse(localStorage.getItem('signalsHistory')||'[]');
+if(stored.length>0)renderSignals(stored);
+loadTradingViewWidget(CURRENT_SYMBOL);
+START_BTN.disabled=false;
+STOP_BTN.disabled=true;
+});
+// إنشاء manifest و service worker ديناميكياً لـ PWA
+const manifestData={
+name:"Crypto Futures Analyzer",
+short_name:"Futures Analyzer",
+description:"تحليل الفيوتشر – العرض والطلب + CVD",
+start_url:".",
+display:"standalone",
+background_color:"#0b0e14",
+theme_color:"#0b0e14",
+icons:[
+{src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23151e2a'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='%23f0b90b' font-family='Arial'%3E📊%3C/text%3E%3C/svg%3E",sizes:"192x192",type:"image/svg+xml"},
+{src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23151e2a'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='%23f0b90b' font-family='Arial'%3E📊%3C/text%3E%3C/svg%3E",sizes:"512x512",type:"image/svg+xml"}
+]
+};
+const manifestBlob=new Blob([JSON.stringify(manifestData)],{type:'application/json'});
+const manifestURL=URL.createObjectURL(manifestBlob);
+const linkManifest=document.createElement('link');
+linkManifest.rel='manifest';
+linkManifest.href=manifestURL;
+document.head.appendChild(linkManifest);
+// Service worker inline via blob
+const swCode=
+'self.addEventListener("install",function(e){'+
+'e.waitUntil('+
+'caches.open("futures-analyzer-v1").then(function(cache){'+
+'return cache.addAll(["/","index.html","style.css","script.js"]);'+
+'})'+
+');'+
+'});'+
+'self.addEventListener("fetch",function(e){'+
+'e.respondWith('+
+'caches.match(e.request).then(function(response){'+
+'return response||fetch(e.request);'+
+'})'+
+');'+
+'});';
+const swBlob=new Blob([swCode],{type:'application/javascript'});
+const swURL=URL.createObjectURL(swBlob);
+if('serviceWorker' in navigator){
+navigator.serviceWorker.register(swURL).then(function(reg){
+console.log('SW registered');
+}).catch(function(err){
+console.warn('SW registration failed:',err);
+});
+}
+})();
+</script>
+</body>
+</html>
