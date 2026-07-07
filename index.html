@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-
 <html lang="ar">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>PWA تداول متقدم - Supply/Demand + CVD</title>
+<title>PWA تداول متكامل - Supply/Demand + CVD</title>
 <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIlRXQUQgUGlwZSIsCiAgInNob3J0X25hbWUiOiAiVFdBRCIsCiAgImRlc2NyaXB0aW9uIjogIlR3YWRpbmcgQXBwIHdpdGggU3VwcGx5ICYgRGVtYW5kICsgQ1ZEIiwKICAic3RhcnRfdXJsIjogIi4iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMxYTFhMWEiLAogICJ0aGVtZV9jb2xvciI6ICIjZjBjMjdhIiwKICAiaWNvbnMiOiBbCiAgICB7CiAgICAgICJzcmMiOiAiZGF0YTppbWFnZS9zdmcreG1sLDxzdmcgeG1sbnM9J2h0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnJyB2aWV3Qm94PScwIDAgNTEyIDUxMic+PHJlY3Qgd2lkdGg9JzUxMicgaGVpZ2h0PSc1MTInIHJ4PSc1MCcgZmlsbD0nJTIzZjBjMjdhJy8+PHRleHQgeD0nMjU2JyB5PSczMjAnIGZvbnQtc2l6ZT0nMjAwJyB0ZXh0LWFuY2hvcj0nbWlkZGxlJyBmaWxsPSclMjMxYTFhMWEnPkQ8L3RleHQ+PC9zdmc+IiwKICAgICAgInNpemVzIjogIjUxMng1MTIiLAogICAgICAidHlwZSI6ICJpbWFnZS9zdmcreG1sIiwKICAgICAgInB1cnBvc2UiOiAiYW55IG1hc2thYmxlIgogICAgfQogIF0KfQ==">
 <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='50' fill='%23f0c27a'/><text x='256' y='320' font-size='200' text-anchor='middle' fill='%231a1a1a'>D</text></svg>">
 <style>
@@ -88,47 +87,47 @@ h2{font-size:1.2rem;color:#ccc;margin:10px 0 5px;border-bottom:1px solid #333;pa
 <div class="toast" id="toast"></div>
 <div class="footer">PWA متكامل - إدارة الصفقات الذكية | بيانات Binance</div>
 <script>
-// ===== بداية الكود الطويل - كل سطر من أقصى اليسار =====
-let currentSymbol='BTCUSDT';
-let priceHistory=[];
-let cvdHistory=[];
-let openTrades=[]; // الصفقات المفتوحة
-let closedTrades=[]; // الصفقات المغلقة
-let lastPrice=0;
-let lastCVD=0;
-let intervalId=null;
-let chartWidget=null;
-let toastTimer=null;
-let swRegistration=null; // لتخزين تسجيل الـ service worker
-
+// ========================================================================
+// الكود الكامل من السطر الأول إلى الأخير، كل سطر يبدأ من أقصى اليسار
+// ========================================================================
+var currentSymbol='BTCUSDT';
+var priceHistory=[];
+var cvdHistory=[];
+var openTrades=[];
+var closedTrades=[];
+var lastPrice=0;
+var lastCVD=0;
+var intervalId=null;
+var chartWidget=null;
+var toastTimer=null;
+var swRegistration=null;
+var notificationPermissionAsked=false;
 function showToast(msg){
-let t=document.getElementById('toast');
+var t=document.getElementById('toast');
 t.textContent=msg;
 t.classList.add('show');
 if(toastTimer)clearTimeout(toastTimer);
-toastTimer=setTimeout(()=>{t.classList.remove('show');},4000);
+toastTimer=setTimeout(function(){t.classList.remove('show');},4000);
 }
-
-// تسجيل service worker والحصول على التسجيل
 async function registerSW(){
 if('serviceWorker' in navigator){
 try{
-let reg=await navigator.serviceWorker.register('data:text/javascript,'+encodeURIComponent(
+var reg=await navigator.serviceWorker.register('data:text/javascript,'+encodeURIComponent(`
 self.addEventListener('install',e=>{e.waitUntil(self.skipWaiting());});
 self.addEventListener('activate',e=>{e.waitUntil(self.clients.claim());});
 self.addEventListener('fetch',e=>{e.respondWith(fetch(e.request).catch(()=>new Response('Offline',{status:503})));});
-));
+`));
 swRegistration=reg;
-console.log('SW registered');
-// طلب إذن الإشعارات إذا كان مسموحاً
-if('Notification' in window && Notification.permission==='default'){
+console.log('Service Worker registered');
+if('Notification' in window && Notification.permission==='default' && !notificationPermissionAsked){
+notificationPermissionAsked=true;
 await Notification.requestPermission();
 }
-}catch(e){console.warn('SW registration error',e);}
+}catch(e){
+console.warn('SW registration error',e);
 }
 }
-
-// دالة عرض إشعار عبر Service Worker إن أمكن، أو fallback
+}
 function showNotification(title,body){
 if(swRegistration && swRegistration.showNotification){
 swRegistration.showNotification(title,{body:body,icon:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="%23f0c27a"/><text x="50" y="65" font-size="60" text-anchor="middle" fill="%231a1a1a">D</text></svg>'});
@@ -142,35 +141,31 @@ console.warn('Notification fallback failed',e);
 console.log('Notifications not available');
 }
 }
-
-// جلب البيانات من Binance
 async function fetchBinanceData(sym){
 try{
-let url='https://api.binance.com/api/v3/ticker/24hr?symbol='+sym;
-let resp=await fetch(url);
+var url='https://api.binance.com/api/v3/ticker/24hr?symbol='+sym;
+var resp=await fetch(url);
 if(!resp.ok)throw new Error('Binance 24hr error');
-let data=await resp.json();
-let price=parseFloat(data.lastPrice);
-let change=parseFloat(data.priceChangePercent);
-let volume=parseFloat(data.quoteVolume);
-let high=parseFloat(data.highPrice);
-let low=parseFloat(data.lowPrice);
-// تحديث الواجهة
+var data=await resp.json();
+var price=parseFloat(data.lastPrice);
+var change=parseFloat(data.priceChangePercent);
+var volume=parseFloat(data.quoteVolume);
+var high=parseFloat(data.highPrice);
+var low=parseFloat(data.lowPrice);
 document.getElementById('currentPrice').textContent='$'+price.toFixed(2);
-let el=document.getElementById('priceChange');
+var el=document.getElementById('priceChange');
 el.textContent=(change>=0?'+':'')+change.toFixed(2)+'%';
 el.className='change '+(change>=0?'positive':'negative');
 document.getElementById('volumeValue').textContent=(volume/1e6).toFixed(2)+'M';
-// حساب CVD
-let cvd=0;
+var cvd=0;
 if(priceHistory.length>0){
-let delta=price-lastPrice;
-let volDelta=volume0.000001;
-if(delta>0)cvd=lastCVD+volDelta0.5;
-else if(delta<0)cvd=lastCVD-volDelta0.5;
+var delta=price-lastPrice;
+var volDelta=volume*0.000001;
+if(delta>0)cvd=lastCVD+volDelta*0.5;
+else if(delta<0)cvd=lastCVD-volDelta*0.5;
 else cvd=lastCVD;
 }else{
-cvd=volume0.00001;
+cvd=volume*0.00001;
 }
 cvd=Math.round(cvd*100)/100;
 lastCVD=cvd;
@@ -180,127 +175,116 @@ priceHistory.push(price);
 if(priceHistory.length>200)priceHistory.shift();
 cvdHistory.push(cvd);
 if(cvdHistory.length>200)cvdHistory.shift();
-// تحديث مستويات العرض والطلب
-let sd='--';
+var sd='--';
 if(priceHistory.length>20){
-let max=Math.max(...priceHistory.slice(-20));
-let min=Math.min(...priceHistory.slice(-20));
-let range=max-min;
+var max=Math.max.apply(null,priceHistory.slice(-20));
+var min=Math.min.apply(null,priceHistory.slice(-20));
+var range=max-min;
 if(range>0){
-let pos=(price-min)/range;
+var pos=(price-min)/range;
 if(pos>0.7)sd='منطقة عرض (مقاومة)';
 else if(pos<0.3)sd='منطقة طلب (دعم)';
 else sd='محايد';
 }
 }
 document.getElementById('sdLevel').textContent=sd;
-// توليد إشارة جديدة إذا لم تكن هناك صفقة مفتوحة لهذا الرمز
-let hasOpen=openTrades.some(t=>t.symbol===sym && t.status==='open');
+var hasOpen=openTrades.some(function(t){return t.symbol===sym && t.status==='open';});
 if(!hasOpen){
-generateSignal(price, cvd, change, volume, high, low);
+generateSignal(price,cvd,change,volume,high,low);
 }
-// التحقق من إغلاق الصفقات المفتوحة بناءً على السعر
 checkAndCloseTrades(price);
-// عرض الصفقات المفتوحة والمغلقة
 renderTrades();
 }catch(e){
 console.warn('Binance fetch error:',e);
 showToast('خطأ في جلب البيانات: '+e.message);
 }
 }
-
-// دالة توليد الإشارة (تضيف صفقة جديدة فقط إذا لم تكن هناك صفقة مفتوحة لنفس الرمز)
-function generateSignal(price, cvd, change, volume, high, low){
-// تحقق من وجود صفقة مفتوحة لهذا الرمز
-let hasOpen=openTrades.some(t=>t.symbol===currentSymbol && t.status==='open');
+function generateSignal(price,cvd,change,volume,high,low){
+var hasOpen=openTrades.some(function(t){return t.symbol===currentSymbol && t.status==='open';});
 if(hasOpen)return;
-let side=null;
-let entry=price;
-let tp=0,sl=0;
-let analysis='';
-let now=new Date();
-let timeStr=now.toLocaleString('ar-EG',{hour12:false});
-let recent=priceHistory.slice(-30);
+var side=null;
+var entry=price;
+var tp=0,sl=0;
+var analysis='';
+var now=new Date();
+var timeStr=now.toLocaleString('ar-EG',{hour12:false});
+var recent=priceHistory.slice(-30);
 if(recent.length<10)return;
-let max=Math.max(...recent);
-let min=Math.min(...recent);
-let range=max-min;
+var max=Math.max.apply(null,recent);
+var min=Math.min.apply(null,recent);
+var range=max-min;
 if(range<0.001)return;
-let pos=(price-min)/range;
-let cvdShort=cvdHistory.slice(-5);
-let cvdLong=cvdHistory.slice(-10);
-let avgShort=0,avgLong=0;
-if(cvdShort.length>0)avgShort=cvdShort.reduce((a,b)=>a+b,0)/cvdShort.length;
-if(cvdLong.length>0)avgLong=cvdLong.reduce((a,b)=>a+b,0)/cvdLong.length;
-let cvdTrend=avgShort-avgLong;
-// شروط البيع
+var pos=(price-min)/range;
+var cvdShort=cvdHistory.slice(-5);
+var cvdLong=cvdHistory.slice(-10);
+var avgShort=0,avgLong=0;
+if(cvdShort.length>0){
+var sumShort=0;
+for(var i=0;i<cvdShort.length;i++){sumShort+=cvdShort[i];}
+avgShort=sumShort/cvdShort.length;
+}
+if(cvdLong.length>0){
+var sumLong=0;
+for(var j=0;j<cvdLong.length;j++){sumLong+=cvdLong[j];}
+avgLong=sumLong/cvdLong.length;
+}
+var cvdTrend=avgShort-avgLong;
 if(pos>0.75 && cvdTrend<0 && change<0){
 side='sell';
-tp=price-(range0.15);
-sl=price+(range0.08);
+tp=price-(range*0.15);
+sl=price+(range*0.08);
 analysis='منطقة عرض قوية (مقاومة) مع تراجع CVD ومؤشر سلبي، ضغط بيع متوقع.';
-}
-// شروط الشراء
-else if(pos<0.25 && cvdTrend>0 && change>0){
+}else if(pos<0.25 && cvdTrend>0 && change>0){
 side='buy';
-tp=price+(range0.15);
-sl=price-(range0.08);
+tp=price+(range*0.15);
+sl=price-(range*0.08);
 analysis='منطقة طلب قوية (دعم) مع ارتفاع CVD ومؤشر إيجابي، ضغط شراء متوقع.';
-}
-// إشارة إضافية
-else if(cvdTrend>0.5 && change>1.5 && pos<0.6){
+}else if(cvdTrend>0.5 && change>1.5 && pos<0.6){
 side='buy';
-tp=price+(range0.12);
-sl=price-(range0.06);
+tp=price+(range*0.12);
+sl=price-(range*0.06);
 analysis='اختراق صاعد مع CVD مرتفع، زخم شراء.';
-}
-else if(cvdTrend<-0.5 && change<-1.5 && pos>0.4){
+}else if(cvdTrend<-0.5 && change<-1.5 && pos>0.4){
 side='sell';
-tp=price-(range0.12);
-sl=price+(range0.06);
+tp=price-(range*0.12);
+sl=price+(range*0.06);
 analysis='اختراق هابط مع CVD منخفض، زخم بيع.';
 }
 if(!side)return;
-// إنشاء صفقة جديدة
-let trade={
+var trade={
 id:Date.now(),
 symbol:currentSymbol,
 side:side,
-entry:Math.round(entry100)/100,
-tp:Math.round(tp100)/100,
+entry:Math.round(entry*100)/100,
+tp:Math.round(tp*100)/100,
 sl:Math.round(sl*100)/100,
 openTime:now.toISOString(),
 timeStr:timeStr,
 analysis:analysis,
 note:'',
-status:'open', // open أو closed
+status:'open',
 closePrice:null,
 closeTime:null,
-pnl:null
+pnl:null,
+alertActive:false
 };
 openTrades.push(trade);
 showToast('🔔 صفقة '+ (side==='buy'?'شراء':'بيع') +' جديدة! رقم: '+trade.id);
-// إشعار عبر SW
 showNotification('صفقة جديدة '+trade.symbol, (side==='buy'?'شراء':'بيع')+' عند '+trade.entry);
-// تحديث الجدول
 renderTrades();
 }
-
-// التحقق من إغلاق الصفقات بناءً على السعر الحالي والوقت
 function checkAndCloseTrades(currentPrice){
-let now=new Date();
-let toClose=[];
-for(let i=0;i<openTrades.length;i++){
-let t=openTrades[i];
+var now=new Date();
+var toClose=[];
+for(var i=0;i<openTrades.length;i++){
+var t=openTrades[i];
 if(t.status!=='open')continue;
-let openTime=new Date(t.openTime);
-let minutesDiff=(now-openTime)/60000;
-// إغلاق تلقائي بعد 10 دقائق
+var openTime=new Date(t.openTime);
+var minutesDiff=(now-openTime)/60000;
 if(minutesDiff>=10){
 toClose.push(i);
 continue;
 }
-// إغلاق عند الوصول إلى TP أو SL
 if(t.side==='buy'){
 if(currentPrice>=t.tp || currentPrice<=t.sl){
 toClose.push(i);
@@ -311,38 +295,34 @@ toClose.push(i);
 }
 }
 }
-// إغلاق الصفقات المحددة (نقوم بالعكس لعدم التأثير على الفهرسة)
-for(let idx of toClose.reverse()){
-let trade=openTrades[idx];
+for(var idx=toClose.length-1;idx>=0;idx--){
+var index=toClose[idx];
+var trade=openTrades[index];
 trade.status='closed';
-trade.closePrice=Math.round(currentPrice100)/100;
+trade.closePrice=Math.round(currentPrice*100)/100;
 trade.closeTime=new Date().toISOString();
-// حساب الربح/الخسارة
 if(trade.side==='buy'){
-trade.pnl=Math.round((trade.closePrice-trade.entry)/trade.entry10000)/100;
+trade.pnl=Math.round((trade.closePrice-trade.entry)/trade.entry*10000)/100;
 }else{
 trade.pnl=Math.round((trade.entry-trade.closePrice)/trade.entry*10000)/100;
 }
-// نقل إلى المغلقة
 closedTrades.push(trade);
-openTrades.splice(idx,1);
+openTrades.splice(index,1);
 showToast('🔒 صفقة '+trade.id+' مغلقة. الربح: '+trade.pnl+'%');
 showNotification('إغلاق صفقة', 'الصفقة '+trade.id+' أغلقت بربح '+trade.pnl+'%');
 }
 }
-
-// عرض الصفقات (المفتوحة والمغلقة)
 function renderTrades(){
-// عرض المفتوحة
-let container=document.getElementById('tradesContainer');
+var container=document.getElementById('tradesContainer');
 if(!container)return;
 if(openTrades.length===0){
 container.innerHTML='<p style="color:#666;text-align:center;padding:20px;">لا توجد صفقات مفتوحة حالياً.</p>';
 }else{
-let html='<table class="trades-table"><thead><tr><th>المعرف</th><th>الاتجاه</th><th>الدخول</th><th>TP</th><th>SL</th><th>الوقت</th><th>الحالة</th></tr></thead><tbody>';
-openTrades.forEach(t=>{
-let cls=t.side;
-let sideText=t.side==='buy'?'شراء':'بيع';
+var html='<table class="trades-table"><thead><tr><th>المعرف</th><th>الاتجاه</th><th>الدخول</th><th>TP</th><th>SL</th><th>الوقت</th><th>الحالة</th></tr></thead><tbody>';
+for(var i=0;i<openTrades.length;i++){
+var t=openTrades[i];
+var cls=t.side;
+var sideText=t.side==='buy'?'شراء':'بيع';
 html+='<tr class="'+cls+'">';
 html+='<td>'+t.id+'</td>';
 html+='<td>'+sideText+'</td>';
@@ -352,79 +332,84 @@ html+='<td>'+t.sl+'</td>';
 html+='<td>'+t.timeStr+'</td>';
 html+='<td><span class="status-badge open">مفتوحة</span></td>';
 html+='</tr>';
-});
+}
 html+='</tbody></table>';
-// إضافة الكروت
 html+='<div style="margin-top:10px;">';
-openTrades.forEach(t=>{
-let cls=t.side;
-let sideText=t.side==='buy'?'🟢 شراء':'🔴 بيع';
-html+='<div class="signal-card '+cls+'">';
-html+='<div class="header"><span class="side">'+sideText+'</span><span class="time">'+t.timeStr+'</span><span class="status-badge open">مفتوحة</span></div>';
+for(var k=0;k<openTrades.length;k++){
+var tr=openTrades[k];
+var cls2=tr.side;
+var sideText2=tr.side==='buy'?'🟢 شراء':'🔴 بيع';
+html+='<div class="signal-card '+cls2+'">';
+html+='<div class="header"><span class="side">'+sideText2+'</span><span class="time">'+tr.timeStr+'</span><span class="status-badge open">مفتوحة</span></div>';
 html+='<div class="details">';
-html+='<div><div class="label">الدخول</div><div class="val">'+t.entry+'</div></div>';
-html+='<div><div class="label">هدف الربح</div><div class="val">'+t.tp+'</div></div>';
-html+='<div><div class="label">وقف الخسارة</div><div class="val">'+t.sl+'</div></div>';
+html+='<div><div class="label">الدخول</div><div class="val">'+tr.entry+'</div></div>';
+html+='<div><div class="label">هدف الربح</div><div class="val">'+tr.tp+'</div></div>';
+html+='<div><div class="label">وقف الخسارة</div><div class="val">'+tr.sl+'</div></div>';
 html+='</div>';
-html+='<div class="analysis">📝 '+t.analysis+'</div>';
+html+='<div class="analysis">📝 '+tr.analysis+'</div>';
 html+='<div class="actions">';
-html+='<button class="primary" onclick="shareTrade(\''+t.id+'\')">📤 مشاركة</button>';
-html+='<button onclick="toggleAlert(\''+t.id+'\')">🔔 '+ (t.alertActive?'إلغاء التنبيه':'تفعيل التنبيه') +'</button>';
-html+='<button onclick="closeTradeManual(\''+t.id+'\')">❌ إغلاق يدوي</button>';
+html+='<button class="primary" onclick="shareTrade(\''+tr.id+'\')">📤 مشاركة</button>';
+html+='<button onclick="toggleAlert(\''+tr.id+'\')">🔔 '+ (tr.alertActive?'إلغاء التنبيه':'تفعيل التنبيه') +'</button>';
+html+='<button onclick="closeTradeManual(\''+tr.id+'\')">❌ إغلاق يدوي</button>';
 html+='</div>';
-html+='<textarea class="note-input" placeholder="أضف ملاحظتك..." onchange="updateNote(\''+t.id+'\',this.value)">'+t.note+'</textarea>';
+html+='<textarea class="note-input" placeholder="أضف ملاحظتك..." onchange="updateNote(\''+tr.id+'\',this.value)">'+tr.note+'</textarea>';
 html+='</div>';
-});
+}
 html+='</div>';
 container.innerHTML=html;
 }
-// عرض المغلقة
-let closedContainer=document.getElementById('closedTradesContainer');
+var closedContainer=document.getElementById('closedTradesContainer');
 if(!closedContainer)return;
 if(closedTrades.length===0){
 closedContainer.innerHTML='<p style="color:#666;text-align:center;padding:10px;">لا توجد صفقات مغلقة.</p>';
 }else{
-let html='<table class="trades-table"><thead><tr><th>المعرف</th><th>الاتجاه</th><th>الدخول</th><th>الخروج</th><th>الربح%</th><th>وقت الإغلاق</th></tr></thead><tbody>';
-closedTrades.slice(-10).reverse().forEach(t=>{
-let cls=t.side;
-let sideText=t.side==='buy'?'شراء':'بيع';
-let pnlColor=t.pnl>=0?'#4caf50':'#f44336';
-html+='<tr class="closed '+cls+'">';
-html+='<td>'+t.id+'</td>';
-html+='<td>'+sideText+'</td>';
-html+='<td>'+t.entry+'</td>';
-html+='<td>'+t.closePrice+'</td>';
-html+='<td style="color:'+pnlColor+';">'+(t.pnl>=0?'+':'')+t.pnl+'%</td>';
-html+='<td>'+new Date(t.closeTime).toLocaleString('ar-EG',{hour12:false})+'</td>';
-html+='</tr>';
-});
-html+='</tbody></table>';
-closedContainer.innerHTML=html;
+var html2='<table class="trades-table"><thead><tr><th>المعرف</th><th>الاتجاه</th><th>الدخول</th><th>الخروج</th><th>الربح%</th><th>وقت الإغلاق</th></tr></thead><tbody>';
+var start=Math.max(0,closedTrades.length-10);
+for(var m=closedTrades.length-1;m>=start;m--){
+var ct=closedTrades[m];
+var cls3=ct.side;
+var sideText3=ct.side==='buy'?'شراء':'بيع';
+var pnlColor=ct.pnl>=0?'#4caf50':'#f44336';
+html2+='<tr class="closed '+cls3+'">';
+html2+='<td>'+ct.id+'</td>';
+html2+='<td>'+sideText3+'</td>';
+html2+='<td>'+ct.entry+'</td>';
+html2+='<td>'+ct.closePrice+'</td>';
+html2+='<td style="color:'+pnlColor+';">'+(ct.pnl>=0?'+':'')+ct.pnl+'%</td>';
+html2+='<td>'+new Date(ct.closeTime).toLocaleString('ar-EG',{hour12:false})+'</td>';
+html2+='</tr>';
+}
+html2+='</tbody></table>';
+closedContainer.innerHTML=html2;
 }
 }
-
-// دوال تفاعل الأزرار
 function shareTrade(id){
-let allTrades=[...openTrades,...closedTrades];
-let t=allTrades.find(x=>x.id==parseInt(id));
+var allTrades=openTrades.concat(closedTrades);
+var t=null;
+for(var i=0;i<allTrades.length;i++){
+if(allTrades[i].id==parseInt(id)){t=allTrades[i];break;}
+}
 if(!t){showToast('الصفقة غير موجودة');return;}
-let txt='صفقة '+t.symbol+'\nالاتجاه: '+(t.side==='buy'?'شراء':'بيع')+'\nالدخول: '+t.entry+'\nTP: '+t.tp+'\nSL: '+t.sl+'\nالتحليل: '+t.analysis;
+var txt='صفقة '+t.symbol+'\nالاتجاه: '+(t.side==='buy'?'شراء':'بيع')+'\nالدخول: '+t.entry+'\nTP: '+t.tp+'\nSL: '+t.sl+'\nالتحليل: '+t.analysis;
 if(t.status==='closed')txt+='\nأغلقت بسعر: '+t.closePrice+' الربح: '+t.pnl+'%';
 if(navigator.share){
-navigator.share({title:'صفقة تداول',text:txt}).catch(()=>{});
+navigator.share({title:'صفقة تداول',text:txt}).catch(function(){});
 }else{
-navigator.clipboard.writeText(txt).then(()=>{showToast('تم نسخ الصفقة للحافظة');}).catch(()=>{showToast('اضغط مع الاستمرار للنسخ');});
+navigator.clipboard.writeText(txt).then(function(){showToast('تم نسخ الصفقة للحافظة');}).catch(function(){showToast('اضغط مع الاستمرار للنسخ');});
 }
 }
 function toggleAlert(id){
-let t=openTrades.find(x=>x.id==parseInt(id));
+var t=null;
+for(var i=0;i<openTrades.length;i++){
+if(openTrades[i].id==parseInt(id)){t=openTrades[i];break;}
+}
 if(!t){showToast('الصفقة غير موجودة أو مغلقة');return;}
 t.alertActive=!t.alertActive;
 if(t.alertActive){
 if('Notification' in window && Notification.permission==='granted'){
 showToast('🔔 تم تفعيل التنبيه لهذه الصفقة');
 }else if('Notification' in window && Notification.permission==='default'){
-Notification.requestPermission().then(perm=>{
+Notification.requestPermission().then(function(perm){
 if(perm==='granted'){showToast('تم تفعيل التنبيهات');}else{showToast('الرجاء السماح بالتنبيهات');t.alertActive=false;renderTrades();}
 });
 }else{
@@ -437,32 +422,34 @@ showToast('تم إلغاء التنبيه');
 renderTrades();
 }
 function closeTradeManual(id){
-let idx=openTrades.findIndex(t=>t.id==parseInt(id));
-if(idx===-1){showToast('الصفقة غير موجودة أو مغلقة');return;}
-let trade=openTrades[idx];
+var index=-1;
+for(var i=0;i<openTrades.length;i++){
+if(openTrades[i].id==parseInt(id)){index=i;break;}
+}
+if(index===-1){showToast('الصفقة غير موجودة أو مغلقة');return;}
+var trade=openTrades[index];
 trade.status='closed';
 trade.closePrice=lastPrice || trade.entry;
 trade.closeTime=new Date().toISOString();
 if(trade.side==='buy'){
-trade.pnl=Math.round((trade.closePrice-trade.entry)/trade.entry10000)/100;
+trade.pnl=Math.round((trade.closePrice-trade.entry)/trade.entry*10000)/100;
 }else{
-trade.pnl=Math.round((trade.entry-trade.closePrice)/trade.entry10000)/100;
+trade.pnl=Math.round((trade.entry-trade.closePrice)/trade.entry*10000)/100;
 }
 closedTrades.push(trade);
-openTrades.splice(idx,1);
+openTrades.splice(index,1);
 showToast('✅ تم إغلاق الصفقة يدوياً. الربح: '+trade.pnl+'%');
 renderTrades();
 }
 function updateNote(id,val){
-let all=[...openTrades,...closedTrades];
-let t=all.find(x=>x.id==parseInt(id));
-if(t)t.note=val;
+var all=openTrades.concat(closedTrades);
+for(var i=0;i<all.length;i++){
+if(all[i].id==parseInt(id)){all[i].note=val;break;}
 }
-
-// تحميل TradingView
+}
 function loadTradingView(){
 try{
-let script=document.createElement('script');
+var script=document.createElement('script');
 script.src='https://s3.tradingview.com/tv.js';
 script.async=true;
 script.onload=function(){
@@ -471,16 +458,16 @@ new TradingView.widget({
 'autosize':true,
 'symbol':'BINANCE:'+currentSymbol,
 'interval':'5',
-timezone:'Etc/UTC',
-theme:'dark',
-style:'1',
-locale:'ar',
-toolbar_bg:'#1a1a1a',
-enable_publishing:false,
-hide_side_toolbar:false,
-allow_symbol_change:true,
-container_id:'tradingview-widget',
-studies:['Volume@tv-basicstudies']
+'timezone':'Etc/UTC',
+'theme':'dark',
+'style':'1',
+'locale':'ar',
+'toolbar_bg':'#1a1a1a',
+'enable_publishing':false,
+'hide_side_toolbar':false,
+'allow_symbol_change':true,
+'container_id':'tradingview-widget',
+'studies':['Volume@tv-basicstudies']
 });
 }else{
 document.getElementById('tradingview-widget').innerHTML='<div style="color:#888;text-align:center;padding:40px;">تعذر تحميل TradingView</div>';
@@ -496,35 +483,34 @@ document.getElementById('tradingview-widget').innerHTML='<div style="color:#888;
 }
 function changeSymbol(sym){
 currentSymbol=sym;
-document.querySelectorAll('.symbol-picker button').forEach(b=>{
-b.classList.toggle('active',b.dataset.sym===sym);
-});
-let container=document.getElementById('tradingview-widget');
+var buttons=document.querySelectorAll('.symbol-picker button');
+for(var i=0;i<buttons.length;i++){
+var btn=buttons[i];
+btn.classList.toggle('active',btn.dataset.sym===sym);
+}
+var container=document.getElementById('tradingview-widget');
 container.innerHTML='جاري تحميل الرسم البياني...';
 loadTradingView();
 fetchBinanceData(sym);
 showToast('تم التبديل إلى '+sym);
 }
-
-// تهيئة التطبيق
 async function init(){
 await registerSW();
-document.querySelectorAll('.symbol-picker button').forEach(btn=>{
-btn.addEventListener('click',function(){changeSymbol(this.dataset.sym);});
-});
+var buttons=document.querySelectorAll('.symbol-picker button');
+for(var i=0;i<buttons.length;i++){
+buttons[i].addEventListener('click',function(e){changeSymbol(this.dataset.sym);});
+}
 loadTradingView();
 fetchBinanceData(currentSymbol);
 if(intervalId)clearInterval(intervalId);
-intervalId=setInterval(()=>{fetchBinanceData(currentSymbol);},10000);
+intervalId=setInterval(function(){fetchBinanceData(currentSymbol);},10000);
 showToast('🚀 جاهز - إدارة الصفقات الذكية');
 }
-
 if(document.readyState==='loading'){
 document.addEventListener('DOMContentLoaded',init);
 }else{
 init();
 }
 </script>
-
 </body>
 </html>
