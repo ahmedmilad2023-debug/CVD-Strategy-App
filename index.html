@@ -1,290 +1,1003 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Volume-Trend OB Engine | BigBeluga</title>
-  <link rel="manifest" href="data:application/json,{}" id="manifestLink">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    /* ... (بقية الـ CSS كما هي، فقط أضف هذا في نهاية الـ CSS) ... */
-    .error-message {
-      background: #ff444422;
-      border: 1px solid #ff4444;
-      color: #ff4444;
-      padding: 10px;
-      border-radius: 8px;
-      text-align: center;
-      font-size: 0.9rem;
-      margin-bottom: 10px;
-      display: none;
-    }
-    .error-message.visible { display: block; }
-    .reconnect-btn {
-      background: #1f2937;
-      border: 1px solid #00ffcc;
-      color: #00ffcc;
-      padding: 4px 12px;
-      border-radius: 12px;
-      cursor: pointer;
-      font-size: 0.8rem;
-      margin-left: 10px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BigBeluga Trading Bot</title>
+    <link rel="manifest" href="data:application/json,{}" id="manifest">
+    <meta name="theme-color" content="#0b0e17">
+    <style>
+        /* ========== RESET & BASE ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        body {
+            background: #0b0e17;
+            color: #e0e6f0;
+            overflow-x: hidden;
+            padding: 12px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+        }
+        .app {
+            max-width: 1300px;
+            width: 100%;
+        }
+
+        /* ========== SCROLLBAR ========== */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1a1f2e;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3b4a6b;
+            border-radius: 8px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #5a6f99;
+        }
+
+        /* ========== HEADER ========== */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding: 12px 20px;
+            background: #111827;
+            border-radius: 16px;
+            border: 1px solid #1f2a3f;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.3rem;
+            background: linear-gradient(135deg, #00ffcc, #00b8ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .logo span {
+            background: #1f2a3f;
+            padding: 6px 12px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            -webkit-text-fill-color: #8ba0d2;
+            background: #1a2335;
+        }
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .header-actions button {
+            background: #1f2a3f;
+            border: none;
+            color: #b0c5e5;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .header-actions button:hover {
+            background: #2b3957;
+            color: white;
+        }
+        .badge {
+            background: #1f2a3f;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            color: #8ba0d2;
+        }
+
+        /* ========== COIN GRID ========== */
+        .coin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .coin-card {
+            background: #111827;
+            border: 1px solid #1f2a3f;
+            border-radius: 14px;
+            padding: 12px 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: center;
+            position: relative;
+        }
+        .coin-card.active {
+            border-color: #00ffcc;
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.08);
+        }
+        .coin-card .symbol {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .coin-card .price {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 4px 0 2px;
+        }
+        .coin-card .change {
+            font-size: 0.8rem;
+        }
+        .coin-card .signal-badge {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            font-size: 0.6rem;
+            padding: 2px 8px;
+            border-radius: 20px;
+            background: #1f2a3f;
+        }
+        .signal-badge.buy {
+            background: #00cc88;
+            color: #0b0e17;
+        }
+        .signal-badge.sell {
+            background: #ff4477;
+            color: #0b0e17;
+        }
+
+        /* ========== CHART ========== */
+        .chart-container {
+            background: #111827;
+            border-radius: 16px;
+            border: 1px solid #1f2a3f;
+            padding: 12px;
+            margin-bottom: 20px;
+            position: relative;
+            height: 420px;
+        }
+        .chart-container canvas {
+            width: 100% !important;
+            height: 100% !important;
+            border-radius: 8px;
+        }
+        .chart-controls {
+            display: flex;
+            gap: 12px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        .chart-controls select,
+        .chart-controls input {
+            background: #1a2335;
+            border: 1px solid #2a3a55;
+            color: #e0e6f0;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+        }
+        .chart-controls button {
+            background: #1f2a3f;
+            border: none;
+            color: #b0c5e5;
+            padding: 6px 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        .chart-controls button:hover {
+            background: #2b3957;
+            color: white;
+        }
+
+        /* ========== STATS & LOG ========== */
+        .stats-log {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        @media (max-width: 700px) {
+            .stats-log {
+                grid-template-columns: 1fr;
+            }
+        }
+        .panel {
+            background: #111827;
+            border: 1px solid #1f2a3f;
+            border-radius: 16px;
+            padding: 16px;
+        }
+        .panel h3 {
+            font-size: 0.9rem;
+            color: #8ba0d2;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #1f2a3f;
+            padding-bottom: 8px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .stat-item {
+            background: #0f1622;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .stat-item .value {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+        .stat-item .label {
+            font-size: 0.7rem;
+            color: #8ba0d2;
+        }
+        .trade-log {
+            max-height: 200px;
+            overflow-y: auto;
+            font-size: 0.8rem;
+        }
+        .trade-log .entry {
+            padding: 6px 0;
+            border-bottom: 1px solid #1a2335;
+            display: flex;
+            justify-content: space-between;
+        }
+        .trade-log .entry .side-buy {
+            color: #00cc88;
+        }
+        .trade-log .entry .side-sell {
+            color: #ff4477;
+        }
+
+        /* ========== BOTTOM BAR ========== */
+        .bottom-bar {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            background: #111827;
+            border-radius: 16px;
+            border: 1px solid #1f2a3f;
+            padding: 12px 20px;
+            margin-top: 10px;
+        }
+        .bottom-bar .status {
+            font-size: 0.8rem;
+            color: #8ba0d2;
+        }
+        .bottom-bar .status .dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+        .dot.green {
+            background: #00cc88;
+        }
+        .dot.red {
+            background: #ff4477;
+        }
+        .bottom-bar button {
+            background: #1f2a3f;
+            border: none;
+            color: #b0c5e5;
+            padding: 6px 18px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        .bottom-bar button:hover {
+            background: #2b3957;
+            color: white;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 480px) {
+            .coin-grid {
+                grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            }
+            .chart-container {
+                height: 280px;
+            }
+            .header-actions button {
+                padding: 4px 12px;
+                font-size: 0.75rem;
+            }
+        }
+    </style>
 </head>
 <body>
+    <div class="app" id="app">
+        <!-- HEADER -->
+        <header>
+            <div class="logo">
+                📊 BigBeluga
+                <span>v2.0</span>
+            </div>
+            <div class="header-actions">
+                <button onclick="toggleAutoScan()">🔍 تلقائي</button>
+                <button onclick="shareSignal()">📤 مشاركة</button>
+                <button onclick="installPWA()">📲 تثبيت</button>
+                <span class="badge" id="connectionStatus">🟢 متصل</span>
+            </div>
+        </header>
 
-<div class="app-wrapper" id="app">
-  <!-- ... (باقي الهيكل كما هو) ... -->
-  
-  <!-- أضف هذا الزر في لوحة الإعدادات أو في مكان قريب من حالة الاتصال -->
-  <div class="signal-panel">
-    <span class="text-muted">الإشارة الحالية:</span>
-    <span class="signal-badge neutral" id="signalBadge">محايد</span>
-    <span class="text-muted">|</span>
-    <span class="flex-center"><span class="status-dot offline" id="statusDot"></span> <span id="statusText">غير متصل</span>
-      <button id="manualReconnectBtn" class="reconnect-btn"><i class="fas fa-sync"></i> إعادة الاتصال</button>
-    </span>
-    <span class="text-muted">|</span>
-    <span class="flex-center"><i class="fas fa-chart-simple"></i> ADX: <strong id="adxValue">0.0</strong></span>
-    <span class="flex-center"><i class="fas fa-arrow-trend-up"></i> الاتجاه: <strong id="trendLabel">محايد</strong></span>
-  </div>
-  
-  <div id="connectionError" class="error-message">⚠️ فشل الاتصال بـ Binance. جاري محاولة إعادة الاتصال...</div>
+        <!-- COIN GRID -->
+        <div class="coin-grid" id="coinGrid"></div>
 
-  <!-- ... (باقي الهيكل) ... -->
-</div>
+        <!-- CHART -->
+        <div class="chart-container">
+            <canvas id="chartCanvas"></canvas>
+            <div class="chart-controls">
+                <select id="timeframeSelect">
+                    <option value="30">30 دقيقة</option>
+                    <option value="60">1 ساعة</option>
+                    <option value="240">4 ساعات</option>
+                    <option value="D">يوم</option>
+                </select>
+                <button onclick="loadHistorical()">📥 تحميل التاريخ</button>
+                <span style="font-size:0.75rem;color:#8ba0d2;margin-right:auto;" id="chartInfo">BTCUSDT · 30m</span>
+            </div>
+        </div>
 
-<!-- ============================================================ -->
-<!-- ===== JAVASCRIPT المُحسّن ===== -->
-<!-- ============================================================ -->
-<script src="https://unpkg.com/lightweight-charts@3.8.0/dist/lightweight-charts.standalone.production.js"></script>
-<script>
-  (function() {
-    'use strict';
+        <!-- STATS & LOG -->
+        <div class="stats-log">
+            <div class="panel">
+                <h3>📈 الإحصائيات</h3>
+                <div class="stats-grid">
+                    <div class="stat-item"><div class="value" id="totalTrades">0</div><div class="label">إجمالي الصفقات</div></div>
+                    <div class="stat-item"><div class="value" id="winRate">0%</div><div class="label">نسبة النجاح</div></div>
+                    <div class="stat-item"><div class="value" id="profitLoss">0</div><div class="label">الربح/الخسارة</div></div>
+                    <div class="stat-item"><div class="value" id="activeTrades">0</div><div class="label">صفقات مفتوحة</div></div>
+                </div>
+            </div>
+            <div class="panel">
+                <h3>📜 سجل الصفقات</h3>
+                <div class="trade-log" id="tradeLog">
+                    <div style="color:#5a6f99;text-align:center;padding:20px 0;">لا توجد صفقات بعد</div>
+                </div>
+            </div>
+        </div>
 
-    // ... (باقي المتغيرات كما هي) ...
+        <!-- BOTTOM BAR -->
+        <div class="bottom-bar">
+            <div class="status">
+                <span class="dot green" id="statusDot"></span>
+                <span id="statusText">جاري التحميل...</span>
+            </div>
+            <div>
+                <button onclick="clearTrades()">🗑️ مسح السجل</button>
+                <button onclick="exportLog()">📥 تصدير</button>
+            </div>
+        </div>
+    </div>
 
-    // دالة جديدة للتحقق من الاتصال بالإنترنت
-    function checkNetworkAndReconnect() {
-      if (!navigator.onLine) {
-        setStatus('offline', 'لا يوجد اتصال بالإنترنت');
-        return false;
-      }
-      return true;
-    }
+    <script>
+        /* =================================================================
+           BigBeluga Volume-Trend Order Block Engine (Pine Script → JS)
+           مع ADX > 25 ، إطار 30 دقيقة ، إدارة صفقات تلقائية
+           يعمل على Binance WebSocket (بيانات الشموع)
+           ================================================================= */
 
-    // تحديث دالة الاتصال (connectBinance) لتكون أكثر قوة
-    function connectBinance() {
-      if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) {
-        console.log('WebSocket already connected or connecting.');
-        return;
-      }
+        // ---------- الإعدادات ----------
+        const SYMBOLS = [
+            'BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 'XRPUSDT',
+            'ADAUSDT', 'DOGEUSDT', 'AVAXUSDT', 'DOTUSDT', 'MATICUSDT'
+        ];
+        const TIMEFRAME = '30m'; // 30 دقيقة
+        const ADX_THRESHOLD = 25;
+        const STOP_LOSS_PCT = 0.005; // 0.5%
+        const TAKE_PROFIT_PCT = 0.02; // 2%
+        const MAX_CANDLES = 300;
 
-      if (!checkNetworkAndReconnect()) return;
+        // ---------- حالة التطبيق ----------
+        let activeSymbol = 'BTCUSDT';
+        let marketData = {}; // symbol -> { candles: [{open,high,low,close,volume,time}], indicators: {...} }
+        let trades = [];
+        let activeTrade = null; // {symbol, side, entryPrice, stopLoss, takeProfit, timestamp}
+        let isAutoScan = true;
+        let ws = null;
+        let chartCtx = null;
+        let canvas = document.getElementById('chartCanvas');
 
-      const sym = symbol.toLowerCase();
-      const stream = `wss://stream.binance.com:9443/ws/${sym}@kline_${INTERVAL}`;
-      
-      try {
-        ws = new WebSocket(stream);
-      } catch (e) {
-        console.error('Failed to create WebSocket:', e);
-        setStatus('offline', 'خطأ في إنشاء الاتصال');
-        showError('فشل إنشاء اتصال WebSocket. تحقق من الشبكة.');
-        setTimeout(connectBinance, 3000);
-        return;
-      }
+        // ---------- دوال مساعدة ----------
+        function formatPrice(p) { return p.toFixed(2); }
 
-      ws.onopen = () => {
-        console.log('✅ Binance WebSocket connected');
-        isConnected = true;
-        setStatus('online', 'متصل');
-        hideError();
-        // إلغاء أي مؤقت إعادة اتصال
-        if (window.reconnectTimer) {
-          clearTimeout(window.reconnectTimer);
-          window.reconnectTimer = null;
+        function formatTime(ts) {
+            const d = new Date(ts);
+            return d.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
         }
-      };
 
-      ws.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
-          if (data.e === 'kline') {
-            const k = data.k;
-            const candle = {
-              time: k.t,
-              open: parseFloat(k.o),
-              high: parseFloat(k.h),
-              low: parseFloat(k.l),
-              close: parseFloat(k.c),
-              volume: parseFloat(k.v)
-            };
-            if (k.x) {
-              processNewCandle(candle);
+        // ---------- ADX حساب ----------
+        function calcADX(candles, period = 14) {
+            if (candles.length < period + 2) return 0;
+            let tr = [], plusDM = [], minusDM = [];
+            for (let i = 1; i < candles.length; i++) {
+                const h = candles[i].high,
+                    l = candles[i].low,
+                    pc = candles[i - 1].close;
+                tr.push(Math.max(h - l, Math.abs(h - pc), Math.abs(l - pc)));
+                const up = h - candles[i - 1].high;
+                const down = candles[i - 1].low - l;
+                plusDM.push(up > down && up > 0 ? up : 0);
+                minusDM.push(down > up && down > 0 ? down : 0);
             }
-          }
-        } catch (e) {
-          console.error('WS message error:', e);
+            // smooth
+            let atr = tr.slice(0, period).reduce((a, b) => a + b, 0) / period;
+            let pdi = plusDM.slice(0, period).reduce((a, b) => a + b, 0) / period;
+            let mdi = minusDM.slice(0, period).reduce((a, b) => a + b, 0) / period;
+            for (let i = period; i < tr.length; i++) {
+                atr = (atr * (period - 1) + tr[i]) / period;
+                pdi = (pdi * (period - 1) + plusDM[i]) / period;
+                mdi = (mdi * (period - 1) + minusDM[i]) / period;
+            }
+            const dx = (pdi + mdi === 0) ? 0 : Math.abs(pdi - mdi) / (pdi + mdi) * 100;
+            let adx = dx;
+            // smooth ADX
+            for (let i = period + 1; i < tr.length; i++) {
+                const dx2 = (pdi + mdi === 0) ? 0 : Math.abs(pdi - mdi) / (pdi + mdi) * 100;
+                adx = (adx * (period - 1) + dx2) / period;
+                // update pdi,mdi for next
+                const idx = i;
+                if (idx < plusDM.length) {
+                    pdi = (pdi * (period - 1) + plusDM[idx]) / period;
+                    mdi = (mdi * (period - 1) + minusDM[idx]) / period;
+                }
+            }
+            return adx;
         }
-      };
 
-      ws.onerror = (err) => {
-        console.error('❌ WebSocket error:', err);
-        // لا نقوم بقطع الاتصال هنا، نتركه للـ onclose
-      };
-
-      ws.onclose = (event) => {
-        isConnected = false;
-        setStatus('offline', 'غير متصل');
-        console.warn(`WebSocket closed (code: ${event.code}). Reconnecting in 3s...`);
-        
-        // إذا كان الإغلاق طبيعياً (1000) فلا داعي لإعادة الاتصال الفوري
-        // ولكن إذا كان خطأ (مثل 1006) نعيد المحاولة
-        if (event.code !== 1000) {
-          showError('انقطع الاتصال بـ Binance. جاري إعادة المحاولة...');
-          if (window.reconnectTimer) clearTimeout(window.reconnectTimer);
-          window.reconnectTimer = setTimeout(connectBinance, 3000);
-        } else {
-          hideError();
+        // ---------- SuperTrend (مبسط) ----------
+        function calcSuperTrend(candles, period = 50, multiplier = 3.5) {
+            if (candles.length < period + 1) return { trend: 1, stop: 0 };
+            const atr = candles.slice(-period).reduce((s, c) => s + (c.high - c.low), 0) / period;
+            const hl2 = candles[candles.length - 1].high + candles[candles.length - 1].low / 2;
+            const upper = hl2 + multiplier * atr;
+            const lower = hl2 - multiplier * atr;
+            let trend = 1; // 1 = buy, -1 = sell
+            let stop = lower;
+            for (let i = candles.length - 1; i >= 1; i--) {
+                const prev = candles[i - 1];
+                const cur = candles[i];
+                if (trend === 1) {
+                    stop = Math.max(lower, stop);
+                    if (cur.close < stop) { trend = -1;
+                        stop = upper; }
+                } else {
+                    stop = Math.min(upper, stop);
+                    if (cur.close > stop) { trend = 1;
+                        stop = lower; }
+                }
+            }
+            return { trend, stop };
         }
-      };
-    }
 
-    // دوال مساعدة للواجهة
-    function setStatus(type, text) {
-      const dot = document.getElementById('statusDot');
-      const txt = document.getElementById('statusText');
-      const chartDot = document.getElementById('chartStatusDot');
-      const chartTxt = document.getElementById('chartStatusText');
-      
-      if (type === 'online') {
-        dot.className = 'status-dot online';
-        chartDot.className = 'status-dot online';
-        txt.textContent = text;
-        chartTxt.textContent = 'متصل';
-      } else {
-        dot.className = 'status-dot offline';
-        chartDot.className = 'status-dot offline';
-        txt.textContent = text;
-        chartTxt.textContent = 'غير متصل';
-      }
-    }
-
-    function showError(msg) {
-      const el = document.getElementById('connectionError');
-      el.textContent = '⚠️ ' + msg;
-      el.classList.add('visible');
-    }
-
-    function hideError() {
-      document.getElementById('connectionError').classList.remove('visible');
-    }
-
-    // دالة تحميل البيانات التاريخية (تم تحسينها للتعامل مع الأخطاء)
-    async function loadHistoricalData() {
-      const sym = symbol;
-      const limit = 300;
-      const url = `https://api.binance.com/api/v3/klines?symbol=${sym}&interval=${INTERVAL}&limit=${limit}`;
-      try {
-        setStatus('offline', 'جاري تحميل البيانات...');
-        const resp = await fetch(url);
-        if (!resp.ok) throw new Error(`HTTP error! status: ${resp.status}`);
-        const data = await resp.json();
-        candles = data.map(item => ({
-          time: item[0],
-          open: parseFloat(item[1]),
-          high: parseFloat(item[2]),
-          low: parseFloat(item[3]),
-          close: parseFloat(item[4]),
-          volume: parseFloat(item[5])
-        }));
-        let indData = computeIndicators(candles);
-        if (indData) {
-          updateChart(candles, indData);
-          hideError();
+        // ---------- Order Block (مبسط) ----------
+        function findOrderBlock(candles, pivotLen = 7) {
+            if (candles.length < pivotLen * 2 + 1) return null;
+            const idx = candles.length - 1;
+            const pivotLow = candles[idx - pivotLen].low;
+            const pivotHigh = candles[idx - pivotLen].high;
+            const isLow = true; // نبسط: نكتشف القيعان والقمم ببساطة
+            // في الكود الأصلي يتم التحقق من pivot
+            // سنكتفي بإرجاع OB بسيط بناءً على آخر شمعة
+            const last = candles[candles.length - 1];
+            const prev = candles[candles.length - 2];
+            const ob = {
+                top: Math.max(last.open, last.close),
+                bottom: Math.min(last.open, last.close) - (last.high - last.low) * 0.5,
+                trend: last.close > prev.close ? 1 : -1
+            };
+            return ob;
         }
-        console.log('✅ Historical data loaded:', candles.length);
-        return true;
-      } catch (e) {
-        console.error('❌ Failed to load historical data:', e);
-        showError('فشل تحميل البيانات التاريخية. تأكد من اتصال الشبكة.');
-        setStatus('offline', 'خطأ في التحميل');
-        return false;
-      }
-    }
 
-    // دالة التهيئة (تم تحسين الترتيب)
-    async function init() {
-      loadSettings();
-      initChart();
-
-      // محاولة تحميل البيانات التاريخية أولاً
-      const histLoaded = await loadHistoricalData();
-      
-      // ثم الاتصال بـ WebSocket
-      if (histLoaded) {
-        connectBinance();
-      } else {
-        // إذا فشل التحميل، نحاول مرة أخرى بعد 5 ثوانٍ
-        setTimeout(() => {
-          loadHistoricalData().then(() => connectBinance());
-        }, 5000);
-      }
-
-      // ربط زر إعادة الاتصال اليدوي
-      document.getElementById('manualReconnectBtn').addEventListener('click', () => {
-        if (ws) {
-          ws.close(1000, 'Manual reconnect');
-          ws = null;
+        // ---------- إشارة الاستراتيجية ----------
+        function generateSignal(symbol, candles) {
+            if (candles.length < 60) return null;
+            const adx = calcADX(candles);
+            if (adx < ADX_THRESHOLD) return null;
+            const st = calcSuperTrend(candles);
+            const ob = findOrderBlock(candles);
+            if (!ob) return null;
+            const last = candles[candles.length - 1];
+            const prev = candles[candles.length - 2];
+            // شرط الشراء: الاتجاه صاعد + اختراق OB العلوي
+            let signal = null;
+            if (st.trend === 1 && last.close > ob.top && prev.close <= ob.top) {
+                signal = { side: 'buy', price: last.close, timestamp: last.time };
+            }
+            // شرط البيع: الاتجاه هابط + كسر OB السفلي
+            if (st.trend === -1 && last.close < ob.bottom && prev.close >= ob.bottom) {
+                signal = { side: 'sell', price: last.close, timestamp: last.time };
+            }
+            return signal;
         }
-        if (window.reconnectTimer) {
-          clearTimeout(window.reconnectTimer);
-          window.reconnectTimer = null;
+
+        // ---------- إدارة الصفقات ----------
+        function manageTrade(symbol, candles, signal) {
+            if (!signal) return;
+            const price = signal.price;
+            const side = signal.side;
+            // إذا كانت هناك صفقة مفتوحة، نتحقق من تغير الاتجاه
+            if (activeTrade) {
+                const st = calcSuperTrend(candles);
+                if ((activeTrade.side === 'buy' && st.trend === -1) ||
+                    (activeTrade.side === 'sell' && st.trend === 1)) {
+                    // إغلاق الصفقة بخسارة أو ربح حسب السعر الحالي
+                    const closePrice = candles[candles.length - 1].close;
+                    const pnl = (activeTrade.side === 'buy') ? (closePrice - activeTrade.entryPrice) / activeTrade.entryPrice :
+                        (activeTrade.entryPrice - closePrice) / activeTrade.entryPrice;
+                    trades.push({
+                        symbol: activeTrade.symbol,
+                        side: activeTrade.side,
+                        entry: activeTrade.entryPrice,
+                        exit: closePrice,
+                        pnl: pnl,
+                        timestamp: Date.now()
+                    });
+                    activeTrade = null;
+                    updateUI();
+                }
+                // التحقق من وقف الخسارة / الهدف
+                if (activeTrade) {
+                    const current = candles[candles.length - 1].close;
+                    const sl = activeTrade.stopLoss;
+                    const tp = activeTrade.takeProfit;
+                    let closed = false;
+                    if (activeTrade.side === 'buy') {
+                        if (current <= sl) { // وقف خسارة
+                            trades.push({ symbol, side: 'buy', entry: activeTrade.entryPrice, exit: current, pnl: -STOP_LOSS_PCT,
+                                timestamp: Date.now() });
+                            closed = true;
+                        } else if (current >= tp) { // هدف
+                            trades.push({ symbol, side: 'buy', entry: activeTrade.entryPrice, exit: current, pnl: TAKE_PROFIT_PCT,
+                                timestamp: Date.now() });
+                            closed = true;
+                        }
+                    } else { // sell
+                        if (current >= sl) {
+                            trades.push({ symbol, side: 'sell', entry: activeTrade.entryPrice, exit: current, pnl: -STOP_LOSS_PCT,
+                                timestamp: Date.now() });
+                            closed = true;
+                        } else if (current <= tp) {
+                            trades.push({ symbol, side: 'sell', entry: activeTrade.entryPrice, exit: current, pnl: TAKE_PROFIT_PCT,
+                                timestamp: Date.now() });
+                            closed = true;
+                        }
+                    }
+                    if (closed) {
+                        activeTrade = null;
+                        updateUI();
+                    }
+                }
+            } else {
+                // فتح صفقة جديدة
+                const entryPrice = price;
+                const sl = side === 'buy' ? entryPrice * (1 - STOP_LOSS_PCT) : entryPrice * (1 + STOP_LOSS_PCT);
+                const tp = side === 'buy' ? entryPrice * (1 + TAKE_PROFIT_PCT) : entryPrice * (1 - TAKE_PROFIT_PCT);
+                activeTrade = { symbol, side, entryPrice, stopLoss: sl, takeProfit: tp, timestamp: Date.now() };
+                // إرسال إشارة تيليجرام (محاكاة)
+                sendTelegramAlert(symbol, side, entryPrice);
+                updateUI();
+            }
         }
-        hideError();
-        setStatus('offline', 'جاري إعادة الاتصال...');
-        loadHistoricalData().then(() => connectBinance());
-      });
 
-      // مراقبة تغيير حالة الشبكة (عند عودة الإنترنت)
-      window.addEventListener('online', () => {
-        console.log('Network is back online. Reconnecting...');
-        hideError();
-        if (ws) ws.close(1000, 'Network online');
-        setTimeout(() => connectBinance(), 1000);
-      });
-
-      // ... (باقي أحداث الإعدادات والمشاركة كما هي) ...
-      
-      // حفظ الإعدادات وتحديث الرمز
-      const saveDebounced = () => {
-        saveSettings();
-        if (ws) {
-          ws.close(1000, 'Settings changed');
-          ws = null;
+        // ---------- محاكاة تيليجرام ----------
+        function sendTelegramAlert(symbol, side, price) {
+            const msg = `🚨 إشارة ${side === 'buy' ? 'شراء' : 'بيع'} على ${symbol}\nالسعر: ${formatPrice(price)}\nالوقت: ${new Date().toLocaleString('ar-EG')}`;
+            // نعرض في السجل
+            const log = document.getElementById('tradeLog');
+            const entry = document.createElement('div');
+            entry.className = 'entry';
+            entry.innerHTML =
+                `<span>📨 ${msg}</span><span class="${side === 'buy' ? 'side-buy' : 'side-sell'}">${side === 'buy' ? '🟢' : '🔴'}</span>`;
+            log.prepend(entry);
+            // محاكاة مشاركة عبر واتساب/تليجرام (فتح رابط)
+            // يمكن للمستخدم الضغط على زر المشاركة
         }
-        if (window.reconnectTimer) {
-          clearTimeout(window.reconnectTimer);
-          window.reconnectTimer = null;
+
+        // ---------- WebSocket Binance ----------
+        function connectWebSocket() {
+            if (ws) ws.close();
+            const streams = SYMBOLS.map(s => `${s.toLowerCase()}@kline_${TIMEFRAME}`).join('/');
+            const url = `wss://stream.binance.com:9443/ws/${streams}`;
+            ws = new WebSocket(url);
+            ws.onopen = () => {
+                document.getElementById('connectionStatus').innerHTML = '🟢 متصل';
+                document.getElementById('statusText').textContent = 'متصل بـ Binance';
+                document.getElementById('statusDot').className = 'dot green';
+            };
+            ws.onmessage = (e) => {
+                const data = JSON.parse(e.data);
+                if (data.e === 'kline') {
+                    const sym = data.s;
+                    const k = data.k;
+                    const candle = {
+                        time: k.t,
+                        open: parseFloat(k.o),
+                        high: parseFloat(k.h),
+                        low: parseFloat(k.l),
+                        close: parseFloat(k.c),
+                        volume: parseFloat(k.v)
+                    };
+                    if (!marketData[sym]) {
+                        marketData[sym] = { candles: [] };
+                    }
+                    // إذا كانت شمعة جديدة
+                    if (k.x) {
+                        // أضف الشمعة الجديدة
+                        marketData[sym].candles.push(candle);
+                        if (marketData[sym].candles.length > MAX_CANDLES) {
+                            marketData[sym].candles.shift();
+                        }
+                        // عند وصول شمعة جديدة ننفذ الاستراتيجية
+                        if (sym === activeSymbol) {
+                            processNewCandle(sym);
+                            drawChart(sym);
+                        }
+                        // تحديث بطاقة العملة
+                        updateCoinCard(sym);
+                        // إذا كان المسح التلقائي مفعل، نبحث عن إشارات لجميع العملات
+                        if (isAutoScan) {
+                            scanAllSymbols();
+                        }
+                    } else {
+                        // تحديث الشمعة الحالية (لم تنته بعد)
+                        const arr = marketData[sym].candles;
+                        if (arr.length > 0) {
+                            arr[arr.length - 1] = candle;
+                        } else {
+                            arr.push(candle);
+                        }
+                        if (sym === activeSymbol) {
+                            drawChart(sym);
+                        }
+                    }
+                }
+            };
+            ws.onerror = (err) => {
+                console.error('WebSocket error', err);
+                document.getElementById('connectionStatus').innerHTML = '🔴 خطأ';
+                document.getElementById('statusDot').className = 'dot red';
+            };
+            ws.onclose = () => {
+                document.getElementById('connectionStatus').innerHTML = '🔴 غير متصل';
+                document.getElementById('statusDot').className = 'dot red';
+                setTimeout(connectWebSocket, 5000);
+            };
         }
-        loadHistoricalData().then(() => connectBinance());
-      };
-      
-      // ... (باقي الكود) ...
-      updateUI();
-    }
 
-    // ... (باقي الكود) ...
-    // بدء التطبيق
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', init);
-    } else {
-      init();
-    }
+        // ---------- معالجة شمعة جديدة للعملة النشطة ----------
+        function processNewCandle(symbol) {
+            const data = marketData[symbol];
+            if (!data || data.candles.length < 30) return;
+            const candles = data.candles;
+            const signal = generateSignal(symbol, candles);
+            if (signal) {
+                manageTrade(symbol, candles, signal);
+                updateUI();
+            }
+            // تحديث مؤشرات أخرى
+        }
 
-  })();
-</script>
+        // ---------- مسح تلقائي لجميع العملات ----------
+        function scanAllSymbols() {
+            for (const sym of SYMBOLS) {
+                const data = marketData[sym];
+                if (!data || data.candles.length < 30) continue;
+                const signal = generateSignal(sym, data.candles);
+                if (signal) {
+                    // إذا لم تكن هناك صفقة مفتوحة على هذه العملة، نفتحها
+                    // لكننا نكتفي بالعملة النشطة حاليًا لتجنب التعقيد
+                    if (sym === activeSymbol) {
+                        manageTrade(sym, data.candles, signal);
+                    }
+                    // نعرض إشارة على البطاقة
+                    const card = document.querySelector(`.coin-card[data-symbol="${sym}"]`);
+                    if (card) {
+                        const badge = card.querySelector('.signal-badge');
+                        badge.textContent = signal.side === 'buy' ? 'شراء' : 'بيع';
+                        badge.className = `signal-badge ${signal.side === 'buy' ? 'buy' : 'sell'}`;
+                    }
+                }
+            }
+        }
+
+        // ---------- رسم الشموع ----------
+        function drawChart(symbol) {
+            const data = marketData[symbol];
+            if (!data || data.candles.length < 2) return;
+            const candles = data.candles;
+            const canvas = document.getElementById('chartCanvas');
+            const ctx = canvas.getContext('2d');
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width - 24;
+            canvas.height = rect.height - 24;
+            const w = canvas.width,
+                h = canvas.height;
+            ctx.clearRect(0, 0, w, h);
+
+            // تحديد النطاق
+            const high = Math.max(...candles.map(c => c.high)) * 1.02;
+            const low = Math.min(...candles.map(c => c.low)) * 0.98;
+            const range = high - low || 1;
+            const padding = 10;
+            const chartHeight = h - 2 * padding;
+            const chartWidth = w - 2 * padding;
+            const candleWidth = chartWidth / candles.length;
+
+            // رسم الخلفية
+            ctx.fillStyle = '#0f1622';
+            ctx.fillRect(0, 0, w, h);
+
+            // رسم الشبكة
+            ctx.strokeStyle = '#1a2335';
+            ctx.lineWidth = 0.5;
+            for (let i = 0; i <= 4; i++) {
+                const y = padding + (chartHeight * i) / 4;
+                ctx.beginPath();
+                ctx.moveTo(padding, y);
+                ctx.lineTo(w - padding, y);
+                ctx.stroke();
+            }
+
+            // رسم الشموع
+            for (let i = 0; i < candles.length; i++) {
+                const c = candles[i];
+                const x = padding + i * candleWidth;
+                const yHigh = padding + (high - c.high) / range * chartHeight;
+                const yLow = padding + (high - c.low) / range * chartHeight;
+                const yOpen = padding + (high - c.open) / range * chartHeight;
+                const yClose = padding + (high - c.close) / range * chartHeight;
+                const isBull = c.close >= c.open;
+                ctx.fillStyle = isBull ? '#00cc88' : '#ff4477';
+                ctx.strokeStyle = isBull ? '#00cc88' : '#ff4477';
+                ctx.lineWidth = 1;
+                // الفتيل
+                ctx.beginPath();
+                ctx.moveTo(x + candleWidth / 2, yHigh);
+                ctx.lineTo(x + candleWidth / 2, yLow);
+                ctx.stroke();
+                // جسم الشمعة
+                const top = Math.min(yOpen, yClose);
+                const bottom = Math.max(yOpen, yClose);
+                const bodyHeight = Math.max(bottom - top, 1);
+                ctx.fillRect(x + 1, top, candleWidth - 2, bodyHeight);
+            }
+
+            // رسم المؤشرات (SuperTrend, Order Block) - مبسط
+            // نرسم خط Trend
+            const st = calcSuperTrend(candles);
+            if (st.stop > 0) {
+                const yStop = padding + (high - st.stop) / range * chartHeight;
+                ctx.strokeStyle = st.trend === 1 ? '#00ffcc' : '#ff007f';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(padding, yStop);
+                ctx.lineTo(w - padding, yStop);
+                ctx.stroke();
+            }
+
+            // تحديث معلومات الشارت
+            document.getElementById('chartInfo').textContent = `${symbol} · ${TIMEFRAME}`;
+        }
+
+        // ---------- تحديث بطاقة العملة ----------
+        function updateCoinCard(symbol) {
+            const data = marketData[symbol];
+            if (!data || data.candles.length === 0) return;
+            const last = data.candles[data.candles.length - 1];
+            const prev = data.candles.length > 1 ? data.candles[data.candles.length - 2] : last;
+            const change = ((last.close - prev.close) / prev.close * 100);
+            const card = document.querySelector(`.coin-card[data-symbol="${symbol}"]`);
+            if (card) {
+                card.querySelector('.price').textContent = formatPrice(last.close);
+                const changeEl = card.querySelector('.change');
+                changeEl.textContent = `${change > 0 ? '+' : ''}${change.toFixed(2)}%`;
+                changeEl.style.color = change >= 0 ? '#00cc88' : '#ff4477';
+            }
+        }
+
+        // ---------- بناء واجهة العملات ----------
+        function buildCoinGrid() {
+            const grid = document.getElementById('coinGrid');
+            grid.innerHTML = '';
+            SYMBOLS.forEach(sym => {
+                const card = document.createElement('div');
+                card.className = 'coin-card' + (sym === activeSymbol ? ' active' : '');
+                card.dataset.symbol = sym;
+                card.innerHTML = `
+                    <div class="symbol">${sym}</div>
+                    <div class="price">---</div>
+                    <div class="change">0.00%</div>
+                    <div class="signal-badge">-</div>
+                `;
+                card.addEventListener('click', () => {
+                    activeSymbol = sym;
+                    document.querySelectorAll('.coin-card').forEach(c => c.classList.remove('active'));
+                    card.classList.add('active');
+                    drawChart(sym);
+                    // تحميل تاريخ إذا لم يوجد
+                    if (!marketData[sym] || marketData[sym].candles.length < 30) {
+                        loadHistorical(sym);
+                    }
+                });
+                grid.appendChild(card);
+            });
+        }
+
+        // ---------- تحميل البيانات التاريخية (REST) ----------
+        async function loadHistorical(symbol = activeSymbol) {
+            const limit = 200;
+            const url =
+                `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${TIMEFRAME}&limit=${limit}`;
+            try {
+                const resp = await fetch(url);
+                const data = await resp.json();
+                const candles = data.map(k => ({
+                    time: k[0],
+                    open: parseFloat(k[1]),
+                    high: parseFloat(k[2]),
+                    low: parseFloat(k[3]),
+                    close: parseFloat(k[4]),
+                    volume: parseFloat(k[5])
+                }));
+                if (!marketData[symbol]) marketData[symbol] = { candles: [] };
+                marketData[symbol].candles = candles;
+                drawChart(symbol);
+                updateCoinCard(symbol);
+                document.getElementById('statusText').textContent = `تم تحميل ${candles.length} شمعة لـ ${symbol}`;
+            } catch (err) {
+                console.error('فشل تحميل التاريخ', err);
+            }
+        }
+
+        // ---------- تحديث واجهة الإحصائيات ----------
+        function updateUI() {
+            // إحصائيات
+            const total = trades.length + (activeTrade ? 1 : 0);
+            document.getElementById('totalTrades').textContent = total;
+            const wins = trades.filter(t => t.pnl > 0).length;
+            const winRate = trades.length > 0 ? (wins / trades.length * 100) : 0;
+            document.getElementById('winRate').textContent = winRate.toFixed(1) + '%';
+            const pnl = trades.reduce((s, t) => s + t.pnl, 0) * 100;
+            document.getElementById('profitLoss').textContent = pnl.toFixed(2) + '%';
+            document.getElementById('activeTrades').textContent = activeTrade ? 1 : 0;
+
+            // سجل الصفقات
+            const log = document.getElementById('tradeLog');
+            if (trades.length === 0 && !activeTrade) {
+                log.innerHTML = '<div style="color:#5a6f99;text-align:center;padding:20px 0;">لا توجد صفقات بعد</div>';
+                return;
+            }
+            log.innerHTML = '';
+            // نعرض آخر 20 صفقة
+            const all = [...trades];
+            if (activeTrade) {
+                all.push({ symbol: activeTrade.symbol, side: activeTrade.side, entry: activeTrade.entryPrice, exit: 'مفتوحة',
+                    pnl: 'جاري', timestamp: Date.now() });
+            }
+            all.slice(-20).reverse().forEach(t => {
+                const div = document.createElement('div');
+                div.className = 'entry';
+                const sideClass = t.side === 'buy' ? 'side-buy' : 'side-sell';
+                const pnlStr = typeof t.pnl === 'number' ? (t.pnl * 100).toFixed(2) + '%' : t.pnl;
+                div.innerHTML = `
+                    <span>${t.symbol} ${t.side === 'buy' ? '🟢 شراء' : '🔴 بيع'} @ ${formatPrice(t.entry)}</span>
+                    <span class="${sideClass}">${pnlStr}</span>
+                `;
+                log.appendChild(div);
+            });
+        }
+
+        // ---------- أزرار التحكم ----------
+        function toggleAutoScan() {
+            isAutoScan = !isAutoScan;
+            document.querySelector('.header-actions button:first-child').textContent = isAutoScan ? '🔍 تلقائي' : '🔍 يدوي';
+        }
+
+        function shareSignal() {
+            if (!activeTrade) {
+                alert('لا توجد إشارة حالية للمشاركة.');
+                return;
+            }
+            const msg =
+                `🚀 إشارة ${activeTrade.side === 'buy' ? 'شراء' : 'بيع'} على ${activeTrade.symbol}\nالسعر: ${formatPrice(activeTrade.entryPrice)}\nالهدف: ${formatPrice(activeTrade.takeProfit)} | وقف: ${formatPrice(activeTrade.stopLoss)}`;
+            if (navigator.share) {
+                navigator.share({ title: 'BigBeluga Signal', text: msg });
+            } else {
+                // نسخ إلى الحافظة
+                navigator.clipboard.writeText(msg).then(() => alert('تم نسخ الإشارة!'));
+            }
+        }
+
+        function clearTrades() {
+            trades = [];
+            activeTrade = null;
+            updateUI();
+        }
+
+        function exportLog() {
+            const data = trades.map(t => `${t.symbol},${t.side},${t.entry},${t.exit},${t.pnl},${new Date(t.timestamp).toISOString()}`)
+                .join('\n');
+            const blob = new Blob([data], { type: 'text/csv' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'trades.csv';
+            a.click();
+        }
+
+        // ---------- PWA التثبيت ----------
+        let deferredPrompt = null;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+        });
+
+        function installPWA() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then(choice => {
+                    if (choice.outcome === 'accepted') {
+                        console.log('تم التثبيت');
+                    }
+                    deferredPrompt = null;
+                });
+            } else {
+                alert('يمكنك تثبيت التطبيق من متصفحك عبر "إضافة إلى الشاشة الرئيسية"');
+            }
+        }
+
+        // ---------- Service Worker للتثبيت ----------
+        function registerSW() {
+            if ('serviceWorker' in navigator) {
+                const swCode = `
+                    self.addEventListener('install', e => self.skipWaiting());
+                    self.addEventListener('activate', e => e.waitUntil(clients.claim()));
+                    self.addEventListener('fetch', e => e.respondWith(fetch(e.request)));
+                `;
+                const blob = new Blob([swCode], { type: 'application/javascript' });
+                const swURL = URL.createObjectURL(blob);
+                navigator.serviceWorker.register(swURL).then(() => console.log('SW مسجل'));
+            }
+        }
+
+        // ---------- تهيئة التطبيق ----------
+        function init() {
+            buildCoinGrid();
+            registerSW();
+            // تحميل تاريخ أول عملة
+            loadHistorical(activeSymbol);
+            // اتصال WebSocket
+            connectWebSocket();
+            // تحديث دوري للإحصائيات
+            setInterval(updateUI, 10000);
+            // ضبط حجم الشارت عند تغيير النافذة
+            window.addEventListener('resize', () => drawChart(activeSymbol));
+            // إذا لم توجد بيانات بعد 5 ثوانٍ، حاول مرة أخرى
+            setTimeout(() => {
+                if (!marketData[activeSymbol] || marketData[activeSymbol].candles.length < 10) {
+                    loadHistorical(activeSymbol);
+                }
+            }, 5000);
+        }
+
+        // بدء التشغيل
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
 </body>
-</html>
+  </html>
