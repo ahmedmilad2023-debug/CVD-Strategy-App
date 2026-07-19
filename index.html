@@ -7,1135 +7,105 @@
   <link rel="manifest" href="data:application/json,{}" id="manifestLink">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
-    /* ===== RESET & BASE ===== */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #0b0e14;
-      color: #e0e0e0;
-      padding: 12px;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-    a {
-      color: #00ffcc;
-      text-decoration: none;
-    }
-    ::-webkit-scrollbar {
-      width: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #1a1f2a;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #00ffcc;
+    /* ... (بقية الـ CSS كما هي، فقط أضف هذا في نهاية الـ CSS) ... */
+    .error-message {
+      background: #ff444422;
+      border: 1px solid #ff4444;
+      color: #ff4444;
+      padding: 10px;
       border-radius: 8px;
-    }
-
-    /* ===== LAYOUT ===== */
-    .app-wrapper {
-      max-width: 1200px;
-      margin: 0 auto;
-      width: 100%;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    /* ===== HEADER ===== */
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 12px;
-      background: #141a24;
-      padding: 12px 20px;
-      border-radius: 16px;
-      border: 1px solid #2a3440;
-    }
-    .header h1 {
-      font-size: 1.2rem;
-      font-weight: 600;
-      background: linear-gradient(135deg, #00ffcc, #00b8ff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .header h1 i {
-      font-size: 1.4rem;
-    }
-    .header-controls {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-    .header-controls button,
-    .header-controls .btn {
-      background: #1f2937;
-      border: none;
-      color: #b0c4de;
-      padding: 8px 16px;
-      border-radius: 30px;
-      font-size: 0.85rem;
-      cursor: pointer;
-      transition: 0.3s;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      border: 1px solid #2d3a4a;
-    }
-    .header-controls button:hover,
-    .header-controls .btn:hover {
-      background: #2d3a4a;
-      color: #fff;
-      border-color: #00ffcc;
-    }
-    .header-controls .btn-primary {
-      background: #00ffcc;
-      color: #0b0e14;
-      border-color: #00ffcc;
-    }
-    .header-controls .btn-primary:hover {
-      background: #00e6b8;
-    }
-
-    /* ===== SETTINGS PANEL ===== */
-    .settings-panel {
-      background: #141a24;
-      border: 1px solid #2a3440;
-      border-radius: 16px;
-      padding: 16px 20px;
-      display: none;
-      flex-wrap: wrap;
-      gap: 16px 24px;
-      transition: 0.3s;
-    }
-    .settings-panel.open {
-      display: flex;
-    }
-    .settings-group {
-      flex: 1 1 180px;
-      min-width: 150px;
-    }
-    .settings-group label {
-      display: block;
-      font-size: 0.75rem;
-      color: #8899aa;
-      margin-bottom: 4px;
-      font-weight: 500;
-    }
-    .settings-group input,
-    .settings-group select {
-      width: 100%;
-      background: #1a1f2a;
-      border: 1px solid #2d3a4a;
-      color: #e0e0e0;
-      padding: 8px 10px;
-      border-radius: 8px;
+      text-align: center;
       font-size: 0.9rem;
-      outline: none;
-      transition: 0.3s;
-    }
-    .settings-group input:focus,
-    .settings-group select:focus {
-      border-color: #00ffcc;
-    }
-    .settings-group input[type="color"] {
-      height: 40px;
-      padding: 4px;
-      cursor: pointer;
-    }
-
-    /* ===== CHART ===== */
-    .chart-container {
-      background: #0f141c;
-      border-radius: 16px;
-      border: 1px solid #2a3440;
-      overflow: hidden;
-      position: relative;
-      height: 480px;
-      min-height: 300px;
-    }
-    #chart {
-      width: 100%;
-      height: 100%;
-    }
-    .chart-status {
-      position: absolute;
-      top: 12px;
-      right: 16px;
-      background: #141a24cc;
-      padding: 6px 14px;
-      border-radius: 30px;
-      font-size: 0.75rem;
-      backdrop-filter: blur(4px);
-      border: 1px solid #2a3440;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      pointer-events: none;
-    }
-    .status-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      display: inline-block;
-    }
-    .status-dot.online {
-      background: #00ffcc;
-      box-shadow: 0 0 8px #00ffcc88;
-    }
-    .status-dot.offline {
-      background: #ff4444;
-    }
-
-    /* ===== STATS & TRADE LOG ===== */
-    .dashboard {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-    @media (max-width: 700px) {
-      .dashboard {
-        grid-template-columns: 1fr;
-      }
-    }
-    .card {
-      background: #141a24;
-      border: 1px solid #2a3440;
-      border-radius: 16px;
-      padding: 16px 18px;
-    }
-    .card-title {
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: #8899aa;
       margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-      gap: 12px;
-    }
-    .stat-item {
-      background: #1a1f2a;
-      padding: 10px 12px;
-      border-radius: 10px;
-      text-align: center;
-    }
-    .stat-item .label {
-      font-size: 0.7rem;
-      color: #8899aa;
-    }
-    .stat-item .value {
-      font-size: 1.3rem;
-      font-weight: 700;
-      margin-top: 4px;
-    }
-    .stat-item .value.positive {
-      color: #00ffcc;
-    }
-    .stat-item .value.negative {
-      color: #ff007f;
-    }
-    .stat-item .value.neutral {
-      color: #f0b90b;
-    }
-
-    /* ===== TRADE LOG TABLE ===== */
-    .trade-log-wrap {
-      overflow-x: auto;
-    }
-    .trade-log-wrap table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.8rem;
-    }
-    .trade-log-wrap th,
-    .trade-log-wrap td {
-      padding: 8px 10px;
-      text-align: center;
-      border-bottom: 1px solid #1f2937;
-      white-space: nowrap;
-    }
-    .trade-log-wrap th {
-      color: #8899aa;
-      font-weight: 500;
-      background: #0f141c;
-    }
-    .trade-log-wrap tr:last-child td {
-      border-bottom: none;
-    }
-    .trade-log-wrap .win {
-      color: #00ffcc;
-    }
-    .trade-log-wrap .loss {
-      color: #ff007f;
-    }
-    .trade-log-wrap .type-buy {
-      color: #00ffcc;
-    }
-    .trade-log-wrap .type-sell {
-      color: #ff007f;
-    }
-
-    /* ===== SIGNAL PANEL ===== */
-    .signal-panel {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      align-items: center;
-      background: #141a24;
-      border: 1px solid #2a3440;
-      border-radius: 16px;
-      padding: 12px 18px;
-    }
-    .signal-panel .signal-badge {
-      padding: 6px 16px;
-      border-radius: 30px;
-      font-weight: 600;
-      font-size: 0.9rem;
-    }
-    .signal-badge.buy {
-      background: #00ffcc22;
-      color: #00ffcc;
-      border: 1px solid #00ffcc88;
-    }
-    .signal-badge.sell {
-      background: #ff007f22;
-      color: #ff007f;
-      border: 1px solid #ff007f88;
-    }
-    .signal-badge.neutral {
-      background: #2a3440;
-      color: #8899aa;
-      border: 1px solid #2a3440;
-    }
-
-    /* ===== TELEGRAM SETTINGS ===== */
-    .tg-row {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-    .tg-row input {
-      flex: 1;
-      min-width: 120px;
-    }
-    .tg-row button {
-      background: #1f2937;
-      border: 1px solid #2d3a4a;
-      color: #b0c4de;
-      padding: 8px 16px;
-      border-radius: 30px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    .tg-row button:hover {
-      border-color: #00ffcc;
-      color: #fff;
-    }
-
-    /* ===== RESPONSIVE ===== */
-    @media (max-width: 500px) {
-      .header h1 {
-        font-size: 1rem;
-      }
-      .header-controls button {
-        font-size: 0.75rem;
-        padding: 6px 12px;
-      }
-      .stats-grid {
-        grid-template-columns: 1fr 1fr;
-      }
-      .chart-container {
-        height: 300px;
-      }
-    }
-
-    /* ===== INSTALL BUTTON (PWA) ===== */
-    .install-btn {
       display: none;
     }
-    .install-btn.visible {
-      display: inline-flex;
-    }
-
-    /* ===== UTILITY ===== */
-    .flex-center {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .mt-8 {
-      margin-top: 8px;
-    }
-    .text-muted {
-      color: #8899aa;
-    }
-    .text-success {
+    .error-message.visible { display: block; }
+    .reconnect-btn {
+      background: #1f2937;
+      border: 1px solid #00ffcc;
       color: #00ffcc;
-    }
-    .text-danger {
-      color: #ff007f;
-    }
-    .w-100 {
-      width: 100%;
+      padding: 4px 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      margin-left: 10px;
     }
   </style>
 </head>
 <body>
 
 <div class="app-wrapper" id="app">
-
-  <!-- HEADER -->
-  <header class="header">
-    <h1><i class="fas fa-chart-line"></i> Volume-Trend OB Engine</h1>
-    <div class="header-controls">
-      <button id="settingsToggle"><i class="fas fa-cog"></i> الإعدادات</button>
-      <button id="installBtn" class="install-btn btn btn-primary"><i class="fas fa-download"></i> تثبيت التطبيق</button>
-      <button id="shareBtn"><i class="fas fa-share-alt"></i> مشاركة</button>
-    </div>
-  </header>
-
-  <!-- SETTINGS PANEL -->
-  <div class="settings-panel" id="settingsPanel">
-    <div class="settings-group">
-      <label>الزوج (Symbol)</label>
-      <select id="symbolSelect">
-        <option value="BTCUSDT">BTC/USDT</option>
-        <option value="ETHUSDT">ETH/USDT</option>
-        <option value="BNBUSDT">BNB/USDT</option>
-        <option value="SOLUSDT">SOL/USDT</option>
-        <option value="XRPUSDT">XRP/USDT</option>
-      </select>
-    </div>
-    <div class="settings-group">
-      <label>طول SMA (Volatility)</label>
-      <input type="number" id="stLen" value="50" min="5" max="200">
-    </div>
-    <div class="settings-group">
-      <label>المضاعف (Multiplier)</label>
-      <input type="number" id="stMult" value="3.5" step="0.1" min="0.5" max="10">
-    </div>
-    <div class="settings-group">
-      <label>قوة القمة/القاع (Pivot)</label>
-      <input type="number" id="pivotLen" value="7" min="1" max="50">
-    </div>
-    <div class="settings-group">
-      <label>لون الاتجاه الصاعد</label>
-      <input type="color" id="bullColor" value="#00ffcc">
-    </div>
-    <div class="settings-group">
-      <label>لون الاتجاه الهابط</label>
-      <input type="color" id="bearColor" value="#ff007f">
-    </div>
-    <div class="settings-group" style="flex:2; min-width:250px;">
-      <label>بوت تيليجرام (اختياري)</label>
-      <div class="tg-row">
-        <input type="text" id="tgToken" placeholder="توكن البوت" style="flex:1;">
-        <input type="text" id="tgChatId" placeholder="معرف الدردشة" style="flex:1;">
-        <button id="tgTestBtn"><i class="fas fa-paper-plane"></i> اختبار</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- SIGNAL PANEL -->
+  <!-- ... (باقي الهيكل كما هو) ... -->
+  
+  <!-- أضف هذا الزر في لوحة الإعدادات أو في مكان قريب من حالة الاتصال -->
   <div class="signal-panel">
     <span class="text-muted">الإشارة الحالية:</span>
     <span class="signal-badge neutral" id="signalBadge">محايد</span>
     <span class="text-muted">|</span>
-    <span class="flex-center"><span class="status-dot offline" id="statusDot"></span> <span id="statusText">غير متصل</span></span>
+    <span class="flex-center"><span class="status-dot offline" id="statusDot"></span> <span id="statusText">غير متصل</span>
+      <button id="manualReconnectBtn" class="reconnect-btn"><i class="fas fa-sync"></i> إعادة الاتصال</button>
+    </span>
     <span class="text-muted">|</span>
     <span class="flex-center"><i class="fas fa-chart-simple"></i> ADX: <strong id="adxValue">0.0</strong></span>
     <span class="flex-center"><i class="fas fa-arrow-trend-up"></i> الاتجاه: <strong id="trendLabel">محايد</strong></span>
   </div>
+  
+  <div id="connectionError" class="error-message">⚠️ فشل الاتصال بـ Binance. جاري محاولة إعادة الاتصال...</div>
 
-  <!-- CHART -->
-  <div class="chart-container">
-    <div id="chart"></div>
-    <div class="chart-status">
-      <span class="status-dot offline" id="chartStatusDot"></span>
-      <span id="chartStatusText">جاري التحميل...</span>
-    </div>
-  </div>
-
-  <!-- DASHBOARD -->
-  <div class="dashboard">
-    <div class="card">
-      <div class="card-title"><i class="fas fa-chart-pie"></i> الإحصائيات</div>
-      <div class="stats-grid" id="statsGrid">
-        <div class="stat-item"><div class="label">الصفقات الكلية</div><div class="value neutral" id="totalTrades">0</div></div>
-        <div class="stat-item"><div class="label">الربح</div><div class="value positive" id="winTrades">0</div></div>
-        <div class="stat-item"><div class="label">الخسارة</div><div class="value negative" id="lossTrades">0</div></div>
-        <div class="stat-item"><div class="label">نسبة النجاح</div><div class="value neutral" id="winRate">0%</div></div>
-        <div class="stat-item"><div class="label">صافي الربح</div><div class="value neutral" id="netProfit">0</div></div>
-        <div class="stat-item"><div class="label">الرصيد الحالي</div><div class="value neutral" id="currentBalance">1000</div></div>
-      </div>
-    </div>
-    <div class="card trade-log-wrap">
-      <div class="card-title"><i class="fas fa-list"></i> سجل الصفقات</div>
-      <table>
-        <thead><tr><th>#</th><th>نوع</th><th>دخول</th><th>خروج</th><th>ربح/خسارة</th><th>النتيجة</th></tr></thead>
-        <tbody id="tradeLogBody"><tr><td colspan="6" class="text-muted">لا توجد صفقات بعد</td></tr></tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- FOOTER -->
-  <footer style="text-align:center; color:#667; font-size:0.7rem; padding:8px;">
-    <span>© BigBeluga · Volume-Trend Order Block Engine · <a href="#" id="licenseLink">CC BY-NC-SA 4.0</a></span>
-  </footer>
+  <!-- ... (باقي الهيكل) ... -->
 </div>
 
 <!-- ============================================================ -->
-<!-- ===== JAVASCRIPT ===== -->
+<!-- ===== JAVASCRIPT المُحسّن ===== -->
 <!-- ============================================================ -->
 <script src="https://unpkg.com/lightweight-charts@3.8.0/dist/lightweight-charts.standalone.production.js"></script>
 <script>
   (function() {
     'use strict';
 
-    // ===== CONFIG =====
-    const INTERVAL = '30m';
-    const ADX_PERIOD = 14;
-    const STOP_LOSS_PCT = 0.005;   // 0.5%
-    const TAKE_PROFIT_PCT = 0.02;  // 2%
-    const INITIAL_BALANCE = 1000;
+    // ... (باقي المتغيرات كما هي) ...
 
-    // ===== DOM REFS =====
-    const $ = id => document.getElementById(id);
-    const symbolSelect = $('symbolSelect');
-    const stLenInput = $('stLen');
-    const stMultInput = $('stMult');
-    const pivotLenInput = $('pivotLen');
-    const bullColorInput = $('bullColor');
-    const bearColorInput = $('bearColor');
-    const tgToken = $('tgToken');
-    const tgChatId = $('tgChatId');
-    const tgTestBtn = $('tgTestBtn');
-    const settingsToggle = $('settingsToggle');
-    const settingsPanel = $('settingsPanel');
-    const installBtn = $('installBtn');
-    const shareBtn = $('shareBtn');
-    const signalBadge = $('signalBadge');
-    const statusDot = $('statusDot');
-    const statusText = $('statusText');
-    const chartStatusDot = $('chartStatusDot');
-    const chartStatusText = $('chartStatusText');
-    const adxValue = $('adxValue');
-    const trendLabel = $('trendLabel');
-    const totalTrades = $('totalTrades');
-    const winTrades = $('winTrades');
-    const lossTrades = $('lossTrades');
-    const winRate = $('winRate');
-    const netProfit = $('netProfit');
-    const currentBalance = $('currentBalance');
-    const tradeLogBody = $('tradeLogBody');
-
-    // ===== STATE =====
-    let symbol = 'BTCUSDT';
-    let stLen = 50;
-    let stMult = 3.5;
-    let pivotLen = 7;
-    let bullColor = '#00ffcc';
-    let bearColor = '#ff007f';
-
-    // Data arrays
-    let candles = [];           // {open, high, low, close, volume, time}
-    let indicators = [];        // {market_trend, trend_stop, adx, buy_vol_pct, sell_vol_pct, pivot_low, pivot_high, ob_top, ob_bot, ob_trend, active_buy_ratio}
-
-    // Trading state
-    let position = null;        // {type: 'buy'|'sell', entryPrice, stopLoss, takeProfit, size, entryTime}
-    let trades = [];           // closed trades
-    let balance = INITIAL_BALANCE;
-    let tradeCount = 0;
-    let winCount = 0;
-    let lossCount = 0;
-
-    // Chart instance
-    let chart = null;
-    let candleSeries = null;
-    let lineSeries = null;      // for Supertrend
-    let markerSeries = null;    // for signals
-
-    // WebSocket
-    let ws = null;
-    let isConnected = false;
-
-    // Order blocks (for chart drawing)
-    let obBoxes = [];          // store box objects
-
-    // ===== UTILITY FUNCTIONS =====
-    function sma(arr, period) {
-      if (arr.length < period) return null;
-      let sum = 0;
-      for (let i = arr.length - period; i < arr.length; i++) sum += arr[i];
-      return sum / period;
+    // دالة جديدة للتحقق من الاتصال بالإنترنت
+    function checkNetworkAndReconnect() {
+      if (!navigator.onLine) {
+        setStatus('offline', 'لا يوجد اتصال بالإنترنت');
+        return false;
+      }
+      return true;
     }
 
-    function calcADX(high, low, close, period) {
-      // Need at least period+1 bars
-      if (high.length < period + 1) return null;
-      let tr = [];
-      let plusDM = [], minusDM = [];
-      for (let i = 1; i < high.length; i++) {
-        let h = high[i], l = low[i], c = close[i-1];
-        let hDiff = h - high[i-1];
-        let lDiff = low[i-1] - l;
-        let trVal = Math.max(h - l, Math.abs(h - c), Math.abs(l - c));
-        tr.push(trVal);
-        let pDM = hDiff > 0 && hDiff > lDiff ? hDiff : 0;
-        let mDM = lDiff > 0 && lDiff > hDiff ? lDiff : 0;
-        plusDM.push(pDM);
-        minusDM.push(mDM);
-      }
-      // Smooth TR, +DM, -DM with Wilder's smoothing (EMA with alpha=1/period)
-      let trSmooth = [], plusDMSmooth = [], minusDMSmooth = [];
-      for (let i = 0; i < tr.length; i++) {
-        if (i === 0) {
-          trSmooth.push(tr[0]);
-          plusDMSmooth.push(plusDM[0]);
-          minusDMSmooth.push(minusDM[0]);
-        } else {
-          trSmooth.push(trSmooth[i-1] - trSmooth[i-1]/period + tr[i]);
-          plusDMSmooth.push(plusDMSmooth[i-1] - plusDMSmooth[i-1]/period + plusDM[i]);
-          minusDMSmooth.push(minusDMSmooth[i-1] - minusDMSmooth[i-1]/period + minusDM[i]);
-        }
-      }
-      let diPlus = [], diMinus = [], dx = [];
-      for (let i = 0; i < trSmooth.length; i++) {
-        if (trSmooth[i] === 0) {
-          diPlus.push(0);
-          diMinus.push(0);
-          dx.push(0);
-          continue;
-        }
-        let dp = (plusDMSmooth[i] / trSmooth[i]) * 100;
-        let dm = (minusDMSmooth[i] / trSmooth[i]) * 100;
-        diPlus.push(dp);
-        diMinus.push(dm);
-        dx.push(Math.abs(dp - dm) / (dp + dm) * 100);
-      }
-      // ADX = SMA of DX over period
-      if (dx.length < period) return null;
-      let adx = sma(dx.slice(-period), period);
-      return adx;
-    }
-
-    // ===== INDICATOR CALCULATION =====
-    function computeIndicators(candleData) {
-      // candleData: array of {open, high, low, close, volume}
-      const n = candleData.length;
-      if (n < Math.max(stLen, pivotLen * 2 + 2, ADX_PERIOD + 2)) return null;
-
-      let result = [];
-      let market_trend = 1;
-      let trend_stop = null;
-      let active_top = null, active_bot = null, active_ob_trend = 0, active_buy_ratio = null;
-      let pivotLowValues = [], pivotHighValues = [];
-
-      // Precompute custom_atr (SMA of high-low)
-      let atrValues = [];
-      for (let i = 0; i < n; i++) {
-        let hl = candleData[i].high - candleData[i].low;
-        atrValues.push(hl);
-      }
-      // Compute SMA for each i
-      function getSMA(arr, idx, period) {
-        if (idx < period - 1) return null;
-        let sum = 0;
-        for (let j = idx - period + 1; j <= idx; j++) sum += arr[j];
-        return sum / period;
-      }
-
-      // Also compute ADX on the fly
-      let highArr = candleData.map(c => c.high);
-      let lowArr = candleData.map(c => c.low);
-      let closeArr = candleData.map(c => c.close);
-
-      for (let i = 0; i < n; i++) {
-        let c = candleData[i];
-        let custom_atr = getSMA(atrValues, i, stLen);
-        if (custom_atr === null) {
-          result.push({ market_trend: 1, trend_stop: null, adx: null });
-          continue;
-        }
-
-        // Supertrend
-        let hl2 = (c.high + c.low) / 2;
-        let upper_band = hl2 + stMult * custom_atr;
-        let lower_band = hl2 - stMult * custom_atr;
-
-        if (i === 0) {
-          trend_stop = lower_band; // initial
-        } else {
-          let prevTrend = result[i-1].market_trend;
-          let prevStop = result[i-1].trend_stop;
-          if (prevTrend === 1) {
-            trend_stop = Math.max(lower_band, prevStop);
-          } else {
-            trend_stop = Math.min(upper_band, prevStop);
-          }
-          // Check crossover
-          if (c.close > result[i-1].trend_stop && result[i-1].close <= result[i-1].trend_stop) {
-            market_trend = 1;
-            trend_stop = lower_band;
-          } else if (c.close < result[i-1].trend_stop && result[i-1].close >= result[i-1].trend_stop) {
-            market_trend = -1;
-            trend_stop = upper_band;
-          } else {
-            market_trend = prevTrend;
-          }
-        }
-
-        // ADX
-        let adx = null;
-        if (i >= ADX_PERIOD + 1) {
-          let subHigh = highArr.slice(0, i+1);
-          let subLow = lowArr.slice(0, i+1);
-          let subClose = closeArr.slice(0, i+1);
-          adx = calcADX(subHigh, subLow, subClose, ADX_PERIOD);
-        }
-
-        // Pivots & Order Blocks (simplified)
-        // We'll detect pivots after pivotLen bars have passed
-        let pivot_low = null, pivot_high = null;
-        let ob_top = null, ob_bot = null, ob_trend = 0, buy_ratio = null;
-
-        if (i >= pivotLen && i < n - pivotLen) {
-          // Check low pivot
-          let isLow = true;
-          for (let j = i - pivotLen; j <= i + pivotLen; j++) {
-            if (j === i) continue;
-            if (candleData[j].low < candleData[i].low) { isLow = false; break; }
-          }
-          if (isLow) {
-            pivot_low = candleData[i].low;
-            // Order Block for uptrend
-            if (market_trend === 1) {
-              let obTop = Math.min(candleData[i].open, candleData[i].close);
-              let obBot = obTop - custom_atr;
-              // Check overlap with active
-              if (active_top !== null && active_bot !== null) {
-                if (!(obBot > active_top || obTop < active_bot)) {
-                  // overlapping, skip
-                } else {
-                  // new OB
-                  active_top = obTop;
-                  active_bot = obBot;
-                  active_ob_trend = 1;
-                  // calculate buy ratio in window
-                  let buyVol = 0, sellVol = 0;
-                  for (let k = i - pivotLen; k <= i + pivotLen; k++) {
-                    if (candleData[k].close >= candleData[k].open) buyVol += candleData[k].volume;
-                    else sellVol += candleData[k].volume;
-                  }
-                  let total = buyVol + sellVol;
-                  buy_ratio = total > 0 ? buyVol / total : 0.5;
-                  active_buy_ratio = buy_ratio;
-                  ob_top = active_top;
-                  ob_bot = active_bot;
-                  ob_trend = 1;
-                }
-              } else {
-                active_top = obTop;
-                active_bot = obBot;
-                active_ob_trend = 1;
-                // buy ratio
-                let buyVol = 0, sellVol = 0;
-                for (let k = i - pivotLen; k <= i + pivotLen; k++) {
-                  if (candleData[k].close >= candleData[k].open) buyVol += candleData[k].volume;
-                  else sellVol += candleData[k].volume;
-                }
-                let total = buyVol + sellVol;
-                buy_ratio = total > 0 ? buyVol / total : 0.5;
-                active_buy_ratio = buy_ratio;
-                ob_top = active_top;
-                ob_bot = active_bot;
-                ob_trend = 1;
-              }
-            }
-          }
-
-          // Check high pivot
-          let isHigh = true;
-          for (let j = i - pivotLen; j <= i + pivotLen; j++) {
-            if (j === i) continue;
-            if (candleData[j].high > candleData[i].high) { isHigh = false; break; }
-          }
-          if (isHigh) {
-            pivot_high = candleData[i].high;
-            if (market_trend === -1) {
-              let obBot = Math.max(candleData[i].open, candleData[i].close);
-              let obTop = obBot + custom_atr;
-              if (active_top !== null && active_bot !== null) {
-                if (!(obBot > active_top || obTop < active_bot)) {
-                  // overlapping
-                } else {
-                  active_top = obTop;
-                  active_bot = obBot;
-                  active_ob_trend = -1;
-                  let buyVol = 0, sellVol = 0;
-                  for (let k = i - pivotLen; k <= i + pivotLen; k++) {
-                    if (candleData[k].close >= candleData[k].open) buyVol += candleData[k].volume;
-                    else sellVol += candleData[k].volume;
-                  }
-                  let total = buyVol + sellVol;
-                  buy_ratio = total > 0 ? buyVol / total : 0.5;
-                  active_buy_ratio = buy_ratio;
-                  ob_top = active_top;
-                  ob_bot = active_bot;
-                  ob_trend = -1;
-                }
-              } else {
-                active_top = obTop;
-                active_bot = obBot;
-                active_ob_trend = -1;
-                let buyVol = 0, sellVol = 0;
-                for (let k = i - pivotLen; k <= i + pivotLen; k++) {
-                  if (candleData[k].close >= candleData[k].open) buyVol += candleData[k].volume;
-                  else sellVol += candleData[k].volume;
-                }
-                let total = buyVol + sellVol;
-                buy_ratio = total > 0 ? buyVol / total : 0.5;
-                active_buy_ratio = buy_ratio;
-                ob_top = active_top;
-                ob_bot = active_bot;
-                ob_trend = -1;
-              }
-            }
-          }
-        }
-
-        // Invalidation (delete OB if broken)
-        if (active_top !== null && active_bot !== null) {
-          if (active_ob_trend === 1 && candleData[i].high < active_bot) {
-            active_top = null; active_bot = null; active_ob_trend = 0; active_buy_ratio = null;
-          } else if (active_ob_trend === -1 && candleData[i].low > active_top) {
-            active_top = null; active_bot = null; active_ob_trend = 0; active_buy_ratio = null;
-          }
-        }
-
-        result.push({
-          market_trend: market_trend,
-          trend_stop: trend_stop,
-          adx: adx,
-          pivot_low: pivot_low,
-          pivot_high: pivot_high,
-          ob_top: active_top,
-          ob_bot: active_bot,
-          ob_trend: active_ob_trend,
-          active_buy_ratio: active_buy_ratio,
-          close: candleData[i].close
-        });
-      }
-
-      return result;
-    }
-
-    // ===== TRADING LOGIC =====
-    function evaluateSignal(candle, ind, prevInd) {
-      if (!ind || !prevInd) return null;
-      if (ind.adx === null || ind.adx < 25) return null;
-
-      // Retest signals: we need ob_top, ob_bot
-      if (ind.ob_top === null || ind.ob_bot === null) return null;
-
-      let signal = null;
-      // Bullish retest: price crosses above ob_top
-      if (ind.ob_trend === 1 && ind.active_buy_ratio >= 0.5) { // threshold from input, default 50%
-        if (candle.low > ind.ob_top && prevInd.close <= prevInd.ob_top) {
-          signal = 'buy';
-        }
-      }
-      // Bearish retest: price crosses below ob_bot
-      if (ind.ob_trend === -1 && (1 - ind.active_buy_ratio) >= 0.5) {
-        if (candle.high < ind.ob_bot && prevInd.close >= prevInd.ob_bot) {
-          signal = 'sell';
-        }
-      }
-      return signal;
-    }
-
-    // ===== POSITION MANAGEMENT =====
-    function openPosition(type, price, time) {
-      if (position) {
-        // close existing first (if any)
-        closePosition(price, time);
-      }
-      let stopLoss = type === 'buy' ? price * (1 - STOP_LOSS_PCT) : price * (1 + STOP_LOSS_PCT);
-      let takeProfit = type === 'buy' ? price * (1 + TAKE_PROFIT_PCT) : price * (1 - TAKE_PROFIT_PCT);
-      position = {
-        type: type,
-        entryPrice: price,
-        stopLoss: stopLoss,
-        takeProfit: takeProfit,
-        size: balance / price, // full balance
-        entryTime: time
-      };
-      // Send Telegram alert
-      sendTelegram(`🔔 *صفقة جديدة* (${type.toUpperCase()})\nالسعر: ${price}\nوقف الخسارة: ${stopLoss.toFixed(2)}\nالهدف: ${takeProfit.toFixed(2)}`);
-      updateUI();
-    }
-
-    function closePosition(price, time) {
-      if (!position) return;
-      let pnl = 0;
-      if (position.type === 'buy') {
-        pnl = (price - position.entryPrice) / position.entryPrice * 100;
-      } else {
-        pnl = (position.entryPrice - price) / position.entryPrice * 100;
-      }
-      let profitAmount = balance * pnl / 100;
-      balance += profitAmount;
-      let result = pnl > 0 ? 'win' : 'loss';
-      if (result === 'win') winCount++; else lossCount++;
-      tradeCount++;
-
-      trades.push({
-        id: tradeCount,
-        type: position.type,
-        entry: position.entryPrice,
-        exit: price,
-        pnl: pnl,
-        result: result,
-        time: time
-      });
-
-      // Telegram
-      sendTelegram(`📊 *صفقة مغلقة*\nالنوع: ${position.type.toUpperCase()}\nالدخول: ${position.entryPrice}\nالخروج: ${price}\nالربح/الخسارة: ${pnl.toFixed(2)}% (${result === 'win' ? '✅' : '❌'})`);
-
-      position = null;
-      updateUI();
-    }
-
-    // ===== CHECK POSITION =====
-    function checkPosition(currentPrice, currentTime) {
-      if (!position) return;
-      let shouldClose = false;
-      if (position.type === 'buy') {
-        if (currentPrice <= position.stopLoss || currentPrice >= position.takeProfit) shouldClose = true;
-      } else {
-        if (currentPrice >= position.stopLoss || currentPrice <= position.takeProfit) shouldClose = true;
-      }
-      if (shouldClose) {
-        closePosition(currentPrice, currentTime);
-      }
-    }
-
-    // ===== TELEGRAM =====
-    async function sendTelegram(msg) {
-      const token = tgToken.value.trim();
-      const chatId = tgChatId.value.trim();
-      if (!token || !chatId) return;
-      try {
-        const url = `https://api.telegram.org/bot${token}/sendMessage`;
-        const resp = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ chat_id: chatId, text: msg, parse_mode: 'Markdown' })
-        });
-        if (!resp.ok) console.warn('Telegram error:', await resp.text());
-      } catch (e) {
-        console.error('Telegram send failed:', e);
-      }
-    }
-
-    // ===== UI UPDATE =====
-    function updateUI() {
-      totalTrades.textContent = tradeCount;
-      winTrades.textContent = winCount;
-      lossTrades.textContent = lossCount;
-      winRate.textContent = tradeCount > 0 ? ((winCount / tradeCount) * 100).toFixed(1) + '%' : '0%';
-      netProfit.textContent = (balance - INITIAL_BALANCE).toFixed(2);
-      currentBalance.textContent = balance.toFixed(2);
-
-      // Trade log table
-      if (trades.length === 0) {
-        tradeLogBody.innerHTML = '<tr><td colspan="6" class="text-muted">لا توجد صفقات بعد</td></tr>';
+    // تحديث دالة الاتصال (connectBinance) لتكون أكثر قوة
+    function connectBinance() {
+      if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) {
+        console.log('WebSocket already connected or connecting.');
         return;
       }
-      let html = '';
-      trades.slice(-20).reverse().forEach(t => {
-        let cls = t.result === 'win' ? 'win' : 'loss';
-        let typeCls = t.type === 'buy' ? 'type-buy' : 'type-sell';
-        html += `<tr>
-          <td>${t.id}</td>
-          <td class="${typeCls}">${t.type === 'buy' ? 'شراء' : 'بيع'}</td>
-          <td>${t.entry.toFixed(2)}</td>
-          <td>${t.exit.toFixed(2)}</td>
-          <td class="${cls}">${t.pnl.toFixed(2)}%</td>
-          <td class="${cls}">${t.result === 'win' ? '✅ ربح' : '❌ خسارة'}</td>
-        </tr>`;
-      });
-      tradeLogBody.innerHTML = html;
-    }
 
-    // ===== CHART DRAWING =====
-    function initChart() {
-      if (chart) chart.remove();
-      const container = document.getElementById('chart');
-      chart = LightweightCharts.createChart(container, {
-        width: container.clientWidth,
-        height: container.clientHeight,
-        layout: { background: { color: '#0f141c' }, textColor: '#b0c4de' },
-        grid: { vertLines: { color: '#1f2937' }, horzLines: { color: '#1f2937' } },
-        crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
-        rightPriceScale: { borderColor: '#2a3440' },
-        timeScale: { borderColor: '#2a3440', timeVisible: true }
-      });
-      candleSeries = chart.addCandlestickSeries({
-        upColor: '#00ffcc', downColor: '#ff007f', borderUpColor: '#00ffcc', borderDownColor: '#ff007f', wickUpColor: '#00ffcc', wickDownColor: '#ff007f'
-      });
-      lineSeries = chart.addLineSeries({ color: '#ffaa00', lineWidth: 2, crosshairMarkerVisible: false });
-      markerSeries = chart.addSeries(LightweightCharts.SeriesType.Histogram, { color: '#ffffff', priceFormat: { type: 'price' } });
-      chart.timeScale().fitContent();
-      window.addEventListener('resize', () => {
-        chart.resize(container.clientWidth, container.clientHeight);
-      });
-    }
+      if (!checkNetworkAndReconnect()) return;
 
-    function updateChart(candleData, indData) {
-      if (!chart || !candleSeries) return;
-      let chartData = candleData.map((c, i) => ({
-        time: Math.floor(c.time / 1000),
-        open: c.open,
-        high: c.high,
-        low: c.low,
-        close: c.close
-      }));
-      candleSeries.setData(chartData);
-
-      // Supertrend line
-      let lineData = [];
-      for (let i = 0; i < indData.length; i++) {
-        if (indData[i].trend_stop !== null && indData[i].trend_stop !== undefined) {
-          lineData.push({
-            time: Math.floor(candleData[i].time / 1000),
-            value: indData[i].trend_stop
-          });
-        }
-      }
-      lineSeries.setData(lineData);
-
-      // Markers for signals
-      // We'll add markers when signal occurred (we can store signals separately)
-      // For simplicity, we'll add shapes in the future
-
-      // Order blocks drawing: we need to draw boxes on chart? Lightweight charts doesn't support boxes directly.
-      // We can use a custom overlay, but for simplicity we'll skip boxes in chart.
-      // We'll instead show current OB in signal panel.
-
-      chart.timeScale().fitContent();
-    }
-
-    // ===== DATA PROCESSING =====
-    let processing = false;
-
-    function processNewCandle(newCandle) {
-      if (processing) return;
-      processing = true;
-
-      // Add to candles
-      candles.push(newCandle);
-      if (candles.length > 500) candles.shift();
-
-      // Compute indicators
-      let indData = computeIndicators(candles);
-      if (!indData) { processing = false; return; }
-
-      let lastIdx = indData.length - 1;
-      let currentInd = indData[lastIdx];
-      let prevInd = lastIdx > 0 ? indData[lastIdx - 1] : null;
-      let currentCandle = candles[lastIdx];
-
-      // Update UI with ADX and trend
-      if (currentInd.adx !== null) {
-        adxValue.textContent = currentInd.adx.toFixed(1);
-      }
-      if (currentInd.market_trend === 1) {
-        trendLabel.textContent = 'صاعد 📈';
-        trendLabel.style.color = bullColor;
-      } else if (currentInd.market_trend === -1) {
-        trendLabel.textContent = 'هابط 📉';
-        trendLabel.style.color = bearColor;
-      } else {
-        trendLabel.textContent = 'محايد';
-        trendLabel.style.color = '#8899aa';
-      }
-
-      // Check signal
-      if (prevInd && currentInd) {
-        let signal = evaluateSignal(currentCandle, currentInd, prevInd);
-        if (signal) {
-          // ADX already checked inside evaluateSignal
-          if (signal === 'buy') {
-            signalBadge.textContent = 'شراء 🔵';
-            signalBadge.className = 'signal-badge buy';
-            openPosition('buy', currentCandle.close, currentCandle.time);
-          } else if (signal === 'sell') {
-            signalBadge.textContent = 'بيع 🔴';
-            signalBadge.className = 'signal-badge sell';
-            openPosition('sell', currentCandle.close, currentCandle.time);
-          }
-        } else {
-          signalBadge.textContent = 'محايد';
-          signalBadge.className = 'signal-badge neutral';
-        }
-
-        // Check trend change: if market_trend changed, close position
-        if (position && prevInd.market_trend !== currentInd.market_trend) {
-          closePosition(currentCandle.close, currentCandle.time);
-        }
-      }
-
-      // Check stop loss / take profit
-      if (position) {
-        checkPosition(currentCandle.close, currentCandle.time);
-      }
-
-      // Update chart
-      updateChart(candles, indData);
-
-      // Update UI stats
-      updateUI();
-
-      processing = false;
-    }
-
-    // ===== BINANCE WEBSOCKET =====
-    function connectBinance() {
-      if (ws) {
-        ws.close();
-        ws = null;
-      }
       const sym = symbol.toLowerCase();
       const stream = `wss://stream.binance.com:9443/ws/${sym}@kline_${INTERVAL}`;
-      ws = new WebSocket(stream);
+      
+      try {
+        ws = new WebSocket(stream);
+      } catch (e) {
+        console.error('Failed to create WebSocket:', e);
+        setStatus('offline', 'خطأ في إنشاء الاتصال');
+        showError('فشل إنشاء اتصال WebSocket. تحقق من الشبكة.');
+        setTimeout(connectBinance, 3000);
+        return;
+      }
 
       ws.onopen = () => {
+        console.log('✅ Binance WebSocket connected');
         isConnected = true;
-        statusDot.className = 'status-dot online';
-        statusText.textContent = 'متصل';
-        chartStatusDot.className = 'status-dot online';
-        chartStatusText.textContent = 'متصل';
-        console.log('Binance WebSocket connected');
+        setStatus('online', 'متصل');
+        hideError();
+        // إلغاء أي مؤقت إعادة اتصال
+        if (window.reconnectTimer) {
+          clearTimeout(window.reconnectTimer);
+          window.reconnectTimer = null;
+        }
       };
 
       ws.onmessage = (event) => {
@@ -1151,12 +121,8 @@
               close: parseFloat(k.c),
               volume: parseFloat(k.v)
             };
-            // If it's a new candle (k.x === true), process it
             if (k.x) {
               processNewCandle(candle);
-            } else {
-              // Update last candle (still forming) - we can update chart partially
-              // For simplicity, we'll ignore update until it closes.
             }
           }
         } catch (e) {
@@ -1165,32 +131,66 @@
       };
 
       ws.onerror = (err) => {
-        console.error('WebSocket error:', err);
-        isConnected = false;
-        statusDot.className = 'status-dot offline';
-        statusText.textContent = 'خطأ';
-        chartStatusDot.className = 'status-dot offline';
-        chartStatusText.textContent = 'خطأ في الاتصال';
+        console.error('❌ WebSocket error:', err);
+        // لا نقوم بقطع الاتصال هنا، نتركه للـ onclose
       };
 
-      ws.onclose = () => {
+      ws.onclose = (event) => {
         isConnected = false;
-        statusDot.className = 'status-dot offline';
-        statusText.textContent = 'غير متصل';
-        chartStatusDot.className = 'status-dot offline';
-        chartStatusText.textContent = 'غير متصل';
-        console.log('WebSocket closed. Reconnecting in 5s...');
-        setTimeout(connectBinance, 5000);
+        setStatus('offline', 'غير متصل');
+        console.warn(`WebSocket closed (code: ${event.code}). Reconnecting in 3s...`);
+        
+        // إذا كان الإغلاق طبيعياً (1000) فلا داعي لإعادة الاتصال الفوري
+        // ولكن إذا كان خطأ (مثل 1006) نعيد المحاولة
+        if (event.code !== 1000) {
+          showError('انقطع الاتصال بـ Binance. جاري إعادة المحاولة...');
+          if (window.reconnectTimer) clearTimeout(window.reconnectTimer);
+          window.reconnectTimer = setTimeout(connectBinance, 3000);
+        } else {
+          hideError();
+        }
       };
     }
 
-    // ===== LOAD HISTORICAL DATA =====
+    // دوال مساعدة للواجهة
+    function setStatus(type, text) {
+      const dot = document.getElementById('statusDot');
+      const txt = document.getElementById('statusText');
+      const chartDot = document.getElementById('chartStatusDot');
+      const chartTxt = document.getElementById('chartStatusText');
+      
+      if (type === 'online') {
+        dot.className = 'status-dot online';
+        chartDot.className = 'status-dot online';
+        txt.textContent = text;
+        chartTxt.textContent = 'متصل';
+      } else {
+        dot.className = 'status-dot offline';
+        chartDot.className = 'status-dot offline';
+        txt.textContent = text;
+        chartTxt.textContent = 'غير متصل';
+      }
+    }
+
+    function showError(msg) {
+      const el = document.getElementById('connectionError');
+      el.textContent = '⚠️ ' + msg;
+      el.classList.add('visible');
+    }
+
+    function hideError() {
+      document.getElementById('connectionError').classList.remove('visible');
+    }
+
+    // دالة تحميل البيانات التاريخية (تم تحسينها للتعامل مع الأخطاء)
     async function loadHistoricalData() {
       const sym = symbol;
       const limit = 300;
       const url = `https://api.binance.com/api/v3/klines?symbol=${sym}&interval=${INTERVAL}&limit=${limit}`;
       try {
+        setStatus('offline', 'جاري تحميل البيانات...');
         const resp = await fetch(url);
+        if (!resp.ok) throw new Error(`HTTP error! status: ${resp.status}`);
         const data = await resp.json();
         candles = data.map(item => ({
           time: item[0],
@@ -1200,198 +200,91 @@
           close: parseFloat(item[4]),
           volume: parseFloat(item[5])
         }));
-        // Compute indicators
         let indData = computeIndicators(candles);
         if (indData) {
           updateChart(candles, indData);
+          hideError();
         }
-        console.log('Historical data loaded:', candles.length);
+        console.log('✅ Historical data loaded:', candles.length);
         return true;
       } catch (e) {
-        console.error('Failed to load historical data:', e);
+        console.error('❌ Failed to load historical data:', e);
+        showError('فشل تحميل البيانات التاريخية. تأكد من اتصال الشبكة.');
+        setStatus('offline', 'خطأ في التحميل');
         return false;
       }
     }
 
-    // ===== SETTINGS =====
-    function loadSettings() {
-      const saved = localStorage.getItem('OB_Engine_Settings');
-      if (saved) {
-        try {
-          const s = JSON.parse(saved);
-          symbol = s.symbol || 'BTCUSDT';
-          stLen = s.stLen || 50;
-          stMult = s.stMult || 3.5;
-          pivotLen = s.pivotLen || 7;
-          bullColor = s.bullColor || '#00ffcc';
-          bearColor = s.bearColor || '#ff007f';
-          tgToken.value = s.tgToken || '';
-          tgChatId.value = s.tgChatId || '';
-          // Apply to inputs
-          symbolSelect.value = symbol;
-          stLenInput.value = stLen;
-          stMultInput.value = stMult;
-          pivotLenInput.value = pivotLen;
-          bullColorInput.value = bullColor;
-          bearColorInput.value = bearColor;
-        } catch (e) {}
-      }
-    }
-
-    function saveSettings() {
-      const s = {
-        symbol: symbolSelect.value,
-        stLen: parseInt(stLenInput.value) || 50,
-        stMult: parseFloat(stMultInput.value) || 3.5,
-        pivotLen: parseInt(pivotLenInput.value) || 7,
-        bullColor: bullColorInput.value,
-        bearColor: bearColorInput.value,
-        tgToken: tgToken.value.trim(),
-        tgChatId: tgChatId.value.trim()
-      };
-      localStorage.setItem('OB_Engine_Settings', JSON.stringify(s));
-      // Apply to variables
-      symbol = s.symbol;
-      stLen = s.stLen;
-      stMult = s.stMult;
-      pivotLen = s.pivotLen;
-      bullColor = s.bullColor;
-      bearColor = s.bearColor;
-    }
-
-    // ===== INITIALIZATION =====
+    // دالة التهيئة (تم تحسين الترتيب)
     async function init() {
       loadSettings();
       initChart();
 
-      // Load historical data
-      await loadHistoricalData();
+      // محاولة تحميل البيانات التاريخية أولاً
+      const histLoaded = await loadHistoricalData();
+      
+      // ثم الاتصال بـ WebSocket
+      if (histLoaded) {
+        connectBinance();
+      } else {
+        // إذا فشل التحميل، نحاول مرة أخرى بعد 5 ثوانٍ
+        setTimeout(() => {
+          loadHistoricalData().then(() => connectBinance());
+        }, 5000);
+      }
 
-      // Connect WebSocket
-      connectBinance();
-
-      // UI events
-      settingsToggle.addEventListener('click', () => {
-        settingsPanel.classList.toggle('open');
+      // ربط زر إعادة الاتصال اليدوي
+      document.getElementById('manualReconnectBtn').addEventListener('click', () => {
+        if (ws) {
+          ws.close(1000, 'Manual reconnect');
+          ws = null;
+        }
+        if (window.reconnectTimer) {
+          clearTimeout(window.reconnectTimer);
+          window.reconnectTimer = null;
+        }
+        hideError();
+        setStatus('offline', 'جاري إعادة الاتصال...');
+        loadHistoricalData().then(() => connectBinance());
       });
 
-      // Save settings on change (debounced)
+      // مراقبة تغيير حالة الشبكة (عند عودة الإنترنت)
+      window.addEventListener('online', () => {
+        console.log('Network is back online. Reconnecting...');
+        hideError();
+        if (ws) ws.close(1000, 'Network online');
+        setTimeout(() => connectBinance(), 1000);
+      });
+
+      // ... (باقي أحداث الإعدادات والمشاركة كما هي) ...
+      
+      // حفظ الإعدادات وتحديث الرمز
       const saveDebounced = () => {
         saveSettings();
-        // Restart connection with new symbol
         if (ws) {
-          ws.close();
+          ws.close(1000, 'Settings changed');
           ws = null;
+        }
+        if (window.reconnectTimer) {
+          clearTimeout(window.reconnectTimer);
+          window.reconnectTimer = null;
         }
         loadHistoricalData().then(() => connectBinance());
       };
-      symbolSelect.addEventListener('change', saveDebounced);
-      stLenInput.addEventListener('change', saveDebounced);
-      stMultInput.addEventListener('change', saveDebounced);
-      pivotLenInput.addEventListener('change', saveDebounced);
-      bullColorInput.addEventListener('change', saveDebounced);
-      bearColorInput.addEventListener('change', saveDebounced);
-
-      // Telegram test
-      tgTestBtn.addEventListener('click', () => {
-        sendTelegram('🟢 *اختبار الاتصال* - بوت التليجرام يعمل بنجاح!');
-        alert('تم إرسال رسالة اختبار. تحقق من التليجرام.');
-      });
-
-      // Share button
-      shareBtn.addEventListener('click', () => {
-        if (navigator.share) {
-          navigator.share({
-            title: 'Volume-Trend OB Engine',
-            text: 'أداة تداول تعتمد على حجم التداول واتجاه السوق',
-            url: window.location.href
-          }).catch(() => {});
-        } else {
-          alert('نسخ الرابط: ' + window.location.href);
-        }
-      });
-
-      // PWA install
-      let deferredPrompt = null;
-      window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        installBtn.classList.add('visible');
-      });
-      installBtn.addEventListener('click', async () => {
-        if (deferredPrompt) {
-          deferredPrompt.prompt();
-          const result = await deferredPrompt.userChoice;
-          if (result.outcome === 'accepted') {
-            console.log('PWA installed');
-          }
-          deferredPrompt = null;
-        }
-      });
-      window.addEventListener('appinstalled', () => {
-        installBtn.classList.remove('visible');
-      });
-
-      // License link
-      document.getElementById('licenseLink').addEventListener('click', (e) => {
-        e.preventDefault();
-        window.open('https://creativecommons.org/licenses/by-nc-sa/4.0/', '_blank');
-      });
-
-      // Auto-save on input blur
-      document.querySelectorAll('.settings-panel input, .settings-panel select').forEach(el => {
-        el.addEventListener('blur', saveDebounced);
-      });
-
+      
+      // ... (باقي الكود) ...
       updateUI();
     }
 
-    // ===== START =====
+    // ... (باقي الكود) ...
+    // بدء التطبيق
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', init);
     } else {
       init();
     }
 
-    // ===== PWA MANIFEST (inline) =====
-    const manifest = {
-      name: 'Volume-Trend OB Engine',
-      short_name: 'OB Engine',
-      description: 'أداة تداول متقدمة تعتمد على حجم التداول واتجاه السوق',
-      start_url: window.location.href.split('?')[0],
-      display: 'standalone',
-      background_color: '#0b0e14',
-      theme_color: '#00ffcc',
-      icons: [
-        { src: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="%2300ffcc"/><text x="50" y="65" font-size="50" text-anchor="middle" fill="%230b0e14" font-weight="bold">📈</text></svg>', sizes: '192x192', type: 'image/svg+xml' }
-      ]
-    };
-    const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
-    const manifestURL = URL.createObjectURL(manifestBlob);
-    document.getElementById('manifestLink').href = manifestURL;
-
-    // ===== SERVICE WORKER (basic) =====
-    if ('serviceWorker' in navigator) {
-      const swCode = `
-        self.addEventListener('install', e => {
-          e.waitUntil(self.skipWaiting());
-        });
-        self.addEventListener('activate', e => {
-          e.waitUntil(self.clients.claim());
-        });
-        self.addEventListener('fetch', e => {
-          e.respondWith(fetch(e.request));
-        });
-      `;
-      const swBlob = new Blob([swCode], { type: 'application/javascript' });
-      const swURL = URL.createObjectURL(swBlob);
-      navigator.serviceWorker.register(swURL).then(() => {
-        console.log('ServiceWorker registered');
-      }).catch(() => {});
-    }
-
-    console.log('✅ Volume-Trend OB Engine started');
   })();
 </script>
 </body>
-  </html>
+</html>
