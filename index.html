@@ -3,230 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>UT Bot Alerts - BigBeluga</title>
+    <title>UT Bot 5m - BigBeluga</title>
     <link rel="manifest" href="data:application/json,{}" id="manifest">
     <meta name="theme-color" content="#0b0e17">
     <style>
         /* ========== RESET & BASE ========== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-        }
-        body {
-            background: #0b0e17;
-            color: #e0e6f0;
-            overflow-x: hidden;
-            padding: 12px;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-        }
-        .app {
-            max-width: 1300px;
-            width: 100%;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+        body { background: #0b0e17; color: #e0e6f0; overflow-x: hidden; padding: 12px; min-height: 100vh; display: flex; justify-content: center; }
+        .app { max-width: 1300px; width: 100%; }
 
         /* ========== SCROLLBAR ========== */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #1a1f2e; }
         ::-webkit-scrollbar-thumb { background: #3b4a6b; border-radius: 8px; }
-        ::-webkit-scrollbar-thumb:hover { background: #5a6f99; }
 
         /* ========== HEADER ========== */
-        header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 20px;
-            padding: 12px 20px;
-            background: #111827;
-            border-radius: 16px;
-            border: 1px solid #1f2a3f;
-        }
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 700;
-            font-size: 1.3rem;
-            background: linear-gradient(135deg, #00ffcc, #00b8ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .logo span {
-            background: #1f2a3f;
-            padding: 6px 12px;
-            border-radius: 40px;
-            font-size: 0.8rem;
-            -webkit-text-fill-color: #8ba0d2;
-            background: #1a2335;
-        }
-        .header-actions {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        .header-actions button {
-            background: #1f2a3f;
-            border: none;
-            color: #b0c5e5;
-            padding: 8px 16px;
-            border-radius: 30px;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
+        header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; padding: 12px 20px; background: #111827; border-radius: 16px; border: 1px solid #1f2a3f; }
+        .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.3rem; background: linear-gradient(135deg, #00ffcc, #00b8ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .logo span { background: #1f2a3f; padding: 6px 12px; border-radius: 40px; font-size: 0.8rem; -webkit-text-fill-color: #8ba0d2; background: #1a2335; }
+        .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .header-actions button { background: #1f2a3f; border: none; color: #b0c5e5; padding: 8px 16px; border-radius: 30px; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
         .header-actions button:hover { background: #2b3957; color: white; }
-        .badge {
-            background: #1f2a3f;
-            padding: 4px 12px;
-            border-radius: 30px;
-            font-size: 0.75rem;
-            color: #8ba0d2;
-        }
+        .badge { background: #1f2a3f; padding: 4px 12px; border-radius: 30px; font-size: 0.75rem; color: #8ba0d2; }
 
         /* ========== COIN GRID ========== */
-        .coin-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        .coin-card {
-            background: #111827;
-            border: 1px solid #1f2a3f;
-            border-radius: 14px;
-            padding: 12px 10px;
-            cursor: pointer;
-            transition: 0.2s;
-            text-align: center;
-            position: relative;
-        }
+        .coin-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; margin-bottom: 20px; }
+        .coin-card { background: #111827; border: 1px solid #1f2a3f; border-radius: 14px; padding: 12px 10px; cursor: pointer; transition: 0.2s; text-align: center; position: relative; }
         .coin-card.active { border-color: #00ffcc; box-shadow: 0 0 20px rgba(0, 255, 204, 0.08); }
         .coin-card .symbol { font-weight: 600; font-size: 0.9rem; }
         .coin-card .price { font-size: 1.1rem; font-weight: 700; margin: 4px 0 2px; }
         .coin-card .change { font-size: 0.8rem; }
-        .coin-card .signal-badge {
-            position: absolute;
-            top: 6px;
-            right: 6px;
-            font-size: 0.6rem;
-            padding: 2px 8px;
-            border-radius: 20px;
-            background: #1f2a3f;
-        }
+        .coin-card .signal-badge { position: absolute; top: 6px; right: 6px; font-size: 0.6rem; padding: 2px 8px; border-radius: 20px; background: #1f2a3f; }
         .signal-badge.buy { background: #00cc88; color: #0b0e17; }
         .signal-badge.sell { background: #ff4477; color: #0b0e17; }
 
         /* ========== CHART ========== */
-        .chart-container {
-            background: #111827;
-            border-radius: 16px;
-            border: 1px solid #1f2a3f;
-            padding: 12px;
-            margin-bottom: 20px;
-            position: relative;
-            height: 420px;
-        }
+        .chart-container { background: #111827; border-radius: 16px; border: 1px solid #1f2a3f; padding: 12px; margin-bottom: 20px; position: relative; height: 420px; }
         .chart-container canvas { width: 100% !important; height: 100% !important; border-radius: 8px; }
-        .chart-controls {
-            display: flex;
-            gap: 12px;
-            margin-top: 10px;
-            flex-wrap: wrap;
-        }
-        .chart-controls select, .chart-controls input {
-            background: #1a2335;
-            border: 1px solid #2a3a55;
-            color: #e0e6f0;
-            padding: 6px 14px;
-            border-radius: 30px;
-            font-size: 0.8rem;
-        }
-        .chart-controls button {
-            background: #1f2a3f;
-            border: none;
-            color: #b0c5e5;
-            padding: 6px 16px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-size: 0.8rem;
-        }
+        .chart-controls { display: flex; gap: 12px; margin-top: 10px; flex-wrap: wrap; }
+        .chart-controls select, .chart-controls input { background: #1a2335; border: 1px solid #2a3a55; color: #e0e6f0; padding: 6px 14px; border-radius: 30px; font-size: 0.8rem; }
+        .chart-controls button { background: #1f2a3f; border: none; color: #b0c5e5; padding: 6px 16px; border-radius: 30px; cursor: pointer; font-size: 0.8rem; }
         .chart-controls button:hover { background: #2b3957; color: white; }
 
         /* ========== STATS & LOG ========== */
-        .stats-log {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin-bottom: 20px;
-        }
+        .stats-log { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
         @media (max-width: 700px) { .stats-log { grid-template-columns: 1fr; } }
-        .panel {
-            background: #111827;
-            border: 1px solid #1f2a3f;
-            border-radius: 16px;
-            padding: 16px;
-        }
-        .panel h3 {
-            font-size: 0.9rem;
-            color: #8ba0d2;
-            margin-bottom: 12px;
-            border-bottom: 1px solid #1f2a3f;
-            padding-bottom: 8px;
-        }
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-        .stat-item {
-            background: #0f1622;
-            padding: 10px;
-            border-radius: 10px;
-            text-align: center;
-        }
+        .panel { background: #111827; border: 1px solid #1f2a3f; border-radius: 16px; padding: 16px; }
+        .panel h3 { font-size: 0.9rem; color: #8ba0d2; margin-bottom: 12px; border-bottom: 1px solid #1f2a3f; padding-bottom: 8px; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .stat-item { background: #0f1622; padding: 10px; border-radius: 10px; text-align: center; }
         .stat-item .value { font-size: 1.4rem; font-weight: 700; }
         .stat-item .label { font-size: 0.7rem; color: #8ba0d2; }
         .trade-log { max-height: 200px; overflow-y: auto; font-size: 0.8rem; }
-        .trade-log .entry {
-            padding: 6px 0;
-            border-bottom: 1px solid #1a2335;
-            display: flex;
-            justify-content: space-between;
-        }
+        .trade-log .entry { padding: 6px 0; border-bottom: 1px solid #1a2335; display: flex; justify-content: space-between; }
         .trade-log .entry .side-buy { color: #00cc88; }
         .trade-log .entry .side-sell { color: #ff4477; }
 
         /* ========== BOTTOM BAR ========== */
-        .bottom-bar {
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 12px;
-            background: #111827;
-            border-radius: 16px;
-            border: 1px solid #1f2a3f;
-            padding: 12px 20px;
-            margin-top: 10px;
-        }
+        .bottom-bar { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; background: #111827; border-radius: 16px; border: 1px solid #1f2a3f; padding: 12px 20px; margin-top: 10px; }
         .bottom-bar .status { font-size: 0.8rem; color: #8ba0d2; }
-        .bottom-bar .status .dot {
-            display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px;
-        }
+        .bottom-bar .status .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
         .dot.green { background: #00cc88; }
         .dot.red { background: #ff4477; }
-        .bottom-bar button {
-            background: #1f2a3f; border: none; color: #b0c5e5; padding: 6px 18px;
-            border-radius: 30px; cursor: pointer; font-size: 0.8rem;
-        }
+        .bottom-bar button { background: #1f2a3f; border: none; color: #b0c5e5; padding: 6px 18px; border-radius: 30px; cursor: pointer; font-size: 0.8rem; }
         .bottom-bar button:hover { background: #2b3957; color: white; }
 
         @media (max-width: 480px) {
@@ -239,7 +78,7 @@
 <body>
     <div class="app" id="app">
         <header>
-            <div class="logo">📊 UT Bot <span>v3.2</span></div>
+            <div class="logo">📊 UT Bot <span>v4.0 - 5m</span></div>
             <div class="header-actions">
                 <button onclick="toggleAutoScan()">🔍 تلقائي</button>
                 <button onclick="shareSignal()">📤 مشاركة</button>
@@ -254,13 +93,12 @@
             <canvas id="chartCanvas"></canvas>
             <div class="chart-controls">
                 <select id="timeframeSelect">
+                    <option value="5">5 دقائق</option>
+                    <option value="15">15 دقيقة</option>
                     <option value="30">30 دقيقة</option>
-                    <option value="60">1 ساعة</option>
-                    <option value="240">4 ساعات</option>
-                    <option value="D">يوم</option>
                 </select>
-                <button onclick="loadHistorical()">📥 تحميل التاريخ</button>
-                <span style="font-size:0.75rem;color:#8ba0d2;margin-right:auto;" id="chartInfo">BTCUSDT · 30m</span>
+                <button onclick="loadHistorical()">📥 تحديث التاريخ</button>
+                <span style="font-size:0.75rem;color:#8ba0d2;margin-right:auto;" id="chartInfo">BTCUSDT · 5m</span>
             </div>
         </div>
 
@@ -277,7 +115,7 @@
             <div class="panel">
                 <h3>📜 سجل الصفقات</h3>
                 <div class="trade-log" id="tradeLog">
-                    <div style="color:#5a6f99;text-align:center;padding:20px 0;">لا توجد صفقات بعد</div>
+                    <div style="color:#5a6f99;text-align:center;padding:20px 0;">⏳ جاري انتظار الإشارات...</div>
                 </div>
             </div>
         </div>
@@ -296,20 +134,21 @@
 
     <script>
         /* =================================================================
-           UT Bot Alerts Strategy - خوارزمية محسنة للحصول على صفقات فورية
-           الإعدادات الجديدة: ADX 20, UT_A 0.8
+           UT Bot Alerts Strategy - تم التحديث لإطار 5 دقائق و ADX 20
            ================================================================= */
 
+        // ---------- الإعدادات ----------
         const SYMBOLS = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 'XRPUSDT', 'ADAUSDT', 'DOGEUSDT', 'AVAXUSDT', 'DOTUSDT', 'MATICUSDT'];
-        const TIMEFRAME = '30m';
         
-        // ⚠️ تم تخفيض ADX من 25 إلى 20 لظهور الصفقات في السوق الحالي
+        // ⚠️ تم تغيير الإطار الزمني إلى 5 دقائق
+        const TIMEFRAME = '5m'; 
+        
+        // شروط الدخول (تم ضبط ADX ليكون فوق 20)
         const ADX_THRESHOLD = 20; 
-        
-        // ⚠️ تم تخفيض الحساسية من 1.0 إلى 0.8 لالتقاط المزيد من الإشارات
         const UT_A = 0.8; 
         const UT_C = 10;
         
+        // إدارة المخاطر (0.5% وقف ، 2% هدف)
         const STOP_LOSS_PCT = 0.005;
         const TAKE_PROFIT_PCT = 0.02;
         const MAX_CANDLES = 300;
@@ -364,9 +203,9 @@
             return adx;
         }
 
-        // ---------- UT Bot Logic (محاكاة دقيقة لـ Pine Script) ----------
+        // ---------- UT Bot Logic (محاكاة دقيقة جداً) ----------
         function calcUT(candles) {
-            if (candles.length < UT_C + 2) return null;
+            if (candles.length < UT_C + 3) return null;
             const atr = calcATR(candles, UT_C);
             if (atr === 0) return null;
             const nLoss = UT_A * atr;
@@ -421,48 +260,39 @@
             const prevStop = stops[prevIdx];
             const currentPos = positions[lastIdx];
 
-            // كشف التقاطع: 
-            // شراء: السعر الحالي فوق الخط، والسعر السابق كان تحت أو عند الخط
-            // بيع: السعر الحالي تحت الخط، والسعر السابق كان فوق أو عند الخط
+            // كشف التقاطع الحقيقي
             let buy = false, sell = false;
-            if (prevSrc <= prevStop && currentSrc > currentStop) {
+            if (prevSrc <= prevStop && currentSrc > currentStop && currentPos === 1) {
                 buy = true;
             }
-            if (prevSrc >= prevStop && currentSrc < currentStop) {
+            if (prevSrc >= prevStop && currentSrc < currentStop && currentPos === -1) {
                 sell = true;
             }
 
-            return {
-                pos: currentPos,
-                stop: currentStop,
-                src: currentSrc,
-                buy: buy,
-                sell: sell
-            };
+            return { pos: currentPos, stop: currentStop, src: currentSrc, buy, sell };
         }
 
         // ---------- إشارة الاستراتيجية ----------
         function generateSignal(symbol, candles) {
             if (candles.length < 30) return null;
             const adx = calcADX(candles);
+            
+            // طباعة قيمة ADX في الكونسول لمساعدتك على المراقبة (F12)
+            console.log(`[${symbol}] ADX الحالي: ${adx.toFixed(2)}`);
+
             if (adx < ADX_THRESHOLD) {
-                // ستظهر هذه الرسالة في الكونسول إذا لم تعطِ صفقة بسبب ADX
-                // console.log(`[${symbol}] تم تخطي الإشارة، ADX = ${adx.toFixed(2)} (أقل من 20)`);
+                console.log(`⛔ تم تخطي الإشارة لأن ADX (${adx.toFixed(2)}) أقل من العتبة (${ADX_THRESHOLD})`);
                 return null;
             }
             const ut = calcUT(candles);
             if (!ut) return null;
 
-            if (ut.buy) {
-                return { side: 'buy', price: ut.src, timestamp: candles[candles.length-1].time };
-            }
-            if (ut.sell) {
-                return { side: 'sell', price: ut.src, timestamp: candles[candles.length-1].time };
-            }
+            if (ut.buy) return { side: 'buy', price: ut.src, timestamp: candles[candles.length-1].time };
+            if (ut.sell) return { side: 'sell', price: ut.src, timestamp: candles[candles.length-1].time };
             return null;
         }
 
-        // ---------- إدارة الصفقات ----------
+        // ---------- إدارة الصفقات (دون تغيير) ----------
         function manageTrade(symbol, candles, signal) {
             if (!signal) return;
             const price = signal.price;
@@ -471,7 +301,6 @@
             if (!ut) return;
 
             if (activeTrade) {
-                // إغلاق عند تغير الاتجاه (عكس الإشارة)
                 if ((activeTrade.side === 'buy' && ut.pos === -1) || 
                     (activeTrade.side === 'sell' && ut.pos === 1)) {
                     const closePrice = candles[candles.length-1].close;
@@ -482,7 +311,6 @@
                     updateUI();
                 }
 
-                // وقف الخسارة والهدف
                 if (activeTrade) {
                     const current = candles[candles.length-1].close;
                     const sl = activeTrade.stopLoss;
@@ -498,7 +326,6 @@
                     if (closed) { activeTrade = null; updateUI(); }
                 }
             } else {
-                // فتح صفقة جديدة
                 const entryPrice = price;
                 const sl = side === 'buy' ? entryPrice * (1 - STOP_LOSS_PCT) : entryPrice * (1 + STOP_LOSS_PCT);
                 const tp = side === 'buy' ? entryPrice * (1 + TAKE_PROFIT_PCT) : entryPrice * (1 - TAKE_PROFIT_PCT);
@@ -516,7 +343,7 @@
             log.prepend(entry);
         }
 
-        // ---------- واجهة المستخدم و WebSocket ----------
+        // ---------- WebSocket Binance (5m) ----------
         function connectWebSocket() {
             if (ws) ws.close();
             const streams = SYMBOLS.map(s => `${s.toLowerCase()}@kline_${TIMEFRAME}`).join('/');
@@ -546,7 +373,7 @@
                         }
                         updateCoinCard(sym);
                         if (isAutoScan) scanAllSymbols();
-                    } else { // شمعة مفتوحة للتحديث
+                    } else { // تحديث الشمعة الحية
                         const arr = marketData[sym].candles;
                         if (arr.length > 0) arr[arr.length - 1] = candle;
                         else arr.push(candle);
@@ -562,6 +389,7 @@
             if (!data || data.candles.length < 30) return;
             const signal = generateSignal(symbol, data.candles);
             if (signal) {
+                console.log(`✅ إشارة تم التقاطها: ${signal.side} على ${symbol}`);
                 manageTrade(symbol, data.candles, signal);
                 updateUI();
             }
@@ -623,7 +451,6 @@
                 ctx.fillRect(x + 1, top, candleWidth - 2, Math.max(bottom - top, 1));
             }
 
-            // رسم خط UT Bot
             const ut = calcUT(candles);
             if (ut && ut.stop > 0) {
                 const yStop = padding + (high - ut.stop) / range * chartHeight;
@@ -634,7 +461,7 @@
             document.getElementById('chartInfo').textContent = `${symbol} · ${TIMEFRAME}`;
         }
 
-        // ---------- بطاقات العملات ----------
+        // ---------- واجهة المستخدم ----------
         function updateCoinCard(symbol) {
             const data = marketData[symbol];
             if (!data || data.candles.length === 0) return;
@@ -670,7 +497,7 @@
         }
 
         async function loadHistorical(symbol = activeSymbol) {
-            const limit = 200;
+            const limit = 300;
             try {
                 const resp = await fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${TIMEFRAME}&limit=${limit}`);
                 const data = await resp.json();
@@ -683,10 +510,12 @@
                 drawChart(symbol);
                 updateCoinCard(symbol);
                 document.getElementById('statusText').textContent = `تم تحميل ${candles.length} شمعة لـ ${symbol}`;
+                // فحص فوري للصفقات بعد التحميل
+                if(symbol === activeSymbol) processNewCandle(symbol);
+                if(isAutoScan) scanAllSymbols();
             } catch (err) { console.error('فشل تحميل التاريخ', err); }
         }
 
-        // ---------- إحصائيات وواجهة ----------
         function formatPrice(p) { return p.toFixed(2); }
 
         function updateUI() {
@@ -700,7 +529,7 @@
 
             const log = document.getElementById('tradeLog');
             if (trades.length === 0 && !activeTrade) {
-                log.innerHTML = '<div style="color:#5a6f99;text-align:center;padding:20px 0;">لا توجد صفقات بعد</div>';
+                log.innerHTML = '<div style="color:#5a6f99;text-align:center;padding:20px 0;">⏳ في انتظار إشارة UT Bot...</div>';
                 return;
             }
             log.innerHTML = '';
@@ -716,7 +545,7 @@
             });
         }
 
-        // ---------- الأزرار و PWA ----------
+        // ---------- الأزرار ----------
         function toggleAutoScan() {
             isAutoScan = !isAutoScan;
             document.querySelector('.header-actions button:first-child').textContent = isAutoScan ? '🔍 تلقائي' : '🔍 يدوي';
