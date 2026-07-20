@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BigBeluga Trading Bot</title>
+    <title>UT Bot Alerts - BigBeluga</title>
     <link rel="manifest" href="data:application/json,{}" id="manifest">
     <meta name="theme-color" content="#0b0e17">
     <style>
@@ -325,8 +325,8 @@
         <!-- HEADER -->
         <header>
             <div class="logo">
-                📊 BigBeluga
-                <span>v2.0</span>
+                📊 UT Bot
+                <span>v3.0</span>
             </div>
             <div class="header-actions">
                 <button onclick="toggleAutoScan()">🔍 تلقائي</button>
@@ -388,7 +388,7 @@
 
     <script>
         /* =================================================================
-           BigBeluga Volume-Trend Order Block Engine (Pine Script → JS)
+           UT Bot Alerts Strategy (Pine Script v4 → JS) 
            مع ADX > 25 ، إطار 30 دقيقة ، إدارة صفقات تلقائية
            يعمل على Binance WebSocket (بيانات الشموع)
            ================================================================= */
@@ -403,6 +403,11 @@
         const STOP_LOSS_PCT = 0.005; // 0.5%
         const TAKE_PROFIT_PCT = 0.02; // 2%
         const MAX_CANDLES = 300;
+
+        // UT Bot Settings
+        const UT_A = 1.0;      // Key Value (حساسية)
+        const UT_C = 10;       // ATR Period
+        const UT_HA = false;   // استخدام Heikin Ashi (false للشموع العادية)
 
         // ---------- حالة التطبيق ----------
         let activeSymbol = 'BTCUSDT';
@@ -422,10 +427,30 @@
             return d.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
         }
 
+        // ---------- حساب ATR ----------
+        function calcATR(candles, period = 14) {
+            if (candles.length < period + 1) return 0;
+            let tr = [];
+            for (let i = 1; i < candles.length; i++) {
+                const h = candles[i].high,
+                    l = candles[i].low,
+                    pc = candles[i - 1].close;
+                tr.push(Math.max(h - l, Math.abs(h - pc), Math.abs(l - pc)));
+            }
+            if (tr.length < period) return 0;
+            let atr = tr.slice(0, period).reduce((a, b) => a + b, 0) / period;
+            for (let i = period; i < tr.length; i++) {
+                atr = (atr * (period - 1) + tr[i]) / period;
+            }
+            return atr;
+        }
+
         // ---------- ADX حساب ----------
         function calcADX(candles, period = 14) {
             if (candles.length < period + 2) return 0;
-            let tr = [], plusDM = [], minusDM = [];
+            let tr = [],
+                plusDM = [],
+                minusDM = [];
             for (let i = 1; i < candles.length; i++) {
                 const h = candles[i].high,
                     l = candles[i].low,
@@ -436,7 +461,6 @@
                 plusDM.push(up > down && up > 0 ? up : 0);
                 minusDM.push(down > up && down > 0 ? down : 0);
             }
-            // smooth
             let atr = tr.slice(0, period).reduce((a, b) => a + b, 0) / period;
             let pdi = plusDM.slice(0, period).reduce((a, b) => a + b, 0) / period;
             let mdi = minusDM.slice(0, period).reduce((a, b) => a + b, 0) / period;
@@ -447,11 +471,9 @@
             }
             const dx = (pdi + mdi === 0) ? 0 : Math.abs(pdi - mdi) / (pdi + mdi) * 100;
             let adx = dx;
-            // smooth ADX
             for (let i = period + 1; i < tr.length; i++) {
                 const dx2 = (pdi + mdi === 0) ? 0 : Math.abs(pdi - mdi) / (pdi + mdi) * 100;
                 adx = (adx * (period - 1) + dx2) / period;
-                // update pdi,mdi for next
                 const idx = i;
                 if (idx < plusDM.length) {
                     pdi = (pdi * (period - 1) + plusDM[idx]) / period;
@@ -461,70 +483,234 @@
             return adx;
         }
 
-        // ---------- SuperTrend (مبسط) ----------
-        function calcSuperTrend(candles, period = 50, multiplier = 3.5) {
-            if (candles.length < period + 1) return { trend: 1, stop: 0 };
-            const atr = candles.slice(-period).reduce((s, c) => s + (c.high - c.low), 0) / period;
-            const hl2 = candles[candles.length - 1].high + candles[candles.length - 1].low / 2;
-            const upper = hl2 + multiplier * atr;
-            const lower = hl2 - multiplier * atr;
-            let trend = 1; // 1 = buy, -1 = sell
-            let stop = lower;
-            for (let i = candles.length - 1; i >= 1; i--) {
-                const prev = candles[i - 1];
-                const cur = candles[i];
-                if (trend === 1) {
-                    stop = Math.max(lower, stop);
-                    if (cur.close < stop) { trend = -1;
-                        stop = upper; }
-                } else {
-                    stop = Math.min(upper, stop);
-                    if (cur.close > stop) { trend = 1;
-                        stop = lower; }
+        // ---------- UT Bot Alerts ----------
+        function calcUTBot(candles, a = UT_A, c = UT_C, useHeikinAshi = UT_HA) {
+            if (candles.length < c + 2) return { pos: 0, stop: 0, src: 0 };
+
+            // تحضير مصدر السعر (src)
+            let srcArray = [];
+            if (useHeikinAshi) {
+                // حساب شموع Heikin Ashi
+                let haOpen = candles[0].open,
+                    haClose = candles[0].close;
+                for (let i = 0; i < candles.length; i++) {
+                    const o = candles[i].open,
+                        h = candles[i].high,
+                        l = candles[i].low,
+                        cl = candles[i].close;
+                    const haC = (o + h + l + cl) / 4;
+                    const haO = (i === 0) ? (o + cl) / 2 : (haOpen + haClose) / 2;
+                    // نقوم بتبسيط: نأخذ فقط الـ haClose باعتبارها src
+                    srcArray.push(haC);
+                    haOpen = haO;
+                    haClose = haC;
+                }
+            } else {
+                srcArray = candles.map(c => c.close);
+            }
+
+            // حساب ATR
+            const atr = calcATR(candles, c);
+            if (atr === 0) return { pos: 0, stop: 0, src: srcArray[srcArray.length - 1] };
+
+            const nLoss = a * atr;
+            let stop = 0;
+            let pos = 0; // 1 = buy, -1 = sell
+
+            for (let i = 0; i < srcArray.length; i++) {
+                const src = srcArray[i];
+                const prevSrc = i > 0 ? srcArray[i - 1] : src;
+                const prevStop = stop;
+                const prevPos = pos;
+
+                // تحديث الـ stop
+                if (prevPos === 0) {
+                    // بداية
+                    stop = src - nLoss;
+                    pos = 1; // افتراضي
+                } else if (prevPos === 1) {
+                    // اتجاه صاعد
+                    if (src > prevStop && prevSrc > prevStop) {
+                        stop = Math.max(prevStop, src - nLoss);
+                    } else if (src > prevStop) {
+                        stop = src - nLoss;
+                    } else {
+                        // تغيير الاتجاه
+                        stop = src + nLoss;
+                        pos = -1;
+                    }
+                } else if (prevPos === -1) {
+                    // اتجاه هابط
+                    if (src < prevStop && prevSrc < prevStop) {
+                        stop = Math.min(prevStop, src + nLoss);
+                    } else if (src < prevStop) {
+                        stop = src + nLoss;
+                    } else {
+                        // تغيير الاتجاه
+                        stop = src - nLoss;
+                        pos = 1;
+                    }
+                }
+
+                // التحقق من التقاطع لتحديث pos (منطق أكثر دقة)
+                if (i > 0) {
+                    const prevSrcVal = srcArray[i - 1];
+                    const prevStopVal = stop; // نستخدم الـ stop المحسوب للشمعة السابقة
+                    // نقوم بحساب stop للشمعة السابقة بشكل منفصل لضمان الدقة
                 }
             }
-            return { trend, stop };
-        }
 
-        // ---------- Order Block (مبسط) ----------
-        function findOrderBlock(candles, pivotLen = 7) {
-            if (candles.length < pivotLen * 2 + 1) return null;
-            const idx = candles.length - 1;
-            const pivotLow = candles[idx - pivotLen].low;
-            const pivotHigh = candles[idx - pivotLen].high;
-            const isLow = true; // نبسط: نكتشف القيعان والقمم ببساطة
-            // في الكود الأصلي يتم التحقق من pivot
-            // سنكتفي بإرجاع OB بسيط بناءً على آخر شمعة
-            const last = candles[candles.length - 1];
-            const prev = candles[candles.length - 2];
-            const ob = {
-                top: Math.max(last.open, last.close),
-                bottom: Math.min(last.open, last.close) - (last.high - last.low) * 0.5,
-                trend: last.close > prev.close ? 1 : -1
+            // إعادة الحساب بشكل تكراري دقيق (محاكاة Pine Script)
+            let p = 0;
+            let s = 0;
+            for (let i = 0; i < srcArray.length; i++) {
+                const src = srcArray[i];
+                const prevSrc = i > 0 ? srcArray[i - 1] : src;
+                const prevS = s;
+                const prevP = p;
+
+                let newS = 0;
+                if (prevP === 0) {
+                    newS = src - nLoss;
+                    p = 1;
+                } else if (prevP === 1) {
+                    if (src > prevS && prevSrc > prevS) {
+                        newS = Math.max(prevS, src - nLoss);
+                    } else if (src > prevS) {
+                        newS = src - nLoss;
+                    } else {
+                        newS = src + nLoss;
+                        p = -1;
+                    }
+                } else if (prevP === -1) {
+                    if (src < prevS && prevSrc < prevS) {
+                        newS = Math.min(prevS, src + nLoss);
+                    } else if (src < prevS) {
+                        newS = src + nLoss;
+                    } else {
+                        newS = src - nLoss;
+                        p = 1;
+                    }
+                }
+                s = newS;
+            }
+
+            // إشارة الشراء/البيع بناءً على تغير الاتجاه (تقاطع)
+            const lastSrc = srcArray[srcArray.length - 1];
+            const prevSrc = srcArray.length > 1 ? srcArray[srcArray.length - 2] : lastSrc;
+            const prevStop = s; // سيكون الـ stop للشمعة السابقة، لكننا بحاجة لحسابه بدقة
+            // سنقوم بتخزين قيمة الـ stop السابقة أثناء التكرار
+            let prevStopVal = 0;
+            let lastStopVal = 0;
+            p = 0;
+            s = 0;
+            for (let i = 0; i < srcArray.length; i++) {
+                const src = srcArray[i];
+                const prevSrcVal = i > 0 ? srcArray[i - 1] : src;
+                const prevSVal = s;
+                const prevPVal = p;
+                if (i === srcArray.length - 1) {
+                    lastStopVal = s;
+                }
+                if (i === srcArray.length - 2) {
+                    prevStopVal = s;
+                }
+                // حساب جديد
+                let newS = 0;
+                if (prevPVal === 0) {
+                    newS = src - nLoss;
+                    p = 1;
+                } else if (prevPVal === 1) {
+                    if (src > prevSVal && prevSrcVal > prevSVal) {
+                        newS = Math.max(prevSVal, src - nLoss);
+                    } else if (src > prevSVal) {
+                        newS = src - nLoss;
+                    } else {
+                        newS = src + nLoss;
+                        p = -1;
+                    }
+                } else if (prevPVal === -1) {
+                    if (src < prevSVal && prevSrcVal < prevSVal) {
+                        newS = Math.min(prevSVal, src + nLoss);
+                    } else if (src < prevSVal) {
+                        newS = src + nLoss;
+                    } else {
+                        newS = src - nLoss;
+                        p = 1;
+                    }
+                }
+                s = newS;
+            }
+
+            // التحقق من إشارة الشراء: src يعبر فوق الـ stop وكان اتجاهه صاعد
+            let signal = null;
+            const currSrc = srcArray[srcArray.length - 1];
+            const prevSrc2 = srcArray.length > 1 ? srcArray[srcArray.length - 2] : currSrc;
+            // نحتاج الـ stop للشمعة السابقة.
+            // نعيد الحساب ولكن نأخذ القيم السابقة
+            let p2 = 0,
+                s2 = 0;
+            let prevStop2 = 0,
+                currStop2 = 0;
+            for (let i = 0; i < srcArray.length; i++) {
+                const src = srcArray[i];
+                const prevSrcV = i > 0 ? srcArray[i - 1] : src;
+                const prevSV = s2;
+                const prevPV = p2;
+                if (i === srcArray.length - 1) { currStop2 = s2; }
+                if (i === srcArray.length - 2) { prevStop2 = s2; }
+                let newS = 0;
+                if (prevPV === 0) {
+                    newS = src - nLoss;
+                    p2 = 1;
+                } else if (prevPV === 1) {
+                    if (src > prevSV && prevSrcV > prevSV) {
+                        newS = Math.max(prevSV, src - nLoss);
+                    } else if (src > prevSV) {
+                        newS = src - nLoss;
+                    } else {
+                        newS = src + nLoss;
+                        p2 = -1;
+                    }
+                } else if (prevPV === -1) {
+                    if (src < prevSV && prevSrcV < prevSV) {
+                        newS = Math.min(prevSV, src + nLoss);
+                    } else if (src < prevSV) {
+                        newS = src + nLoss;
+                    } else {
+                        newS = src - nLoss;
+                        p2 = 1;
+                    }
+                }
+                s2 = newS;
+            }
+
+            // التقاطع
+            const isBuy = currSrc > currStop2 && prevSrc2 <= prevStop2 && p2 === 1;
+            const isSell = currSrc < currStop2 && prevSrc2 >= prevStop2 && p2 === -1;
+
+            return {
+                pos: p2,
+                stop: currStop2,
+                src: currSrc,
+                buy: isBuy,
+                sell: isSell
             };
-            return ob;
         }
 
         // ---------- إشارة الاستراتيجية ----------
         function generateSignal(symbol, candles) {
-            if (candles.length < 60) return null;
+            if (candles.length < 30) return null;
             const adx = calcADX(candles);
             if (adx < ADX_THRESHOLD) return null;
-            const st = calcSuperTrend(candles);
-            const ob = findOrderBlock(candles);
-            if (!ob) return null;
-            const last = candles[candles.length - 1];
-            const prev = candles[candles.length - 2];
-            // شرط الشراء: الاتجاه صاعد + اختراق OB العلوي
-            let signal = null;
-            if (st.trend === 1 && last.close > ob.top && prev.close <= ob.top) {
-                signal = { side: 'buy', price: last.close, timestamp: last.time };
+            const ut = calcUTBot(candles);
+            if (ut.buy) {
+                return { side: 'buy', price: ut.src, timestamp: candles[candles.length - 1].time };
             }
-            // شرط البيع: الاتجاه هابط + كسر OB السفلي
-            if (st.trend === -1 && last.close < ob.bottom && prev.close >= ob.bottom) {
-                signal = { side: 'sell', price: last.close, timestamp: last.time };
+            if (ut.sell) {
+                return { side: 'sell', price: ut.src, timestamp: candles[candles.length - 1].time };
             }
-            return signal;
+            return null;
         }
 
         // ---------- إدارة الصفقات ----------
@@ -532,12 +718,13 @@
             if (!signal) return;
             const price = signal.price;
             const side = signal.side;
-            // إذا كانت هناك صفقة مفتوحة، نتحقق من تغير الاتجاه
+            const ut = calcUTBot(candles);
+
+            // إذا كانت هناك صفقة مفتوحة
             if (activeTrade) {
-                const st = calcSuperTrend(candles);
-                if ((activeTrade.side === 'buy' && st.trend === -1) ||
-                    (activeTrade.side === 'sell' && st.trend === 1)) {
-                    // إغلاق الصفقة بخسارة أو ربح حسب السعر الحالي
+                // إلغاء الإشارة عند تغير الاتجاه (عكس الصفقة)
+                if ((activeTrade.side === 'buy' && ut.pos === -1) ||
+                    (activeTrade.side === 'sell' && ut.pos === 1)) {
                     const closePrice = candles[candles.length - 1].close;
                     const pnl = (activeTrade.side === 'buy') ? (closePrice - activeTrade.entryPrice) / activeTrade.entryPrice :
                         (activeTrade.entryPrice - closePrice) / activeTrade.entryPrice;
@@ -551,7 +738,9 @@
                     });
                     activeTrade = null;
                     updateUI();
+                    sendTelegramAlert(symbol, 'إغلاق (عكس اتجاه)', closePrice);
                 }
+
                 // التحقق من وقف الخسارة / الهدف
                 if (activeTrade) {
                     const current = candles[candles.length - 1].close;
@@ -559,16 +748,16 @@
                     const tp = activeTrade.takeProfit;
                     let closed = false;
                     if (activeTrade.side === 'buy') {
-                        if (current <= sl) { // وقف خسارة
+                        if (current <= sl) {
                             trades.push({ symbol, side: 'buy', entry: activeTrade.entryPrice, exit: current, pnl: -STOP_LOSS_PCT,
                                 timestamp: Date.now() });
                             closed = true;
-                        } else if (current >= tp) { // هدف
+                        } else if (current >= tp) {
                             trades.push({ symbol, side: 'buy', entry: activeTrade.entryPrice, exit: current, pnl: TAKE_PROFIT_PCT,
                                 timestamp: Date.now() });
                             closed = true;
                         }
-                    } else { // sell
+                    } else {
                         if (current >= sl) {
                             trades.push({ symbol, side: 'sell', entry: activeTrade.entryPrice, exit: current, pnl: -STOP_LOSS_PCT,
                                 timestamp: Date.now() });
@@ -590,24 +779,20 @@
                 const sl = side === 'buy' ? entryPrice * (1 - STOP_LOSS_PCT) : entryPrice * (1 + STOP_LOSS_PCT);
                 const tp = side === 'buy' ? entryPrice * (1 + TAKE_PROFIT_PCT) : entryPrice * (1 - TAKE_PROFIT_PCT);
                 activeTrade = { symbol, side, entryPrice, stopLoss: sl, takeProfit: tp, timestamp: Date.now() };
-                // إرسال إشارة تيليجرام (محاكاة)
-                sendTelegramAlert(symbol, side, entryPrice);
+                sendTelegramAlert(symbol, side === 'buy' ? 'شراء' : 'بيع', entryPrice);
                 updateUI();
             }
         }
 
         // ---------- محاكاة تيليجرام ----------
-        function sendTelegramAlert(symbol, side, price) {
-            const msg = `🚨 إشارة ${side === 'buy' ? 'شراء' : 'بيع'} على ${symbol}\nالسعر: ${formatPrice(price)}\nالوقت: ${new Date().toLocaleString('ar-EG')}`;
-            // نعرض في السجل
+        function sendTelegramAlert(symbol, action, price) {
+            const msg = `🚨 إشارة ${action} على ${symbol}\nالسعر: ${formatPrice(price)}\nالوقت: ${new Date().toLocaleString('ar-EG')}`;
             const log = document.getElementById('tradeLog');
             const entry = document.createElement('div');
             entry.className = 'entry';
             entry.innerHTML =
-                `<span>📨 ${msg}</span><span class="${side === 'buy' ? 'side-buy' : 'side-sell'}">${side === 'buy' ? '🟢' : '🔴'}</span>`;
+                `<span>📨 ${msg}</span><span class="${action === 'شراء' || action === 'buy' ? 'side-buy' : 'side-sell'}">${action === 'شراء' || action === 'buy' ? '🟢' : '🔴'}</span>`;
             log.prepend(entry);
-            // محاكاة مشاركة عبر واتساب/تليجرام (فتح رابط)
-            // يمكن للمستخدم الضغط على زر المشاركة
         }
 
         // ---------- WebSocket Binance ----------
@@ -637,26 +822,20 @@
                     if (!marketData[sym]) {
                         marketData[sym] = { candles: [] };
                     }
-                    // إذا كانت شمعة جديدة
                     if (k.x) {
-                        // أضف الشمعة الجديدة
                         marketData[sym].candles.push(candle);
                         if (marketData[sym].candles.length > MAX_CANDLES) {
                             marketData[sym].candles.shift();
                         }
-                        // عند وصول شمعة جديدة ننفذ الاستراتيجية
                         if (sym === activeSymbol) {
                             processNewCandle(sym);
                             drawChart(sym);
                         }
-                        // تحديث بطاقة العملة
                         updateCoinCard(sym);
-                        // إذا كان المسح التلقائي مفعل، نبحث عن إشارات لجميع العملات
                         if (isAutoScan) {
                             scanAllSymbols();
                         }
                     } else {
-                        // تحديث الشمعة الحالية (لم تنته بعد)
                         const arr = marketData[sym].candles;
                         if (arr.length > 0) {
                             arr[arr.length - 1] = candle;
@@ -681,32 +860,27 @@
             };
         }
 
-        // ---------- معالجة شمعة جديدة للعملة النشطة ----------
+        // ---------- معالجة شمعة جديدة ----------
         function processNewCandle(symbol) {
             const data = marketData[symbol];
             if (!data || data.candles.length < 30) return;
-            const candles = data.candles;
-            const signal = generateSignal(symbol, candles);
+            const signal = generateSignal(symbol, data.candles);
             if (signal) {
-                manageTrade(symbol, candles, signal);
+                manageTrade(symbol, data.candles, signal);
                 updateUI();
             }
-            // تحديث مؤشرات أخرى
         }
 
-        // ---------- مسح تلقائي لجميع العملات ----------
+        // ---------- مسح تلقائي ----------
         function scanAllSymbols() {
             for (const sym of SYMBOLS) {
                 const data = marketData[sym];
                 if (!data || data.candles.length < 30) continue;
                 const signal = generateSignal(sym, data.candles);
+                if (signal && sym === activeSymbol) {
+                    manageTrade(sym, data.candles, signal);
+                }
                 if (signal) {
-                    // إذا لم تكن هناك صفقة مفتوحة على هذه العملة، نفتحها
-                    // لكننا نكتفي بالعملة النشطة حاليًا لتجنب التعقيد
-                    if (sym === activeSymbol) {
-                        manageTrade(sym, data.candles, signal);
-                    }
-                    // نعرض إشارة على البطاقة
                     const card = document.querySelector(`.coin-card[data-symbol="${sym}"]`);
                     if (card) {
                         const badge = card.querySelector('.signal-badge');
@@ -731,7 +905,6 @@
                 h = canvas.height;
             ctx.clearRect(0, 0, w, h);
 
-            // تحديد النطاق
             const high = Math.max(...candles.map(c => c.high)) * 1.02;
             const low = Math.min(...candles.map(c => c.low)) * 0.98;
             const range = high - low || 1;
@@ -740,11 +913,9 @@
             const chartWidth = w - 2 * padding;
             const candleWidth = chartWidth / candles.length;
 
-            // رسم الخلفية
             ctx.fillStyle = '#0f1622';
             ctx.fillRect(0, 0, w, h);
 
-            // رسم الشبكة
             ctx.strokeStyle = '#1a2335';
             ctx.lineWidth = 0.5;
             for (let i = 0; i <= 4; i++) {
@@ -767,24 +938,21 @@
                 ctx.fillStyle = isBull ? '#00cc88' : '#ff4477';
                 ctx.strokeStyle = isBull ? '#00cc88' : '#ff4477';
                 ctx.lineWidth = 1;
-                // الفتيل
                 ctx.beginPath();
                 ctx.moveTo(x + candleWidth / 2, yHigh);
                 ctx.lineTo(x + candleWidth / 2, yLow);
                 ctx.stroke();
-                // جسم الشمعة
                 const top = Math.min(yOpen, yClose);
                 const bottom = Math.max(yOpen, yClose);
                 const bodyHeight = Math.max(bottom - top, 1);
                 ctx.fillRect(x + 1, top, candleWidth - 2, bodyHeight);
             }
 
-            // رسم المؤشرات (SuperTrend, Order Block) - مبسط
-            // نرسم خط Trend
-            const st = calcSuperTrend(candles);
-            if (st.stop > 0) {
-                const yStop = padding + (high - st.stop) / range * chartHeight;
-                ctx.strokeStyle = st.trend === 1 ? '#00ffcc' : '#ff007f';
+            // رسم خط UT Bot Trailing Stop
+            const ut = calcUTBot(candles);
+            if (ut.stop > 0) {
+                const yStop = padding + (high - ut.stop) / range * chartHeight;
+                ctx.strokeStyle = ut.pos === 1 ? '#00ffcc' : '#ff007f';
                 ctx.lineWidth = 2;
                 ctx.beginPath();
                 ctx.moveTo(padding, yStop);
@@ -792,7 +960,6 @@
                 ctx.stroke();
             }
 
-            // تحديث معلومات الشارت
             document.getElementById('chartInfo').textContent = `${symbol} · ${TIMEFRAME}`;
         }
 
@@ -831,7 +998,6 @@
                     document.querySelectorAll('.coin-card').forEach(c => c.classList.remove('active'));
                     card.classList.add('active');
                     drawChart(sym);
-                    // تحميل تاريخ إذا لم يوجد
                     if (!marketData[sym] || marketData[sym].candles.length < 30) {
                         loadHistorical(sym);
                     }
@@ -840,11 +1006,10 @@
             });
         }
 
-        // ---------- تحميل البيانات التاريخية (REST) ----------
+        // ---------- تحميل البيانات التاريخية ----------
         async function loadHistorical(symbol = activeSymbol) {
             const limit = 200;
-            const url =
-                `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${TIMEFRAME}&limit=${limit}`;
+            const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${TIMEFRAME}&limit=${limit}`;
             try {
                 const resp = await fetch(url);
                 const data = await resp.json();
@@ -868,7 +1033,6 @@
 
         // ---------- تحديث واجهة الإحصائيات ----------
         function updateUI() {
-            // إحصائيات
             const total = trades.length + (activeTrade ? 1 : 0);
             document.getElementById('totalTrades').textContent = total;
             const wins = trades.filter(t => t.pnl > 0).length;
@@ -878,14 +1042,12 @@
             document.getElementById('profitLoss').textContent = pnl.toFixed(2) + '%';
             document.getElementById('activeTrades').textContent = activeTrade ? 1 : 0;
 
-            // سجل الصفقات
             const log = document.getElementById('tradeLog');
             if (trades.length === 0 && !activeTrade) {
                 log.innerHTML = '<div style="color:#5a6f99;text-align:center;padding:20px 0;">لا توجد صفقات بعد</div>';
                 return;
             }
             log.innerHTML = '';
-            // نعرض آخر 20 صفقة
             const all = [...trades];
             if (activeTrade) {
                 all.push({ symbol: activeTrade.symbol, side: activeTrade.side, entry: activeTrade.entryPrice, exit: 'مفتوحة',
@@ -918,9 +1080,8 @@
             const msg =
                 `🚀 إشارة ${activeTrade.side === 'buy' ? 'شراء' : 'بيع'} على ${activeTrade.symbol}\nالسعر: ${formatPrice(activeTrade.entryPrice)}\nالهدف: ${formatPrice(activeTrade.takeProfit)} | وقف: ${formatPrice(activeTrade.stopLoss)}`;
             if (navigator.share) {
-                navigator.share({ title: 'BigBeluga Signal', text: msg });
+                navigator.share({ title: 'UT Bot Signal', text: msg });
             } else {
-                // نسخ إلى الحافظة
                 navigator.clipboard.writeText(msg).then(() => alert('تم نسخ الإشارة!'));
             }
         }
@@ -962,7 +1123,7 @@
             }
         }
 
-        // ---------- Service Worker للتثبيت ----------
+        // ---------- Service Worker ----------
         function registerSW() {
             if ('serviceWorker' in navigator) {
                 const swCode = `
@@ -980,15 +1141,10 @@
         function init() {
             buildCoinGrid();
             registerSW();
-            // تحميل تاريخ أول عملة
             loadHistorical(activeSymbol);
-            // اتصال WebSocket
             connectWebSocket();
-            // تحديث دوري للإحصائيات
             setInterval(updateUI, 10000);
-            // ضبط حجم الشارت عند تغيير النافذة
             window.addEventListener('resize', () => drawChart(activeSymbol));
-            // إذا لم توجد بيانات بعد 5 ثوانٍ، حاول مرة أخرى
             setTimeout(() => {
                 if (!marketData[activeSymbol] || marketData[activeSymbol].candles.length < 10) {
                     loadHistorical(activeSymbol);
@@ -996,8 +1152,7 @@
             }, 5000);
         }
 
-        // بدء التشغيل
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
-  </html>
+</html>
