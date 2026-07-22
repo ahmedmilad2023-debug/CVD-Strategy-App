@@ -37,33 +37,37 @@
         input:focus, select:focus, textarea:focus { border-color: var(--accent-gold); box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2); outline: none; }
         input::placeholder, textarea::placeholder { color: var(--text-muted); }
 
-        /* ===== App Bar ===== */
+        /* ===== App Bar - FIXED FOR MOBILE ===== */
         .app-bar {
             position: sticky; top: 0; z-index: 100; background: rgba(10, 13, 20, 0.92); backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-color);
-            padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+            padding: 12px 16px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px;
         }
-        .app-bar .logo { display: flex; align-items: center; gap: 10px; font-size: 22px; font-weight: 700; background: linear-gradient(135deg, var(--accent-gold), var(--accent-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .app-bar .logo span { font-size: 26px; -webkit-text-fill-color: initial; }
-        .app-bar .logo .badge-pro { background: var(--accent-gold); color: #000; font-size: 10px; padding: 2px 8px; border-radius: 12px; -webkit-text-fill-color: initial; font-weight: 800; margin-left: 8px; }
-        .app-bar .actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-        .app-bar .actions button { padding: 8px 16px; border-radius: 30px; font-size: 13px; font-weight: 600; transition: var(--transition); background: var(--bg-card); border: 1px solid var(--border-color); display: flex; align-items: center; gap: 6px; }
+        .app-bar .logo { display: flex; align-items: center; gap: 8px; font-size: 20px; font-weight: 700; background: linear-gradient(135deg, var(--accent-gold), var(--accent-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; flex-shrink: 0; white-space: nowrap; }
+        .app-bar .logo span { font-size: 24px; -webkit-text-fill-color: initial; }
+        .app-bar .logo .badge-pro { background: var(--accent-gold); color: #000; font-size: 10px; padding: 2px 8px; border-radius: 12px; -webkit-text-fill-color: initial; font-weight: 800; margin-right: 4px; }
+        .app-bar .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; justify-content: flex-end; flex: 1; }
+        .app-bar .actions button { 
+            padding: 6px 12px; border-radius: 30px; font-size: 12px; font-weight: 600; transition: var(--transition); 
+            background: var(--bg-card); border: 1px solid var(--border-color); display: flex; align-items: center; gap: 4px; 
+            flex-shrink: 0; white-space: nowrap; 
+        }
         .app-bar .actions button:hover { background: var(--bg-card-hover); transform: translateY(-1px); }
         .app-bar .actions button.strategy-btn { border-color: var(--accent-gold); color: var(--accent-gold); }
         .app-bar .actions button.strategy-btn.active { background: var(--accent-gold); color: #000; border-color: var(--accent-gold); }
         .app-bar .actions .btn-install { background: linear-gradient(135deg, var(--accent-gold), var(--accent-purple)); border-color: transparent; color: #fff; }
         .app-bar .actions .btn-install:hover { opacity: 0.9; transform: scale(1.03); }
-        .badge-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--accent-green); animation: pulse-dot 2s infinite; }
+        .badge-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--accent-green); animation: pulse-dot 2s infinite; flex-shrink: 0; }
         @keyframes pulse-dot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
 
         /* ===== Container ===== */
-        .container { max-width: 1200px; margin: 0 auto; padding: 16px 16px 0; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 12px 12px 0; }
 
-        /* ===== Ticker Strip ===== */
-        .ticker-strip { background: var(--bg-secondary); border-radius: var(--radius); padding: 12px 16px; margin-bottom: 20px; border: 1px solid var(--border-color); overflow: hidden; position: relative; }
-        .ticker-strip .scroll-wrap { display: flex; gap: 24px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+        /* ===== Ticker Strip - FIXED ===== */
+        .ticker-strip { background: var(--bg-secondary); border-radius: var(--radius); padding: 10px 14px; margin-bottom: 16px; border: 1px solid var(--border-color); overflow: hidden; position: relative; }
+        .ticker-strip .scroll-wrap { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; -webkit-overflow-scrolling: touch; align-items: center; }
         .ticker-strip .scroll-wrap::-webkit-scrollbar { display: none; }
-        .ticker-item { display: flex; align-items: center; gap: 8px; white-space: nowrap; font-size: 14px; font-weight: 500; padding: 4px 10px; border-radius: 20px; background: var(--bg-card); border: 1px solid var(--border-color); flex-shrink: 0; }
+        .ticker-item { display: flex; align-items: center; gap: 6px; white-space: nowrap; font-size: 13px; font-weight: 500; padding: 4px 10px; border-radius: 20px; background: var(--bg-card); border: 1px solid var(--border-color); flex-shrink: 0; }
         .ticker-item .sym { color: var(--text-secondary); font-weight: 600; }
         .ticker-item .price { font-weight: 700; }
         .ticker-item .signal-badge { font-size: 10px; padding: 2px 8px; border-radius: 12px; font-weight: 700; background: var(--bg-secondary); }
@@ -72,70 +76,66 @@
         .ticker-item .signal-badge.neutral { color: var(--text-muted); background: rgba(75, 85, 99, 0.15); }
 
         /* ===== Stats Row ===== */
-        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 20px; }
-        .stat-card { background: var(--bg-card); border-radius: var(--radius-sm); padding: 14px 16px; text-align: center; border: 1px solid var(--border-color); position: relative; overflow: hidden; }
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 16px; }
+        .stat-card { background: var(--bg-card); border-radius: var(--radius-sm); padding: 12px 14px; text-align: center; border: 1px solid var(--border-color); position: relative; overflow: hidden; }
         .stat-card::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--accent-gold); opacity: 0.3; }
-        .stat-card .label { font-size: 12px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
-        .stat-card .value { font-size: 24px; font-weight: 700; margin-top: 4px; }
+        .stat-card .label { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-card .value { font-size: 20px; font-weight: 700; margin-top: 4px; }
         .stat-card .value.green { color: var(--accent-green); }
         .stat-card .value.red { color: var(--accent-red); }
         .stat-card .value.gold { color: var(--accent-gold); }
         .stat-card .value.blue { color: var(--accent-blue); }
 
-        /* ===== Chart Section (Fixed for mobile) ===== */
+        /* ===== Chart Section ===== */
         .chart-section {
-            background: var(--bg-card);
-            border-radius: var(--radius);
-            border: 1px solid var(--border-color);
-            padding: 16px;
-            margin-bottom: 20px;
-            position: relative;
-            height: 340px;
-            min-height: 250px;
+            background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border-color);
+            padding: 12px; margin-bottom: 16px; position: relative;
+            height: 260px; /* Fixed height ensures chart renders */
         }
         .chart-section .chart-header {
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; height: 36px;
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; height: 32px;
         }
-        .chart-section .chart-header h3 { font-size: 15px; font-weight: 600; color: var(--text-secondary); }
+        .chart-section .chart-header h3 { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
         .chart-section .chart-header select {
-            width: auto; padding: 4px 10px; font-size: 12px; border-radius: 20px;
+            width: auto; padding: 2px 8px; font-size: 11px; border-radius: 20px;
             background: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-primary);
-            cursor: pointer;
         }
-        .chart-section #chartContainer { width: 100%; height: calc(100% - 46px); position: relative; }
+        /* CRITICAL FIX: Chart Container must have explicit height */
+        .chart-section #chartContainer { width: 100%; height: calc(100% - 40px); position: relative; }
 
         /* ===== Section Header ===== */
-        .section-header { display: flex; align-items: center; justify-content: space-between; margin: 24px 0 14px; flex-wrap: wrap; gap: 8px; }
-        .section-header h2 { font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
-        .section-header h2 .badge-count { font-size: 13px; font-weight: 600; background: var(--bg-card); padding: 2px 12px; border-radius: 20px; color: var(--text-secondary); }
-        .section-header .actions button { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; background: var(--bg-card); border: 1px solid var(--border-color); transition: var(--transition); }
+        .section-header { display: flex; align-items: center; justify-content: space-between; margin: 20px 0 12px; flex-wrap: wrap; gap: 8px; }
+        .section-header h2 { font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+        .section-header h2 .badge-count { font-size: 12px; font-weight: 600; background: var(--bg-card); padding: 2px 10px; border-radius: 20px; color: var(--text-secondary); }
+        .section-header .actions button { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; background: var(--bg-card); border: 1px solid var(--border-color); transition: var(--transition); }
         .section-header .actions button:hover { background: var(--bg-card-hover); }
 
         /* ===== Signal Cards ===== */
-        .signals-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 18px; }
-        .signal-card { background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border-color); padding: 18px 20px 20px; transition: var(--transition); position: relative; overflow: hidden; }
+        .signals-grid { display: grid; grid-template-columns: 1fr; gap: 16px; } /* Single column on mobile */
+        @media (min-width: 600px) { .signals-grid { grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); } }
+        .signal-card { background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border-color); padding: 16px; transition: var(--transition); position: relative; overflow: hidden; }
         .signal-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--text-muted); }
         .signal-card.buy::before { background: linear-gradient(90deg, var(--accent-green), #34d399); }
         .signal-card.sell::before { background: linear-gradient(90deg, var(--accent-red), #f87171); }
-        .signal-card:hover { border-color: var(--accent-gold); transform: translateY(-3px); box-shadow: var(--shadow); }
-        .signal-card .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
-        .signal-card .header .symbol { font-size: 20px; font-weight: 700; }
-        .signal-card .header .symbol small { font-weight: 400; font-size: 14px; color: var(--text-secondary); }
-        .signal-card .header .direction { font-size: 14px; font-weight: 700; padding: 4px 16px; border-radius: 20px; background: var(--bg-secondary); }
+        .signal-card:hover { border-color: var(--accent-gold); transform: translateY(-2px); box-shadow: var(--shadow); }
+        .signal-card .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; flex-wrap: wrap; gap: 4px; }
+        .signal-card .header .symbol { font-size: 18px; font-weight: 700; }
+        .signal-card .header .symbol small { font-weight: 400; font-size: 13px; color: var(--text-secondary); }
+        .signal-card .header .direction { font-size: 13px; font-weight: 700; padding: 4px 14px; border-radius: 20px; background: var(--bg-secondary); }
         .signal-card .header .direction.buy { color: var(--accent-green); background: rgba(16, 185, 129, 0.15); }
         .signal-card .header .direction.sell { color: var(--accent-red); background: rgba(239, 68, 68, 0.15); }
-        .signal-card .price-info { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 12px 0; padding: 12px 0; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); }
+        .signal-card .price-info { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin: 10px 0; padding: 10px 0; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); }
         .signal-card .price-info .item { text-align: center; }
-        .signal-card .price-info .item .label { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; }
-        .signal-card .price-info .item .val { font-size: 16px; font-weight: 700; margin-top: 2px; }
+        .signal-card .price-info .item .label { font-size: 10px; color: var(--text-secondary); text-transform: uppercase; }
+        .signal-card .price-info .item .val { font-size: 15px; font-weight: 700; margin-top: 2px; }
         .signal-card .price-info .item .val.green { color: var(--accent-green); }
         .signal-card .price-info .item .val.red { color: var(--accent-red); }
-        .signal-card .analysis { font-size: 13px; color: var(--text-secondary); background: var(--bg-secondary); padding: 10px 14px; border-radius: var(--radius-sm); margin: 12px 0; border-right: 3px solid var(--accent-gold); line-height: 1.7; max-height: 80px; overflow-y: auto; }
+        .signal-card .analysis { font-size: 12px; color: var(--text-secondary); background: var(--bg-secondary); padding: 8px 12px; border-radius: var(--radius-sm); margin: 10px 0; border-right: 3px solid var(--accent-gold); line-height: 1.6; max-height: 70px; overflow-y: auto; }
         .signal-card .analysis strong { color: var(--text-primary); }
-        .signal-card .footer { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-        .signal-card .footer .timestamp { font-size: 12px; color: var(--text-muted); }
-        .signal-card .footer .actions { display: flex; gap: 6px; }
-        .signal-card .footer .actions button { padding: 5px 12px; border-radius: 16px; font-size: 12px; font-weight: 600; transition: var(--transition); border: 1px solid var(--border-color); background: var(--bg-secondary); }
+        .signal-card .footer { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+        .signal-card .footer .timestamp { font-size: 11px; color: var(--text-muted); }
+        .signal-card .footer .actions { display: flex; gap: 4px; }
+        .signal-card .footer .actions button { padding: 4px 10px; border-radius: 16px; font-size: 11px; font-weight: 600; transition: var(--transition); border: 1px solid var(--border-color); background: var(--bg-secondary); }
         .signal-card .footer .actions button:hover { background: var(--bg-card-hover); }
         .signal-card .footer .actions .btn-share { color: var(--accent-blue); }
         .signal-card .footer .actions .btn-lock { color: var(--accent-gold); }
@@ -143,82 +143,76 @@
         .signal-card .footer .actions .btn-lock.locked { background: var(--accent-gold); color: #000; border-color: var(--accent-gold); }
 
         /* ===== Closed Trades ===== */
-        .closed-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
-        .closed-card { background: var(--bg-card); border-radius: var(--radius-sm); border: 1px solid var(--border-color); padding: 14px 16px; opacity: 0.7; transition: var(--transition); }
+        .closed-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+        @media (min-width: 600px) { .closed-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); } }
+        .closed-card { background: var(--bg-card); border-radius: var(--radius-sm); border: 1px solid var(--border-color); padding: 12px 14px; opacity: 0.7; transition: var(--transition); }
         .closed-card:hover { opacity: 1; border-color: var(--text-muted); }
-        .closed-card .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .closed-card .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
         .closed-card .header .symbol { font-weight: 700; }
-        .closed-card .header .result { font-weight: 700; font-size: 13px; padding: 2px 12px; border-radius: 12px; }
+        .closed-card .header .result { font-weight: 700; font-size: 12px; padding: 2px 10px; border-radius: 12px; }
         .closed-card .header .result.win { color: var(--accent-green); background: rgba(16, 185, 129, 0.15); }
         .closed-card .header .result.loss { color: var(--accent-red); background: rgba(239, 68, 68, 0.15); }
         .closed-card .header .result.neutral { color: var(--text-muted); background: rgba(75, 85, 99, 0.15); }
-        .closed-card .details { font-size: 13px; color: var(--text-secondary); display: flex; gap: 16px; flex-wrap: wrap; margin-top: 4px; }
+        .closed-card .details { font-size: 12px; color: var(--text-secondary); display: flex; gap: 12px; flex-wrap: wrap; margin-top: 4px; }
         .closed-card .details span { display: flex; align-items: center; gap: 4px; }
 
         /* ===== Modal / Settings ===== */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 200; display: none; align-items: center; justify-content: center; padding: 16px; }
         .modal-overlay.active { display: flex; }
-        .modal { background: var(--bg-secondary); border-radius: var(--radius); border: 1px solid var(--border-color); padding: 28px 24px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow); animation: modalIn 0.3s ease; }
+        .modal { background: var(--bg-secondary); border-radius: var(--radius); border: 1px solid var(--border-color); padding: 24px 20px; max-width: 460px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow); animation: modalIn 0.3s ease; }
         @keyframes modalIn { from { opacity: 0; transform: scale(0.95) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-        .modal .title { font-size: 22px; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; color: var(--accent-gold); }
-        .modal .form-group { margin-bottom: 16px; }
-        .modal .form-group label { display: block; font-size: 14px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; }
-        .modal .form-group .hint { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+        .modal .title { font-size: 20px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; color: var(--accent-gold); }
+        .modal .form-group { margin-bottom: 14px; }
+        .modal .form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; }
+        .modal .form-group .hint { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
         .modal .form-group input.ltr-fix { direction: ltr !important; text-align: left !important; unicode-bidi: plaintext !important; font-family: monospace !important; }
-        .modal .form-actions { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
-        .modal .form-actions button { padding: 10px 24px; border-radius: 30px; font-weight: 600; transition: var(--transition); flex: 1; min-width: 100px; }
+        .modal .form-actions { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+        .modal .form-actions button { padding: 10px 18px; border-radius: 30px; font-weight: 600; transition: var(--transition); flex: 1; min-width: 80px; }
         .modal .form-actions .btn-primary { background: linear-gradient(135deg, var(--accent-gold), var(--accent-purple)); color: #000; }
         .modal .form-actions .btn-primary:hover { opacity: 0.9; transform: scale(1.02); }
         .modal .form-actions .btn-secondary { background: var(--bg-card); border: 1px solid var(--border-color); }
         .modal .form-actions .btn-secondary:hover { background: var(--bg-card-hover); }
-        .modal .status-msg { margin-top: 12px; padding: 10px 14px; border-radius: var(--radius-sm); font-size: 14px; display: none; }
+        .modal .status-msg { margin-top: 10px; padding: 8px 12px; border-radius: var(--radius-sm); font-size: 13px; display: none; }
         .modal .status-msg.success { display: block; background: rgba(16, 185, 129, 0.15); color: var(--accent-green); border: 1px solid rgba(16, 185, 129, 0.3); }
         .modal .status-msg.error { display: block; background: rgba(239, 68, 68, 0.15); color: var(--accent-red); border: 1px solid rgba(239, 68, 68, 0.3); }
 
         /* ===== Toast ===== */
-        .toast-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 300; display: flex; flex-direction: column; gap: 8px; align-items: center; pointer-events: none; max-width: 90%; }
-        .toast { background: var(--bg-card); border: 1px solid var(--border-color); padding: 12px 20px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 500; box-shadow: var(--shadow); animation: toastIn 0.3s ease; pointer-events: auto; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); text-align: center; }
+        .toast-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 300; display: flex; flex-direction: column; gap: 6px; align-items: center; pointer-events: none; max-width: 92%; }
+        .toast { background: var(--bg-card); border: 1px solid var(--border-color); padding: 10px 18px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; box-shadow: var(--shadow); animation: toastIn 0.3s ease; pointer-events: auto; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); text-align: center; }
         .toast.success { border-color: var(--accent-green); color: var(--accent-green); }
         .toast.error { border-color: var(--accent-red); color: var(--accent-red); }
         .toast.info { border-color: var(--accent-gold); color: var(--accent-gold); }
         @keyframes toastIn { from { opacity: 0; transform: translateY(20px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
         /* ===== Debug Log ===== */
-        .debug-container { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px; margin-top: 20px; margin-bottom: 20px; max-height: 200px; overflow-y: auto; font-family: monospace; font-size: 12px; color: var(--text-secondary); }
+        .debug-container { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 10px; margin-top: 16px; margin-bottom: 16px; max-height: 160px; overflow-y: auto; font-family: monospace; font-size: 11px; color: var(--text-secondary); }
         .debug-container .log-line { padding: 2px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .debug-container .log-line.success { color: var(--accent-green); }
         .debug-container .log-line.error { color: var(--accent-red); }
         .debug-container .log-line.info { color: var(--accent-gold); }
-        .debug-label { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--text-secondary); }
+        .debug-label { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: var(--text-secondary); }
 
-        /* ===== Responsive ===== */
-        @media (max-width: 768px) {
-            .app-bar .logo { font-size: 18px; }
-            .app-bar .actions button { font-size: 12px; padding: 6px 12px; }
-            .signals-grid, .closed-grid { grid-template-columns: 1fr; }
-            .signal-card .price-info { grid-template-columns: 1fr 1fr; }
-            .stats-row { grid-template-columns: repeat(2, 1fr); }
-            .modal { padding: 20px 16px; }
-            .container { padding: 12px 12px 0; }
-            .ticker-strip .scroll-wrap { gap: 12px; }
-            .chart-section { height: 280px; }
-        }
-        @media (max-width: 480px) {
-            .signal-card .price-info { grid-template-columns: 1fr; gap: 4px; }
-            .signal-card .footer { flex-direction: column; align-items: stretch; }
-            .signal-card .footer .actions { justify-content: center; }
-            .app-bar { padding: 8px 12px; }
-            .app-bar .logo { font-size: 16px; gap: 6px; }
-            .stat-card .value { font-size: 18px; }
-            .chart-section { height: 240px; }
-        }
+        /* ===== Loading Spinner ===== */
         .loading-spinner { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 30px 0; color: var(--text-secondary); }
-        .spinner { width: 28px; height: 28px; border-radius: 50%; border: 3px solid var(--border-color); border-top-color: var(--accent-gold); animation: spin 0.8s linear infinite; }
+        .spinner { width: 24px; height: 24px; border-radius: 50%; border: 3px solid var(--border-color); border-top-color: var(--accent-gold); animation: spin 0.8s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-secondary); }
-        .empty-state .icon { font-size: 48px; margin-bottom: 12px; opacity: 0.4; }
-        .empty-state h3 { font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
-        .empty-state p { font-size: 14px; color: var(--text-muted); }
+        .empty-state { text-align: center; padding: 30px 16px; color: var(--text-secondary); }
+        .empty-state .icon { font-size: 40px; margin-bottom: 10px; opacity: 0.4; }
+        .empty-state h3 { font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+        .empty-state p { font-size: 13px; color: var(--text-muted); }
+
+        /* ===== Specific Mobile Width Fix ===== */
+        @media (max-width: 480px) {
+            .app-bar .logo { font-size: 16px; }
+            .app-bar .actions button { font-size: 11px; padding: 4px 8px; }
+            .signal-card .price-info { grid-template-columns: 1fr 1fr; gap: 4px; }
+            .signal-card .footer { flex-direction: column; align-items: stretch; gap: 6px; }
+            .signal-card .footer .actions { justify-content: center; }
+            .stats-row { grid-template-columns: 1fr 1fr; gap: 8px; }
+            .stat-card .value { font-size: 18px; }
+            .chart-section { height: 220px; }
+            .ticker-strip .scroll-wrap { gap: 10px; }
+        }
     </style>
 </head>
 <body>
@@ -248,9 +242,9 @@
     <main class="container">
         <section class="ticker-strip">
             <div class="scroll-wrap" id="tickerStrip">
-                <div class="loading-spinner" style="padding:8px 0;width:100%;">
-                    <div class="spinner" style="width:20px;height:20px;"></div>
-                    <span style="font-size:13px;">جاري تحميل الأسعار...</span>
+                <div class="loading-spinner" style="padding:6px 0;width:100%;">
+                    <div class="spinner" style="width:18px;height:18px;"></div>
+                    <span style="font-size:12px;">جاري التحميل...</span>
                 </div>
             </div>
         </section>
@@ -258,7 +252,7 @@
         <!-- ===== CHART SECTION (TradingView Lightweight Charts) ===== -->
         <section class="chart-section" id="chartSection">
             <div class="chart-header">
-                <h3>📊 رسم بياني شموع يابانية (فريم 30 دقيقة) - TradingView</h3>
+                <h3>📊 شموع (30 دقيقة) - TradingView</h3>
                 <select id="chartSymbolSelect">
                     <option value="BTCUSDT">BTC/USDT</option>
                     <option value="ETHUSDT">ETH/USDT</option>
@@ -279,9 +273,9 @@
         <section class="stats-row" id="statsRow">
             <div class="stat-card"><div class="label">إشارات نشطة</div><div class="value gold" id="statActive">0</div></div>
             <div class="stat-card"><div class="label">إشارات اليوم</div><div class="value blue" id="statToday">0</div></div>
-            <div class="stat-card"><div class="label">صفقات رابحة (اليوم)</div><div class="value green" id="statWins">0</div></div>
-            <div class="stat-card"><div class="label">صفقات خاسرة (اليوم)</div><div class="value red" id="statLosses">0</div></div>
-            <div class="stat-card"><div class="label">نسبة الربح (اليوم)</div><div class="value gold" id="statWinRate">0%</div></div>
+            <div class="stat-card"><div class="label">صفقات رابحة</div><div class="value green" id="statWins">0</div></div>
+            <div class="stat-card"><div class="label">صفقات خاسرة</div><div class="value red" id="statLosses">0</div></div>
+            <div class="stat-card"><div class="label">نسبة الربح</div><div class="value gold" id="statWinRate">0%</div></div>
         </section>
 
         <div class="section-header">
@@ -297,49 +291,49 @@
 
         <!-- Debug Log -->
         <div class="debug-container" id="debugLogContainer">
-            <div class="debug-label">📋 سجل الأحداث والمراقبة</div>
+            <div class="debug-label">📋 سجل الأحداث</div>
             <div id="debugLogContent"><div style="color:var(--text-muted);">بانتظار بدء التحديث...</div></div>
         </div>
 
-        <div class="section-header" style="margin-top:32px;">
+        <div class="section-header" style="margin-top:28px;">
             <h2>📁 سجل الصفقات المغلقة <span class="badge-count" id="closedCount">0</span></h2>
         </div>
         <div id="closedContainer">
-            <div class="empty-state"><div class="icon">📂</div><h3>لا توجد صفقات مغلقة بعد</h3><p>سيظهر هنا سجل الصفقات التي تم إغلاقها يدوياً أو تلقائياً</p></div>
+            <div class="empty-state"><div class="icon">📂</div><h3>لا توجد صفقات مغلقة بعد</h3></div>
         </div>
     </main>
 
     <!-- ===== SETTINGS MODAL ===== -->
     <div class="modal-overlay" id="settingsModal">
         <div class="modal">
-            <div class="title">⚙️ إعدادات التطبيق Pro</div>
+            <div class="title">⚙️ إعدادات التطبيق</div>
             <div class="form-group">
-                <label>🤖 توكن بوت التليجرام (Bot Token)</label>
+                <label>🤖 توكن بوت التليجرام</label>
                 <input type="text" id="telegramToken" class="ltr-fix" value="8701817759:AAFNCDD0p4kh0JdSR1WfVRMFvulDVT7gDCQ" placeholder="8701817759:AAFNCDD0p4kh0JdSR1WfVRMFvulDVT7gDCQ" />
-                <div class="hint">احصل عليه من @BotFather على تليجرام</div>
+                <div class="hint">احصل عليه من @BotFather</div>
             </div>
             <div class="form-group">
                 <label>🆔 معرف الدردشة (Chat ID)</label>
                 <input type="text" id="telegramChatId" class="ltr-fix" value="1003970108966" placeholder="1003970108966" />
-                <div class="hint">معرف القناة أو المجموعة، أو معرف المستخدم</div>
+                <div class="hint">معرف القناة أو المجموعة</div>
             </div>
             <div class="form-group">
                 <label>⏱️ تحديث البيانات (بالدقائق)</label>
                 <input type="number" id="updateInterval" min="1" max="60" value="1" />
-                <div class="hint">كل كم دقيقة يتم تحديث الأسعار والتحليل (يُفضل 1-2 دقيقة)</div>
+                <div class="hint">كل كم دقيقة يتم تحديث الأسعار (1-2 دقيقة مُفضل)</div>
             </div>
             <div class="form-group" style="display:flex;align-items:center;gap:10px;">
-                <label style="margin:0;cursor:pointer;">
+                <label style="margin:0;cursor:pointer; display:flex; align-items:center; gap:8px;">
                     <input type="checkbox" id="autoSendTelegram" checked />
-                    إرسال الإشارات تلقائياً للتليجرام
+                    إرسال الإشارات للتليجرام تلقائياً
                 </label>
             </div>
             <div class="status-msg" id="settingsStatus"></div>
             <div class="form-actions">
-                <button class="btn-primary" id="settingsSave">💾 حفظ الإعدادات</button>
+                <button class="btn-primary" id="settingsSave">💾 حفظ</button>
                 <button class="btn-secondary" id="settingsClose">إغلاق</button>
                 <button class="btn-secondary" id="settingsTest" style="flex:0.5;border-color:var(--accent-gold);color:var(--accent-gold);">🧪 اختبار</button>
-                <button class="btn-secondary" id="settingsCopy">📋 نسخ الإعدادات</button>
+                <button class="btn-secondary" id="settingsCopy">📋 نسخ</button>
             </div>
         </div>
     </div>
@@ -409,8 +403,7 @@
                 currentStrategy: 'new',
                 chart: null,
                 chartSeries: null,
-                chartReady: false,
-                resizeObserver: null
+                chartReady: false
             };
 
             // ============================================================
@@ -453,7 +446,6 @@
             const toastContainer = $('toastContainer');
             const chartContainer = $('chartContainer');
             const chartSymbolSelect = $('chartSymbolSelect');
-            const chartSection = $('chartSection');
 
             // ============================================================
             //  DEBUG LOG
@@ -855,16 +847,14 @@
             }
 
             // ============================================================
-            //  FETCH DATA (Improved with timeout & error handling)
+            //  FETCH DATA
             // ============================================================
             async function fetchKlinesWithRetry(symbol, interval, limit = CONFIG.KLINE_LIMIT, retries = 4) {
                 for (let i = 0; i < retries; i++) {
                     try {
                         const controller = new AbortController();
-                        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
-                        const resp = await fetch(`${CONFIG.BINANCE_BASE}/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`, {
-                            signal: controller.signal
-                        });
+                        const timeoutId = setTimeout(() => controller.abort(), 10000);
+                        const resp = await fetch(`${CONFIG.BINANCE_BASE}/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`, { signal: controller.signal });
                         clearTimeout(timeoutId);
                         
                         if (!resp.ok) {
@@ -903,11 +893,10 @@
             }
 
             // ============================================================
-            //  CHART DRAWING (TradingView Lightweight Charts) - FIXED
+            //  CHART DRAWING (TradingView Lightweight Charts) - ROBUST
             // ============================================================
             function createChart() {
                 if (!chartContainer) return null;
-                // Destroy previous chart if exists
                 if (state.chart) {
                     try { state.chart.remove(); } catch (e) {}
                     state.chart = null;
@@ -916,9 +905,9 @@
                 
                 const rect = chartContainer.getBoundingClientRect();
                 let w = rect.width || chartContainer.clientWidth || 400;
-                let h = rect.height || chartContainer.clientHeight || 260;
+                let h = rect.height || chartContainer.clientHeight || 200; // fallback height
                 if (w < 50) w = 400;
-                if (h < 50) h = 260;
+                if (h < 50) h = 200;
 
                 try {
                     const chart = LightweightCharts.createChart(chartContainer, {
@@ -936,23 +925,8 @@
                             timeVisible: true,
                             secondsVisible: false,
                             borderColor: '#374151',
-                            fixLeftEdge: true,
-                            fixRightEdge: true,
                         },
-                        rightPriceScale: {
-                            borderColor: '#374151',
-                        },
-                        handleScroll: {
-                            horzTouchDrag: true,
-                            vertTouchDrag: true,
-                            mouseWheel: true,
-                            pressedMouseMove: true,
-                        },
-                        handleScale: {
-                            axisPressedMouseMove: true,
-                            mouseWheel: true,
-                            pinch: true,
-                        }
+                        rightPriceScale: { borderColor: '#374151' },
                     });
                     const series = chart.addCandlestickSeries({
                         upColor: '#10b981',
@@ -976,13 +950,12 @@
 
             function updateChart(symbol) {
                 if (!state.chartReady || !state.chart || !state.chartSeries) {
-                    addLog('⚠️ الرسم البياني غير جاهز، سيتم إعادة إنشائه', 'info');
                     createChart();
                     if (!state.chartReady) return;
                 }
                 const klines = state.klines[symbol];
                 if (!klines || klines.length < 2) {
-                    addLog(`⚠️ لا توجد بيانات كافية لرسم الشموع لـ ${symbol} (العدد: ${klines ? klines.length : 0})`, 'info');
+                    addLog(`⚠️ لا توجد بيانات كافية لرسم الشموع لـ ${symbol}`, 'info');
                     return;
                 }
                 try {
@@ -1006,29 +979,11 @@
                     try {
                         const rect = chartContainer.getBoundingClientRect();
                         let w = rect.width || chartContainer.clientWidth || 400;
-                        let h = rect.height || chartContainer.clientHeight || 260;
+                        let h = rect.height || chartContainer.clientHeight || 200;
                         if (w < 50) w = 400;
-                        if (h < 50) h = 260;
+                        if (h < 50) h = 200;
                         state.chart.applyOptions({ width: w, height: h });
                     } catch (e) {}
-                }
-            }
-
-            function ensureChartVisible() {
-                const rect = chartContainer.getBoundingClientRect();
-                if (rect.width < 10 || rect.height < 10) {
-                    addLog('📐 الرسم البياني بحجم صغير، سيتم إعادة ضبطه...', 'info');
-                    setTimeout(() => {
-                        createChart();
-                        updateChart(chartSymbolSelect.value);
-                        resizeChart();
-                    }, 300);
-                } else {
-                    if (!state.chartReady) {
-                        createChart();
-                        updateChart(chartSymbolSelect.value);
-                        resizeChart();
-                    }
                 }
             }
 
@@ -1161,9 +1116,12 @@
                     persistState();
                     renderAll();
 
-                    // Update chart for selected symbol
-                    ensureChartVisible();
-                    updateChart(chartSymbolSelect.value);
+                    // Update Chart with safety delay to ensure container size
+                    setTimeout(() => {
+                        createChart(); // Redraw on resize if needed
+                        updateChart(chartSymbolSelect.value);
+                        resizeChart();
+                    }, 100);
 
                     liveDot.style.background = '#10b981';
                     liveDot.style.animation = 'pulse-dot 2s infinite';
@@ -1584,33 +1542,28 @@
                 btnStrategy.addEventListener('click', toggleStrategy);
                 
                 chartSymbolSelect.addEventListener('change', () => {
-                    ensureChartVisible();
-                    updateChart(chartSymbolSelect.value);
-                    resizeChart();
+                    setTimeout(() => {
+                        createChart();
+                        updateChart(chartSymbolSelect.value);
+                        resizeChart();
+                    }, 100);
                 });
 
-                // Resize Observer for better mobile support
-                if (window.ResizeObserver) {
-                    const ro = new ResizeObserver(() => { 
-                        setTimeout(resizeChart, 200); 
-                    });
-                    ro.observe(chartContainer);
-                    state.resizeObserver = ro;
-                }
-                window.addEventListener('resize', () => { setTimeout(resizeChart, 200); });
+                window.addEventListener('resize', () => {
+                    setTimeout(resizeChart, 200);
+                });
 
                 settingsModal.addEventListener('click', (e) => { if (e.target === settingsModal) closeSettings(); });
                 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSettings(); });
 
-                // Initialize chart after layout
+                // Initialize chart
                 setTimeout(() => {
                     createChart();
-                    ensureChartVisible();
                     setTimeout(() => {
                         updateChart(chartSymbolSelect.value);
                         resizeChart();
-                    }, 300);
-                }, 400);
+                    }, 200);
+                }, 300);
 
                 await requestWakeLock();
                 startSilentAudioLoop();
@@ -1636,4 +1589,4 @@
         })();
     </script>
 </body>
-                                                        </html>
+                </html>
