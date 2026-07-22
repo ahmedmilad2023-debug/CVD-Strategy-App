@@ -9,314 +9,80 @@
     <link rel="manifest" href="#" id="manifest-link">
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>">
     <!-- TradingView Lightweight Charts -->
-    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js">
-    </script>
+    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
-            --bg-primary: #0a0d14;
-            --bg-secondary: #111827;
-            --bg-card: #1f2937;
-            --bg-card-hover: #2d3a52;
-            --border-color: #374151;
-            --text-primary: #f3f4f6;
-            --text-secondary: #9ca3af;
-            --text-muted: #4b5563;
-            --accent-green: #10b981;
-            --accent-red: #ef4444;
-            --accent-blue: #3b82f6;
-            --accent-gold: #f59e0b;
-            --accent-purple: #8b5cf6;
-            --shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
-            --radius: 16px;
-            --radius-sm: 10px;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --bg-primary: #0a0d14; --bg-secondary: #111827; --bg-card: #1f2937; --bg-card-hover: #2d3a52;
+            --border-color: #374151; --text-primary: #f3f4f6; --text-secondary: #9ca3af; --text-muted: #4b5563;
+            --accent-green: #10b981; --accent-red: #ef4444; --accent-blue: #3b82f6; --accent-gold: #f59e0b;
+            --accent-purple: #8b5cf6; --shadow: 0 8px 32px rgba(0, 0, 0, 0.8); --radius: 16px; --radius-sm: 10px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
-        html {
-            scroll-behavior: smooth;
-        }
+        html { scroll-behavior: smooth; }
         body {
-            font-family: var(--font);
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            min-height: 100vh;
-            padding-bottom: 100px;
-            overflow-x: hidden;
-            line-height: 1.6;
+            font-family: var(--font); background: var(--bg-primary); color: var(--text-primary);
+            min-height: 100vh; padding-bottom: 100px; overflow-x: hidden; line-height: 1.6;
         }
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+        ::-webkit-scrollbar-thumb { background: var(--accent-gold); border-radius: 10px; }
+        a { color: var(--accent-blue); text-decoration: none; }
+        button { cursor: pointer; font-family: inherit; border: none; outline: none; background: none; color: inherit; }
+        input, select, textarea {
+            font-family: inherit; background: var(--bg-secondary); color: var(--text-primary);
+            border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 10px 14px;
+            font-size: 14px; width: 100%; transition: var(--transition);
         }
-        ::-webkit-scrollbar-track {
-            background: var(--bg-secondary);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: var(--accent-gold);
-            border-radius: 10px;
-        }
-        a {
-            color: var(--accent-blue);
-            text-decoration: none;
-        }
-        button {
-            cursor: pointer;
-            font-family: inherit;
-            border: none;
-            outline: none;
-            background: none;
-            color: inherit;
-        }
-        input,
-        select,
-        textarea {
-            font-family: inherit;
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-sm);
-            padding: 10px 14px;
-            font-size: 14px;
-            width: 100%;
-            transition: var(--transition);
-        }
-        input:focus,
-        select:focus,
-        textarea:focus {
-            border-color: var(--accent-gold);
-            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
-            outline: none;
-        }
-        input::placeholder,
-        textarea::placeholder {
-            color: var(--text-muted);
-        }
+        input:focus, select:focus, textarea:focus { border-color: var(--accent-gold); box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2); outline: none; }
+        input::placeholder, textarea::placeholder { color: var(--text-muted); }
 
         /* ===== App Bar ===== */
         .app-bar {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: rgba(10, 13, 20, 0.92);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border-color);
-            padding: 12px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            flex-wrap: wrap;
+            position: sticky; top: 0; z-index: 100; background: rgba(10, 13, 20, 0.92); backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-color);
+            padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
         }
-        .app-bar .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 22px;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--accent-gold), var(--accent-purple));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .app-bar .logo span {
-            font-size: 26px;
-            -webkit-text-fill-color: initial;
-        }
-        .app-bar .logo .badge-pro {
-            background: var(--accent-gold);
-            color: #000;
-            font-size: 10px;
-            padding: 2px 8px;
-            border-radius: 12px;
-            -webkit-text-fill-color: initial;
-            font-weight: 800;
-            margin-left: 8px;
-        }
-        .app-bar .actions {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        .app-bar .actions button {
-            padding: 8px 16px;
-            border-radius: 30px;
-            font-size: 13px;
-            font-weight: 600;
-            transition: var(--transition);
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .app-bar .actions button:hover {
-            background: var(--bg-card-hover);
-            transform: translateY(-1px);
-        }
-        .app-bar .actions button.strategy-btn {
-            border-color: var(--accent-gold);
-            color: var(--accent-gold);
-        }
-        .app-bar .actions button.strategy-btn.active {
-            background: var(--accent-gold);
-            color: #000;
-            border-color: var(--accent-gold);
-        }
-        .app-bar .actions .btn-install {
-            background: linear-gradient(135deg, var(--accent-gold), var(--accent-purple));
-            border-color: transparent;
-            color: #fff;
-        }
-        .app-bar .actions .btn-install:hover {
-            opacity: 0.9;
-            transform: scale(1.03);
-        }
-        .badge-dot {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--accent-green);
-            animation: pulse-dot 2s infinite;
-        }
-        @keyframes pulse-dot {
-            0%,
-            100% {
-                opacity: 1;
-                transform: scale(1);
-            }
-            50% {
-                opacity: 0.5;
-                transform: scale(0.8);
-            }
-        }
+        .app-bar .logo { display: flex; align-items: center; gap: 10px; font-size: 22px; font-weight: 700; background: linear-gradient(135deg, var(--accent-gold), var(--accent-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .app-bar .logo span { font-size: 26px; -webkit-text-fill-color: initial; }
+        .app-bar .logo .badge-pro { background: var(--accent-gold); color: #000; font-size: 10px; padding: 2px 8px; border-radius: 12px; -webkit-text-fill-color: initial; font-weight: 800; margin-left: 8px; }
+        .app-bar .actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .app-bar .actions button { padding: 8px 16px; border-radius: 30px; font-size: 13px; font-weight: 600; transition: var(--transition); background: var(--bg-card); border: 1px solid var(--border-color); display: flex; align-items: center; gap: 6px; }
+        .app-bar .actions button:hover { background: var(--bg-card-hover); transform: translateY(-1px); }
+        .app-bar .actions button.strategy-btn { border-color: var(--accent-gold); color: var(--accent-gold); }
+        .app-bar .actions button.strategy-btn.active { background: var(--accent-gold); color: #000; border-color: var(--accent-gold); }
+        .app-bar .actions .btn-install { background: linear-gradient(135deg, var(--accent-gold), var(--accent-purple)); border-color: transparent; color: #fff; }
+        .app-bar .actions .btn-install:hover { opacity: 0.9; transform: scale(1.03); }
+        .badge-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--accent-green); animation: pulse-dot 2s infinite; }
+        @keyframes pulse-dot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
 
         /* ===== Container ===== */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 16px 16px 0;
-        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 16px 16px 0; }
 
         /* ===== Ticker Strip ===== */
-        .ticker-strip {
-            background: var(--bg-secondary);
-            border-radius: var(--radius);
-            padding: 12px 16px;
-            margin-bottom: 20px;
-            border: 1px solid var(--border-color);
-            overflow: hidden;
-            position: relative;
-        }
-        .ticker-strip .scroll-wrap {
-            display: flex;
-            gap: 24px;
-            overflow-x: auto;
-            padding-bottom: 4px;
-            scrollbar-width: none;
-            -webkit-overflow-scrolling: touch;
-        }
-        .ticker-strip .scroll-wrap::-webkit-scrollbar {
-            display: none;
-        }
-        .ticker-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            white-space: nowrap;
-            font-size: 14px;
-            font-weight: 500;
-            padding: 4px 10px;
-            border-radius: 20px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            flex-shrink: 0;
-        }
-        .ticker-item .sym {
-            color: var(--text-secondary);
-            font-weight: 600;
-        }
-        .ticker-item .price {
-            font-weight: 700;
-        }
-        .ticker-item .signal-badge {
-            font-size: 10px;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-weight: 700;
-            background: var(--bg-secondary);
-        }
-        .ticker-item .signal-badge.buy {
-            color: var(--accent-green);
-            background: rgba(16, 185, 129, 0.2);
-        }
-        .ticker-item .signal-badge.sell {
-            color: var(--accent-red);
-            background: rgba(239, 68, 68, 0.2);
-        }
-        .ticker-item .signal-badge.neutral {
-            color: var(--text-muted);
-            background: rgba(75, 85, 99, 0.15);
-        }
+        .ticker-strip { background: var(--bg-secondary); border-radius: var(--radius); padding: 12px 16px; margin-bottom: 20px; border: 1px solid var(--border-color); overflow: hidden; position: relative; }
+        .ticker-strip .scroll-wrap { display: flex; gap: 24px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+        .ticker-strip .scroll-wrap::-webkit-scrollbar { display: none; }
+        .ticker-item { display: flex; align-items: center; gap: 8px; white-space: nowrap; font-size: 14px; font-weight: 500; padding: 4px 10px; border-radius: 20px; background: var(--bg-card); border: 1px solid var(--border-color); flex-shrink: 0; }
+        .ticker-item .sym { color: var(--text-secondary); font-weight: 600; }
+        .ticker-item .price { font-weight: 700; }
+        .ticker-item .signal-badge { font-size: 10px; padding: 2px 8px; border-radius: 12px; font-weight: 700; background: var(--bg-secondary); }
+        .ticker-item .signal-badge.buy { color: var(--accent-green); background: rgba(16, 185, 129, 0.2); }
+        .ticker-item .signal-badge.sell { color: var(--accent-red); background: rgba(239, 68, 68, 0.2); }
+        .ticker-item .signal-badge.neutral { color: var(--text-muted); background: rgba(75, 85, 99, 0.15); }
 
         /* ===== Stats Row ===== */
-        .stats-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-        .stat-card {
-            background: var(--bg-card);
-            border-radius: var(--radius-sm);
-            padding: 14px 16px;
-            text-align: center;
-            border: 1px solid var(--border-color);
-            position: relative;
-            overflow: hidden;
-        }
-        .stat-card::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: var(--accent-gold);
-            opacity: 0.3;
-        }
-        .stat-card .label {
-            font-size: 12px;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .stat-card .value {
-            font-size: 24px;
-            font-weight: 700;
-            margin-top: 4px;
-        }
-        .stat-card .value.green {
-            color: var(--accent-green);
-        }
-        .stat-card .value.red {
-            color: var(--accent-red);
-        }
-        .stat-card .value.gold {
-            color: var(--accent-gold);
-        }
-        .stat-card .value.blue {
-            color: var(--accent-blue);
-        }
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .stat-card { background: var(--bg-card); border-radius: var(--radius-sm); padding: 14px 16px; text-align: center; border: 1px solid var(--border-color); position: relative; overflow: hidden; }
+        .stat-card::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--accent-gold); opacity: 0.3; }
+        .stat-card .label { font-size: 12px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-card .value { font-size: 24px; font-weight: 700; margin-top: 4px; }
+        .stat-card .value.green { color: var(--accent-green); }
+        .stat-card .value.red { color: var(--accent-red); }
+        .stat-card .value.gold { color: var(--accent-gold); }
+        .stat-card .value.blue { color: var(--accent-blue); }
 
-        /* ===== Chart Section ===== */
+        /* ===== Chart Section (Fixed for mobile) ===== */
         .chart-section {
             background: var(--bg-card);
             border-radius: var(--radius);
@@ -325,590 +91,134 @@
             margin-bottom: 20px;
             position: relative;
             height: 340px;
-            /* Fixed height for chart */
+            min-height: 250px;
         }
         .chart-section .chart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            height: 36px;
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; height: 36px;
         }
-        .chart-section .chart-header h3 {
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--text-secondary);
-        }
+        .chart-section .chart-header h3 { font-size: 15px; font-weight: 600; color: var(--text-secondary); }
         .chart-section .chart-header select {
-            width: auto;
-            padding: 4px 10px;
-            font-size: 12px;
-            border-radius: 20px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
+            width: auto; padding: 4px 10px; font-size: 12px; border-radius: 20px;
+            background: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-primary);
+            cursor: pointer;
         }
-        /* ===== FIX: chart container gets explicit height ===== */
-        .chart-section #chartContainer {
-            width: 100%;
-            height: calc(100% - 46px);
-            /* 46px = header height + margins */
-            position: relative;
-        }
+        .chart-section #chartContainer { width: 100%; height: calc(100% - 46px); position: relative; }
 
         /* ===== Section Header ===== */
-        .section-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin: 24px 0 14px;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        .section-header h2 {
-            font-size: 20px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .section-header h2 .badge-count {
-            font-size: 13px;
-            font-weight: 600;
-            background: var(--bg-card);
-            padding: 2px 12px;
-            border-radius: 20px;
-            color: var(--text-secondary);
-        }
-        .section-header .actions button {
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            transition: var(--transition);
-        }
-        .section-header .actions button:hover {
-            background: var(--bg-card-hover);
-        }
+        .section-header { display: flex; align-items: center; justify-content: space-between; margin: 24px 0 14px; flex-wrap: wrap; gap: 8px; }
+        .section-header h2 { font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+        .section-header h2 .badge-count { font-size: 13px; font-weight: 600; background: var(--bg-card); padding: 2px 12px; border-radius: 20px; color: var(--text-secondary); }
+        .section-header .actions button { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; background: var(--bg-card); border: 1px solid var(--border-color); transition: var(--transition); }
+        .section-header .actions button:hover { background: var(--bg-card-hover); }
 
         /* ===== Signal Cards ===== */
-        .signals-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-            gap: 18px;
-        }
-        .signal-card {
-            background: var(--bg-card);
-            border-radius: var(--radius);
-            border: 1px solid var(--border-color);
-            padding: 18px 20px 20px;
-            transition: var(--transition);
-            position: relative;
-            overflow: hidden;
-        }
-        .signal-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: var(--text-muted);
-        }
-        .signal-card.buy::before {
-            background: linear-gradient(90deg, var(--accent-green), #34d399);
-        }
-        .signal-card.sell::before {
-            background: linear-gradient(90deg, var(--accent-red), #f87171);
-        }
-        .signal-card:hover {
-            border-color: var(--accent-gold);
-            transform: translateY(-3px);
-            box-shadow: var(--shadow);
-        }
-        .signal-card .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 12px;
-        }
-        .signal-card .header .symbol {
-            font-size: 20px;
-            font-weight: 700;
-        }
-        .signal-card .header .symbol small {
-            font-weight: 400;
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
-        .signal-card .header .direction {
-            font-size: 14px;
-            font-weight: 700;
-            padding: 4px 16px;
-            border-radius: 20px;
-            background: var(--bg-secondary);
-        }
-        .signal-card .header .direction.buy {
-            color: var(--accent-green);
-            background: rgba(16, 185, 129, 0.15);
-        }
-        .signal-card .header .direction.sell {
-            color: var(--accent-red);
-            background: rgba(239, 68, 68, 0.15);
-        }
-        .signal-card .price-info {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 8px;
-            margin: 12px 0;
-            padding: 12px 0;
-            border-top: 1px solid var(--border-color);
-            border-bottom: 1px solid var(--border-color);
-        }
-        .signal-card .price-info .item {
-            text-align: center;
-        }
-        .signal-card .price-info .item .label {
-            font-size: 11px;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-        }
-        .signal-card .price-info .item .val {
-            font-size: 16px;
-            font-weight: 700;
-            margin-top: 2px;
-        }
-        .signal-card .price-info .item .val.green {
-            color: var(--accent-green);
-        }
-        .signal-card .price-info .item .val.red {
-            color: var(--accent-red);
-        }
-        .signal-card .analysis {
-            font-size: 13px;
-            color: var(--text-secondary);
-            background: var(--bg-secondary);
-            padding: 10px 14px;
-            border-radius: var(--radius-sm);
-            margin: 12px 0;
-            border-right: 3px solid var(--accent-gold);
-            line-height: 1.7;
-            max-height: 80px;
-            overflow-y: auto;
-        }
-        .signal-card .analysis strong {
-            color: var(--text-primary);
-        }
-        .signal-card .footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 12px;
-        }
-        .signal-card .footer .timestamp {
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-        .signal-card .footer .actions {
-            display: flex;
-            gap: 6px;
-        }
-        .signal-card .footer .actions button {
-            padding: 5px 12px;
-            border-radius: 16px;
-            font-size: 12px;
-            font-weight: 600;
-            transition: var(--transition);
-            border: 1px solid var(--border-color);
-            background: var(--bg-secondary);
-        }
-        .signal-card .footer .actions button:hover {
-            background: var(--bg-card-hover);
-        }
-        .signal-card .footer .actions .btn-share {
-            color: var(--accent-blue);
-        }
-        .signal-card .footer .actions .btn-lock {
-            color: var(--accent-gold);
-        }
-        .signal-card .footer .actions .btn-close {
-            color: var(--accent-red);
-        }
-        .signal-card .footer .actions .btn-lock.locked {
-            background: var(--accent-gold);
-            color: #000;
-            border-color: var(--accent-gold);
-        }
+        .signals-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 18px; }
+        .signal-card { background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border-color); padding: 18px 20px 20px; transition: var(--transition); position: relative; overflow: hidden; }
+        .signal-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--text-muted); }
+        .signal-card.buy::before { background: linear-gradient(90deg, var(--accent-green), #34d399); }
+        .signal-card.sell::before { background: linear-gradient(90deg, var(--accent-red), #f87171); }
+        .signal-card:hover { border-color: var(--accent-gold); transform: translateY(-3px); box-shadow: var(--shadow); }
+        .signal-card .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+        .signal-card .header .symbol { font-size: 20px; font-weight: 700; }
+        .signal-card .header .symbol small { font-weight: 400; font-size: 14px; color: var(--text-secondary); }
+        .signal-card .header .direction { font-size: 14px; font-weight: 700; padding: 4px 16px; border-radius: 20px; background: var(--bg-secondary); }
+        .signal-card .header .direction.buy { color: var(--accent-green); background: rgba(16, 185, 129, 0.15); }
+        .signal-card .header .direction.sell { color: var(--accent-red); background: rgba(239, 68, 68, 0.15); }
+        .signal-card .price-info { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 12px 0; padding: 12px 0; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); }
+        .signal-card .price-info .item { text-align: center; }
+        .signal-card .price-info .item .label { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; }
+        .signal-card .price-info .item .val { font-size: 16px; font-weight: 700; margin-top: 2px; }
+        .signal-card .price-info .item .val.green { color: var(--accent-green); }
+        .signal-card .price-info .item .val.red { color: var(--accent-red); }
+        .signal-card .analysis { font-size: 13px; color: var(--text-secondary); background: var(--bg-secondary); padding: 10px 14px; border-radius: var(--radius-sm); margin: 12px 0; border-right: 3px solid var(--accent-gold); line-height: 1.7; max-height: 80px; overflow-y: auto; }
+        .signal-card .analysis strong { color: var(--text-primary); }
+        .signal-card .footer { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+        .signal-card .footer .timestamp { font-size: 12px; color: var(--text-muted); }
+        .signal-card .footer .actions { display: flex; gap: 6px; }
+        .signal-card .footer .actions button { padding: 5px 12px; border-radius: 16px; font-size: 12px; font-weight: 600; transition: var(--transition); border: 1px solid var(--border-color); background: var(--bg-secondary); }
+        .signal-card .footer .actions button:hover { background: var(--bg-card-hover); }
+        .signal-card .footer .actions .btn-share { color: var(--accent-blue); }
+        .signal-card .footer .actions .btn-lock { color: var(--accent-gold); }
+        .signal-card .footer .actions .btn-close { color: var(--accent-red); }
+        .signal-card .footer .actions .btn-lock.locked { background: var(--accent-gold); color: #000; border-color: var(--accent-gold); }
 
         /* ===== Closed Trades ===== */
-        .closed-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 14px;
-        }
-        .closed-card {
-            background: var(--bg-card);
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border-color);
-            padding: 14px 16px;
-            opacity: 0.7;
-            transition: var(--transition);
-        }
-        .closed-card:hover {
-            opacity: 1;
-            border-color: var(--text-muted);
-        }
-        .closed-card .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 6px;
-        }
-        .closed-card .header .symbol {
-            font-weight: 700;
-        }
-        .closed-card .header .result {
-            font-weight: 700;
-            font-size: 13px;
-            padding: 2px 12px;
-            border-radius: 12px;
-        }
-        .closed-card .header .result.win {
-            color: var(--accent-green);
-            background: rgba(16, 185, 129, 0.15);
-        }
-        .closed-card .header .result.loss {
-            color: var(--accent-red);
-            background: rgba(239, 68, 68, 0.15);
-        }
-        .closed-card .header .result.neutral {
-            color: var(--text-muted);
-            background: rgba(75, 85, 99, 0.15);
-        }
-        .closed-card .details {
-            font-size: 13px;
-            color: var(--text-secondary);
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-            margin-top: 4px;
-        }
-        .closed-card .details span {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
+        .closed-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+        .closed-card { background: var(--bg-card); border-radius: var(--radius-sm); border: 1px solid var(--border-color); padding: 14px 16px; opacity: 0.7; transition: var(--transition); }
+        .closed-card:hover { opacity: 1; border-color: var(--text-muted); }
+        .closed-card .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .closed-card .header .symbol { font-weight: 700; }
+        .closed-card .header .result { font-weight: 700; font-size: 13px; padding: 2px 12px; border-radius: 12px; }
+        .closed-card .header .result.win { color: var(--accent-green); background: rgba(16, 185, 129, 0.15); }
+        .closed-card .header .result.loss { color: var(--accent-red); background: rgba(239, 68, 68, 0.15); }
+        .closed-card .header .result.neutral { color: var(--text-muted); background: rgba(75, 85, 99, 0.15); }
+        .closed-card .details { font-size: 13px; color: var(--text-secondary); display: flex; gap: 16px; flex-wrap: wrap; margin-top: 4px; }
+        .closed-card .details span { display: flex; align-items: center; gap: 4px; }
 
         /* ===== Modal / Settings ===== */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            z-index: 200;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        .modal-overlay.active {
-            display: flex;
-        }
-        .modal {
-            background: var(--bg-secondary);
-            border-radius: var(--radius);
-            border: 1px solid var(--border-color);
-            padding: 28px 24px;
-            max-width: 500px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: var(--shadow);
-            animation: modalIn 0.3s ease;
-        }
-        @keyframes modalIn {
-            from {
-                opacity: 0;
-                transform: scale(0.95) translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
-        }
-        .modal .title {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: var(--accent-gold);
-        }
-        .modal .form-group {
-            margin-bottom: 16px;
-        }
-        .modal .form-group label {
-            display: block;
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            margin-bottom: 4px;
-        }
-        .modal .form-group .hint {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-top: 4px;
-        }
-        .modal .form-group input.ltr-fix {
-            direction: ltr !important;
-            text-align: left !important;
-            unicode-bidi: plaintext !important;
-            font-family: monospace !important;
-        }
-        .modal .form-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-            flex-wrap: wrap;
-        }
-        .modal .form-actions button {
-            padding: 10px 24px;
-            border-radius: 30px;
-            font-weight: 600;
-            transition: var(--transition);
-            flex: 1;
-            min-width: 100px;
-        }
-        .modal .form-actions .btn-primary {
-            background: linear-gradient(135deg, var(--accent-gold), var(--accent-purple));
-            color: #000;
-        }
-        .modal .form-actions .btn-primary:hover {
-            opacity: 0.9;
-            transform: scale(1.02);
-        }
-        .modal .form-actions .btn-secondary {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-        }
-        .modal .form-actions .btn-secondary:hover {
-            background: var(--bg-card-hover);
-        }
-        .modal .status-msg {
-            margin-top: 12px;
-            padding: 10px 14px;
-            border-radius: var(--radius-sm);
-            font-size: 14px;
-            display: none;
-        }
-        .modal .status-msg.success {
-            display: block;
-            background: rgba(16, 185, 129, 0.15);
-            color: var(--accent-green);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-        }
-        .modal .status-msg.error {
-            display: block;
-            background: rgba(239, 68, 68, 0.15);
-            color: var(--accent-red);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-        }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: var(--bg-secondary); border-radius: var(--radius); border: 1px solid var(--border-color); padding: 28px 24px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow); animation: modalIn 0.3s ease; }
+        @keyframes modalIn { from { opacity: 0; transform: scale(0.95) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        .modal .title { font-size: 22px; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; color: var(--accent-gold); }
+        .modal .form-group { margin-bottom: 16px; }
+        .modal .form-group label { display: block; font-size: 14px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; }
+        .modal .form-group .hint { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+        .modal .form-group input.ltr-fix { direction: ltr !important; text-align: left !important; unicode-bidi: plaintext !important; font-family: monospace !important; }
+        .modal .form-actions { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+        .modal .form-actions button { padding: 10px 24px; border-radius: 30px; font-weight: 600; transition: var(--transition); flex: 1; min-width: 100px; }
+        .modal .form-actions .btn-primary { background: linear-gradient(135deg, var(--accent-gold), var(--accent-purple)); color: #000; }
+        .modal .form-actions .btn-primary:hover { opacity: 0.9; transform: scale(1.02); }
+        .modal .form-actions .btn-secondary { background: var(--bg-card); border: 1px solid var(--border-color); }
+        .modal .form-actions .btn-secondary:hover { background: var(--bg-card-hover); }
+        .modal .status-msg { margin-top: 12px; padding: 10px 14px; border-radius: var(--radius-sm); font-size: 14px; display: none; }
+        .modal .status-msg.success { display: block; background: rgba(16, 185, 129, 0.15); color: var(--accent-green); border: 1px solid rgba(16, 185, 129, 0.3); }
+        .modal .status-msg.error { display: block; background: rgba(239, 68, 68, 0.15); color: var(--accent-red); border: 1px solid rgba(239, 68, 68, 0.3); }
 
         /* ===== Toast ===== */
-        .toast-container {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 300;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            align-items: center;
-            pointer-events: none;
-            max-width: 90%;
-        }
-        .toast {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            padding: 12px 20px;
-            border-radius: var(--radius-sm);
-            font-size: 14px;
-            font-weight: 500;
-            box-shadow: var(--shadow);
-            animation: toastIn 0.3s ease;
-            pointer-events: auto;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            text-align: center;
-        }
-        .toast.success {
-            border-color: var(--accent-green);
-            color: var(--accent-green);
-        }
-        .toast.error {
-            border-color: var(--accent-red);
-            color: var(--accent-red);
-        }
-        .toast.info {
-            border-color: var(--accent-gold);
-            color: var(--accent-gold);
-        }
-        @keyframes toastIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px) scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
+        .toast-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 300; display: flex; flex-direction: column; gap: 8px; align-items: center; pointer-events: none; max-width: 90%; }
+        .toast { background: var(--bg-card); border: 1px solid var(--border-color); padding: 12px 20px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 500; box-shadow: var(--shadow); animation: toastIn 0.3s ease; pointer-events: auto; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); text-align: center; }
+        .toast.success { border-color: var(--accent-green); color: var(--accent-green); }
+        .toast.error { border-color: var(--accent-red); color: var(--accent-red); }
+        .toast.info { border-color: var(--accent-gold); color: var(--accent-gold); }
+        @keyframes toastIn { from { opacity: 0; transform: translateY(20px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
         /* ===== Debug Log ===== */
-        .debug-container {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-sm);
-            padding: 12px;
-            margin-top: 20px;
-            margin-bottom: 20px;
-            max-height: 200px;
-            overflow-y: auto;
-            font-family: monospace;
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-        .debug-container .log-line {
-            padding: 2px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        .debug-container .log-line.success {
-            color: var(--accent-green);
-        }
-        .debug-container .log-line.error {
-            color: var(--accent-red);
-        }
-        .debug-container .log-line.info {
-            color: var(--accent-gold);
-        }
-        .debug-label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: var(--text-secondary);
-        }
+        .debug-container { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px; margin-top: 20px; margin-bottom: 20px; max-height: 200px; overflow-y: auto; font-family: monospace; font-size: 12px; color: var(--text-secondary); }
+        .debug-container .log-line { padding: 2px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .debug-container .log-line.success { color: var(--accent-green); }
+        .debug-container .log-line.error { color: var(--accent-red); }
+        .debug-container .log-line.info { color: var(--accent-gold); }
+        .debug-label { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--text-secondary); }
 
         /* ===== Responsive ===== */
         @media (max-width: 768px) {
-            .app-bar .logo {
-                font-size: 18px;
-            }
-            .app-bar .actions button {
-                font-size: 12px;
-                padding: 6px 12px;
-            }
-            .signals-grid,
-            .closed-grid {
-                grid-template-columns: 1fr;
-            }
-            .signal-card .price-info {
-                grid-template-columns: 1fr 1fr;
-            }
-            .stats-row {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .modal {
-                padding: 20px 16px;
-            }
-            .container {
-                padding: 12px 12px 0;
-            }
-            .ticker-strip .scroll-wrap {
-                gap: 12px;
-            }
-            .chart-section {
-                height: 260px;
-            }
+            .app-bar .logo { font-size: 18px; }
+            .app-bar .actions button { font-size: 12px; padding: 6px 12px; }
+            .signals-grid, .closed-grid { grid-template-columns: 1fr; }
+            .signal-card .price-info { grid-template-columns: 1fr 1fr; }
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+            .modal { padding: 20px 16px; }
+            .container { padding: 12px 12px 0; }
+            .ticker-strip .scroll-wrap { gap: 12px; }
+            .chart-section { height: 280px; }
         }
         @media (max-width: 480px) {
-            .signal-card .price-info {
-                grid-template-columns: 1fr;
-                gap: 4px;
-            }
-            .signal-card .footer {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .signal-card .footer .actions {
-                justify-content: center;
-            }
-            .app-bar {
-                padding: 8px 12px;
-            }
-            .app-bar .logo {
-                font-size: 16px;
-                gap: 6px;
-            }
-            .stat-card .value {
-                font-size: 18px;
-            }
-            .chart-section {
-                height: 220px;
-            }
+            .signal-card .price-info { grid-template-columns: 1fr; gap: 4px; }
+            .signal-card .footer { flex-direction: column; align-items: stretch; }
+            .signal-card .footer .actions { justify-content: center; }
+            .app-bar { padding: 8px 12px; }
+            .app-bar .logo { font-size: 16px; gap: 6px; }
+            .stat-card .value { font-size: 18px; }
+            .chart-section { height: 240px; }
         }
-
-        /* ===== Spinner ===== */
-        .loading-spinner {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            padding: 30px 0;
-            color: var(--text-secondary);
-        }
-        .spinner {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            border: 3px solid var(--border-color);
-            border-top-color: var(--accent-gold);
-            animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--text-secondary);
-        }
-        .empty-state .icon {
-            font-size: 48px;
-            margin-bottom: 12px;
-            opacity: 0.4;
-        }
-        .empty-state h3 {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 4px;
-        }
-        .empty-state p {
-            font-size: 14px;
-            color: var(--text-muted);
-        }
+        .loading-spinner { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 30px 0; color: var(--text-secondary); }
+        .spinner { width: 28px; height: 28px; border-radius: 50%; border: 3px solid var(--border-color); border-top-color: var(--accent-gold); animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-secondary); }
+        .empty-state .icon { font-size: 48px; margin-bottom: 12px; opacity: 0.4; }
+        .empty-state h3 { font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+        .empty-state p { font-size: 14px; color: var(--text-muted); }
     </style>
 </head>
 <body>
@@ -1052,9 +362,7 @@
             let currentMode = 'FLEXIBLE';
 
             const CONFIG = {
-                SYMBOLS: ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 'XRPUSDT', 'ADAUSDT', 'DOGEUSDT', 'AVAXUSDT', 'DOTUSDT',
-                    'MATICUSDT'
-                ],
+                SYMBOLS: ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 'XRPUSDT', 'ADAUSDT', 'DOGEUSDT', 'AVAXUSDT', 'DOTUSDT', 'MATICUSDT'],
                 INTERVAL_30M: '30m',
                 KLINE_LIMIT: 220,
                 STOCH_RSI_PERIOD: 14,
@@ -1085,21 +393,15 @@
             //  STATE
             // ============================================================
             let state = {
-                signals: [],
-                closedTrades: [],
-                prices: {},
+                signals: [], closedTrades: [], prices: {}, 
                 klines: {},
-                settings: {
-                    telegramToken: '8701817759:AAFNCDD0p4kh0JdSR1WfVRMFvulDVT7gDCQ',
-                    telegramChatId: '1003970108966',
-                    updateInterval: CONFIG.UPDATE_INTERVAL_DEFAULT,
-                    autoSendTelegram: true
+                settings: { 
+                    telegramToken: '8701817759:AAFNCDD0p4kh0JdSR1WfVRMFvulDVT7gDCQ', 
+                    telegramChatId: '1003970108966', 
+                    updateInterval: CONFIG.UPDATE_INTERVAL_DEFAULT, 
+                    autoSendTelegram: true 
                 },
-                sentSignals: [],
-                isUpdating: false,
-                lastUpdate: null,
-                installPrompt: null,
-                updateTimer: null,
+                sentSignals: [], isUpdating: false, lastUpdate: null, installPrompt: null, updateTimer: null,
                 btcFilterEnabled: true,
                 failureCount: 0,
                 wakeLock: null,
@@ -1107,7 +409,8 @@
                 currentStrategy: 'new',
                 chart: null,
                 chartSeries: null,
-                chartReady: false
+                chartReady: false,
+                resizeObserver: null
             };
 
             // ============================================================
@@ -1153,80 +456,6 @@
             const chartSection = $('chartSection');
 
             // ============================================================
-            //  MODE & STRATEGY MANAGEMENT
-            // ============================================================
-            function loadMode() {
-                try { const saved = localStorage.getItem(CONFIG.MODE_KEY); if (saved === 'STRICT' || saved === 'FLEXIBLE')
-                        currentMode = saved; } catch (e) {}
-                applyModeConfig();
-            }
-
-            function saveMode() { try { localStorage.setItem(CONFIG.MODE_KEY, currentMode); } catch (e) {} }
-
-            function applyModeConfig() {
-                const mode = MODES[currentMode];
-                if (!mode) return;
-                CONFIG.ADX_THRESHOLD = mode.ADX_THRESHOLD;
-                CONFIG.STOCH_OVERBOUGHT = mode.STOCH_OVERBOUGHT;
-                CONFIG.STOCH_OVERSOLD = mode.STOCH_OVERSOLD;
-                modeLabel.textContent = mode.label;
-                if (currentMode === 'STRICT') {
-                    btnModeToggle.style.borderColor = 'var(--accent-red)';
-                    btnModeToggle.style.color = 'var(--accent-red)';
-                } else {
-                    btnModeToggle.style.borderColor = 'var(--accent-green)';
-                    btnModeToggle.style.color = 'var(--accent-green)';
-                }
-                addLog(`🔄 تم التبديل إلى النظام ${mode.label}`, 'info');
-            }
-
-            function toggleMode() {
-                currentMode = (currentMode === 'FLEXIBLE') ? 'STRICT' : 'FLEXIBLE';
-                saveMode();
-                applyModeConfig();
-                showToast(`✅ تم التبديل إلى النظام ${MODES[currentMode].label}`, 'info');
-                updateAllData(true);
-            }
-
-            function loadStrategy() {
-                try { const saved = localStorage.getItem(CONFIG.STRATEGY_KEY); if (saved === 'default' || saved === 'new')
-                        state.currentStrategy = saved; } catch (e) {}
-                updateStrategyUI();
-            }
-
-            function saveStrategy() { try { localStorage.setItem(CONFIG.STRATEGY_KEY, state.currentStrategy); } catch (e) {} }
-
-            function updateStrategyUI() {
-                if (state.currentStrategy === 'default') {
-                    strategyLabel.textContent = 'افتراضي';
-                    btnStrategy.classList.remove('active');
-                } else {
-                    strategyLabel.textContent = 'SuperTrend + ADX';
-                    btnStrategy.classList.add('active');
-                }
-            }
-
-            function toggleStrategy() {
-                state.signals.forEach(sig => {
-                    if (!sig.isClosed) {
-                        sig.isClosed = true;
-                        sig.closedAt = now();
-                        sig.closedResult = 'neutral';
-                        sig.analysis += '\n\n🔄 تم إغلاق الصفقة بسبب تبديل الاستراتيجية.';
-                    }
-                });
-                state.currentStrategy = (state.currentStrategy === 'default') ? 'new' : 'default';
-                saveStrategy();
-                updateStrategyUI();
-                addLog(`🔄 تم التبديل إلى الاستراتيجية: ${state.currentStrategy === 'default' ? 'الافتراضية' : 'SuperTrend + ADX (50x)'}`,
-                    'info');
-                showToast(
-                    `🔄 تم التبديل إلى ${state.currentStrategy === 'default' ? 'الاستراتيجية الافتراضية' : 'استراتيجية SuperTrend + ADX (50x)'}`,
-                    'info');
-                updateAllData(true);
-            }
-
-            // ============================================================
             //  DEBUG LOG
             // ============================================================
             function addLog(message, type = 'info') {
@@ -1243,29 +472,76 @@
             // ============================================================
             //  UTILITY
             // ============================================================
-            function fmt(n, d = 2) { if (n === undefined || n === null || !isFinite(n)) return '—'; if (Math.abs(n) >=
-                    1000) return n.toFixed(2); if (Math.abs(n) >= 1) return n.toFixed(4); return n.toFixed(6); }
-
-            function fmtPrice(n) { if (n === undefined || n === null || !isFinite(n)) return '—'; if (n >= 10000) return n
-                    .toFixed(2); if (n >= 1) return n.toFixed(4); if (n >= 0.01) return n.toFixed(6); return n.toFixed(8); }
-
-            function fmtDate(ts) { const d = new Date(ts); return d.toLocaleString('ar-EG', { hour12: false, day: '2-digit',
-                    month: '2-digit', hour: '2-digit', minute: '2-digit' }); }
-
-            function fmtDateFull(ts) { const d = new Date(ts); return d.toLocaleString('ar-EG', { hour12: false,
-                    day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit',
-                    second: '2-digit' }); }
-
+            function fmt(n, d = 2) { if (n === undefined || n === null || !isFinite(n)) return '—'; if (Math.abs(n) >= 1000) return n.toFixed(2); if (Math.abs(n) >= 1) return n.toFixed(4); return n.toFixed(6); }
+            function fmtPrice(n) { if (n === undefined || n === null || !isFinite(n)) return '—'; if (n >= 10000) return n.toFixed(2); if (n >= 1) return n.toFixed(4); if (n >= 0.01) return n.toFixed(6); return n.toFixed(8); }
+            function fmtDate(ts) { const d = new Date(ts); return d.toLocaleString('ar-EG', { hour12: false, day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }); }
+            function fmtDateFull(ts) { const d = new Date(ts); return d.toLocaleString('ar-EG', { hour12: false, day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }); }
             function now() { return Date.now(); }
-
-            function isToday(ts) { const d = new Date(ts); const t = new Date(); return d.getDate() === t.getDate() && d
-                    .getMonth() === t.getMonth() && d.getFullYear() === t.getFullYear(); }
-
+            function isToday(ts) { const d = new Date(ts); const t = new Date(); return d.getDate() === t.getDate() && d.getMonth() === t.getMonth() && d.getFullYear() === t.getFullYear(); }
             function id() { return Math.random().toString(36).substring(2) + Date.now().toString(36); }
-
             function getSymbolDisplay(sym) { return sym.replace('USDT', ''); }
-
             function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+            // ============================================================
+            //  MODE & STRATEGY MANAGEMENT
+            // ============================================================
+            function loadMode() {
+                try { const saved = localStorage.getItem(CONFIG.MODE_KEY); if (saved === 'STRICT' || saved === 'FLEXIBLE') currentMode = saved; } catch (e) {}
+                applyModeConfig();
+            }
+            function saveMode() { try { localStorage.setItem(CONFIG.MODE_KEY, currentMode); } catch (e) {} }
+            function applyModeConfig() {
+                const mode = MODES[currentMode];
+                if (!mode) return;
+                CONFIG.ADX_THRESHOLD = mode.ADX_THRESHOLD;
+                CONFIG.STOCH_OVERBOUGHT = mode.STOCH_OVERBOUGHT;
+                CONFIG.STOCH_OVERSOLD = mode.STOCH_OVERSOLD;
+                modeLabel.textContent = mode.label;
+                if (currentMode === 'STRICT') {
+                    btnModeToggle.style.borderColor = 'var(--accent-red)';
+                    btnModeToggle.style.color = 'var(--accent-red)';
+                } else {
+                    btnModeToggle.style.borderColor = 'var(--accent-green)';
+                    btnModeToggle.style.color = 'var(--accent-green)';
+                }
+                addLog(`🔄 تم التبديل إلى النظام ${mode.label}`, 'info');
+            }
+            function toggleMode() {
+                currentMode = (currentMode === 'FLEXIBLE') ? 'STRICT' : 'FLEXIBLE';
+                saveMode();
+                applyModeConfig();
+                showToast(`✅ تم التبديل إلى النظام ${MODES[currentMode].label}`, 'info');
+                updateAllData(true);
+            }
+
+            function loadStrategy() {
+                try { const saved = localStorage.getItem(CONFIG.STRATEGY_KEY); if (saved === 'default' || saved === 'new') state.currentStrategy = saved; } catch (e) {}
+                updateStrategyUI();
+            }
+            function saveStrategy() { try { localStorage.setItem(CONFIG.STRATEGY_KEY, state.currentStrategy); } catch (e) {} }
+            function updateStrategyUI() {
+                if (state.currentStrategy === 'default') {
+                    strategyLabel.textContent = 'افتراضي';
+                    btnStrategy.classList.remove('active');
+                } else {
+                    strategyLabel.textContent = 'SuperTrend + ADX';
+                    btnStrategy.classList.add('active');
+                }
+            }
+            function toggleStrategy() {
+                state.signals.forEach(sig => {
+                    if (!sig.isClosed) {
+                        sig.isClosed = true; sig.closedAt = now(); sig.closedResult = 'neutral';
+                        sig.analysis += '\n\n🔄 تم إغلاق الصفقة بسبب تبديل الاستراتيجية.';
+                    }
+                });
+                state.currentStrategy = (state.currentStrategy === 'default') ? 'new' : 'default';
+                saveStrategy();
+                updateStrategyUI();
+                addLog(`🔄 تم التبديل إلى الاستراتيجية: ${state.currentStrategy === 'default' ? 'الافتراضية' : 'SuperTrend + ADX (50x)'}`, 'info');
+                showToast(`🔄 تم التبديل إلى ${state.currentStrategy === 'default' ? 'الاستراتيجية الافتراضية' : 'استراتيجية SuperTrend + ADX (50x)'}`, 'info');
+                updateAllData(true);
+            }
 
             // ============================================================
             //  LOCAL STORAGE
@@ -1285,8 +561,8 @@
                 } catch (e) {}
                 try {
                     const raw = localStorage.getItem(CONFIG.SETTINGS_KEY);
-                    if (raw) {
-                        const s = JSON.parse(raw);
+                    if (raw) { 
+                        const s = JSON.parse(raw); 
                         if (s.telegramToken) state.settings.telegramToken = s.telegramToken;
                         if (s.telegramChatId) state.settings.telegramChatId = s.telegramChatId;
                         if (s.updateInterval) state.settings.updateInterval = s.updateInterval;
@@ -1307,17 +583,13 @@
 
             function persistState() {
                 try {
-                    const data = { signals: state.signals, closedTrades: state.closedTrades, prices: state.prices,
-                        sentSignals: state.sentSignals, lastUpdate: state.lastUpdate,
-                        btcFilterEnabled: state.btcFilterEnabled };
+                    const data = { signals: state.signals, closedTrades: state.closedTrades, prices: state.prices, sentSignals: state.sentSignals, lastUpdate: state.lastUpdate, btcFilterEnabled: state.btcFilterEnabled };
                     localStorage.setItem(CONFIG.CACHE_KEY, JSON.stringify(data));
                     localStorage.setItem(CONFIG.HISTORY_KEY, JSON.stringify(state.closedTrades));
                     localStorage.setItem(CONFIG.KLINES_KEY, JSON.stringify(state.klines));
                 } catch (e) {}
             }
-
-            function persistSettings() { try { localStorage.setItem(CONFIG.SETTINGS_KEY, JSON.stringify(state.settings)); } catch (
-                    e) {} }
+            function persistSettings() { try { localStorage.setItem(CONFIG.SETTINGS_KEY, JSON.stringify(state.settings)); } catch (e) {} }
 
             // ============================================================
             //  TELEGRAM
@@ -1328,14 +600,12 @@
                 const resp = await fetch(`${CONFIG.TELEGRAM_API}${telegramToken}/sendMessage`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ chat_id: telegramChatId, text: text, parse_mode: 'HTML',
-                        disable_web_page_preview: true })
+                    body: JSON.stringify({ chat_id: telegramChatId, text: text, parse_mode: 'HTML', disable_web_page_preview: true })
                 });
-                if (!resp.ok) {
+                if (!resp.ok) { 
                     let errorMsg = `فشل الإرسال (HTTP ${resp.status})`;
-                    try { const err = await resp.json();
-                        errorMsg = err.description || errorMsg; } catch (e) {}
-                    throw new Error(errorMsg);
+                    try { const err = await resp.json(); errorMsg = err.description || errorMsg; } catch (e) {}
+                    throw new Error(errorMsg); 
                 }
                 return await resp.json();
             }
@@ -1372,44 +642,36 @@
                 }
                 return result;
             }
-
             function calcEMA(data, period) {
                 if (data.length < period) return [];
                 const multiplier = 2 / (period + 1);
                 let ema = data.slice(0, period).reduce((a, b) => a + b, 0) / period;
                 const result = [ema];
-                for (let i = period; i < data.length; i++) { ema = (data[i] - ema) * multiplier + ema;
-                    result.push(ema); }
+                for (let i = period; i < data.length; i++) { ema = (data[i] - ema) * multiplier + ema; result.push(ema); }
                 return result;
             }
-
             function calcRSI(closes, period) {
                 if (closes.length < period + 1) return [];
                 const changes = [];
                 for (let i = 1; i < closes.length; i++) changes.push(closes[i] - closes[i - 1]);
                 const rsiValues = [];
-                let avgGain = 0,
-                    avgLoss = 0;
+                let avgGain = 0, avgLoss = 0;
                 for (let i = 0; i < period; i++) {
                     if (changes[i] > 0) avgGain += changes[i];
                     else avgLoss += Math.abs(changes[i]);
                 }
-                avgGain /= period;
-                avgLoss /= period;
+                avgGain /= period; avgLoss /= period;
                 let rs = avgLoss === 0 ? 100 : avgGain / avgLoss;
                 rsiValues.push(100 - (100 / (1 + rs)));
                 for (let i = period; i < changes.length; i++) {
                     const change = changes[i];
-                    if (change > 0) { avgGain = (avgGain * (period - 1) + change) / period;
-                        avgLoss = (avgLoss * (period - 1) + 0) / period; } else { avgGain = (avgGain * (period - 1) + 0) /
-                            period;
-                        avgLoss = (avgLoss * (period - 1) + Math.abs(change)) / period; }
+                    if (change > 0) { avgGain = (avgGain * (period - 1) + change) / period; avgLoss = (avgLoss * (period - 1) + 0) / period; }
+                    else { avgGain = (avgGain * (period - 1) + 0) / period; avgLoss = (avgLoss * (period - 1) + Math.abs(change)) / period; }
                     rs = avgLoss === 0 ? 100 : avgGain / avgLoss;
                     rsiValues.push(100 - (100 / (1 + rs)));
                 }
                 return rsiValues;
             }
-
             function calcStochastic(high, low, close, kPeriod = 14, kSmooth = 3, dSmooth = 3) {
                 const len = high.length;
                 if (len < kPeriod + kSmooth + dSmooth) return { k: [], d: [] };
@@ -1421,75 +683,46 @@
                     kValues.push(hh === ll ? 50 : ((c - ll) / (hh - ll)) * 100);
                 }
                 const kSmoothValues = [];
-                for (let i = kSmooth - 1; i < kValues.length; i++) { const sum = kValues.slice(i - kSmooth + 1, i + 1).reduce((
-                        a, b) => a + b, 0);
-                    kSmoothValues.push(sum / kSmooth); }
+                for (let i = kSmooth - 1; i < kValues.length; i++) { const sum = kValues.slice(i - kSmooth + 1, i + 1).reduce((a, b) => a + b, 0); kSmoothValues.push(sum / kSmooth); }
                 const dValues = [];
-                for (let i = dSmooth - 1; i < kSmoothValues.length; i++) { const sum = kSmoothValues.slice(i - dSmooth + 1,
-                        i + 1).reduce((a, b) => a + b, 0);
-                    dValues.push(sum / dSmooth); }
+                for (let i = dSmooth - 1; i < kSmoothValues.length; i++) { const sum = kSmoothValues.slice(i - dSmooth + 1, i + 1).reduce((a, b) => a + b, 0); dValues.push(sum / dSmooth); }
                 return { k: kSmoothValues.slice(dSmooth - 1), d: dValues };
             }
-
             function calcADX(high, low, close, period = 14) {
                 const len = high.length;
                 if (len < period + 1) return { adx: [], plusDI: [], minusDI: [] };
-                const tr = [],
-                    plusDM = [],
-                    minusDM = [];
+                const tr = [], plusDM = [], minusDM = [];
                 for (let i = 1; i < len; i++) {
-                    const h = high[i],
-                        l = low[i],
-                        c = close[i - 1];
+                    const h = high[i], l = low[i], c = close[i - 1];
                     tr.push(Math.max(h - l, Math.abs(h - c), Math.abs(l - c)));
-                    const up = high[i] - high[i - 1],
-                        down = low[i - 1] - low[i];
+                    const up = high[i] - high[i - 1], down = low[i - 1] - low[i];
                     plusDM.push(up > down && up > 0 ? up : 0);
                     minusDM.push(down > up && down > 0 ? down : 0);
                 }
-                const atr = [];
-                let atrVal = tr.slice(0, period).reduce((a, b) => a + b, 0) / period;
-                atr.push(atrVal);
-                for (let i = period; i < tr.length; i++) { atrVal = (atrVal * (period - 1) + tr[i]) / period;
-                    atr.push(atrVal); }
-                const plusDI14 = [],
-                    minusDI14 = [];
-                let plusSum = plusDM.slice(0, period).reduce((a, b) => a + b, 0),
-                    minusSum = minusDM.slice(0, period).reduce((a, b) => a + b, 0);
+                const atr = []; let atrVal = tr.slice(0, period).reduce((a, b) => a + b, 0) / period; atr.push(atrVal);
+                for (let i = period; i < tr.length; i++) { atrVal = (atrVal * (period - 1) + tr[i]) / period; atr.push(atrVal); }
+                const plusDI14 = [], minusDI14 = [];
+                let plusSum = plusDM.slice(0, period).reduce((a, b) => a + b, 0), minusSum = minusDM.slice(0, period).reduce((a, b) => a + b, 0);
                 plusDI14.push((plusSum / (atr[0] * period)) * 100);
                 minusDI14.push((minusSum / (atr[0] * period)) * 100);
                 for (let i = period; i < plusDM.length; i++) {
                     plusSum = plusSum - (plusDM[i - period] || 0) + plusDM[i];
                     minusSum = minusSum - (minusDM[i - period] || 0) + minusDM[i];
                     const atrIdx = i - period + 1;
-                    if (atrIdx < atr.length) { plusDI14.push((plusSum / (atr[atrIdx] * period)) * 100);
-                        minusDI14.push((minusSum / (atr[atrIdx] * period)) * 100); }
+                    if (atrIdx < atr.length) { plusDI14.push((plusSum / (atr[atrIdx] * period)) * 100); minusDI14.push((minusSum / (atr[atrIdx] * period)) * 100); }
                 }
-                const dx = [];
-                const minLen = Math.min(plusDI14.length, minusDI14.length);
-                for (let i = 0; i < minLen; i++) { const p = plusDI14[i],
-                        m = minusDI14[i];
-                    dx.push((p + m) === 0 ? 0 : (Math.abs(p - m) / (p + m)) * 100); }
+                const dx = []; const minLen = Math.min(plusDI14.length, minusDI14.length);
+                for (let i = 0; i < minLen; i++) { const p = plusDI14[i], m = minusDI14[i]; dx.push((p + m) === 0 ? 0 : (Math.abs(p - m) / (p + m)) * 100); }
                 const adx = [];
-                if (dx.length >= period) { let adxVal = dx.slice(0, period).reduce((a, b) => a + b, 0) / period;
-                    adx.push(adxVal); for (let i = period; i < dx.length; i++) { adxVal = (adxVal * (period - 1) + dx[i]) /
-                            period;
-                        adx.push(adxVal); } }
+                if (dx.length >= period) { let adxVal = dx.slice(0, period).reduce((a, b) => a + b, 0) / period; adx.push(adxVal); for (let i = period; i < dx.length; i++) { adxVal = (adxVal * (period - 1) + dx[i]) / period; adx.push(adxVal); } }
                 return { adx: adx, plusDI: plusDI14.slice(0, adx.length), minusDI: minusDI14.slice(0, adx.length) };
             }
-
             function calcATR(klines, period = 14) {
                 if (klines.length < period + 1) return [];
                 const tr = [];
-                for (let i = 1; i < klines.length; i++) { const h = klines[i].high,
-                        l = klines[i].low,
-                        c = klines[i - 1].close;
-                    tr.push(Math.max(h - l, Math.abs(h - c), Math.abs(l - c))); }
-                const atr = [];
-                let atrVal = tr.slice(0, period).reduce((a, b) => a + b, 0) / period;
-                atr.push(atrVal);
-                for (let i = period; i < tr.length; i++) { atrVal = (atrVal * (period - 1) + tr[i]) / period;
-                    atr.push(atrVal); }
+                for (let i = 1; i < klines.length; i++) { const h = klines[i].high, l = klines[i].low, c = klines[i - 1].close; tr.push(Math.max(h - l, Math.abs(h - c), Math.abs(l - c))); }
+                const atr = []; let atrVal = tr.slice(0, period).reduce((a, b) => a + b, 0) / period; atr.push(atrVal);
+                for (let i = period; i < tr.length; i++) { atrVal = (atrVal * (period - 1) + tr[i]) / period; atr.push(atrVal); }
                 return atr;
             }
 
@@ -1499,9 +732,7 @@
             function calcSuperTrend(klines, period = 10, multiplier = 3.0) {
                 const tr = [];
                 for (let i = 1; i < klines.length; i++) {
-                    const h = klines[i].high,
-                        l = klines[i].low,
-                        c = klines[i - 1].close;
+                    const h = klines[i].high, l = klines[i].low, c = klines[i-1].close;
                     tr.push(Math.max(h - l, Math.abs(h - c), Math.abs(l - c)));
                 }
                 const atr = [];
@@ -1518,28 +749,27 @@
                 const trend = new Array(klines.length).fill(0);
                 const src = klines.map(k => (k.high + k.low) / 2);
                 if (klines.length < 2) return null;
-                const firstATR = atr[period - 1] || 0;
+                const firstATR = atr[period-1] || 0;
                 up[0] = src[0] - multiplier * firstATR;
                 dn[0] = src[0] + multiplier * firstATR;
                 trend[0] = 1;
                 for (let i = 1; i < klines.length; i++) {
                     const atrVal = atr[i - period + 1] || atr[atr.length - 1];
-                    const prevUp = up[i - 1],
-                        prevDn = dn[i - 1];
+                    const prevUp = up[i-1], prevDn = dn[i-1];
                     const upBase = src[i] - multiplier * atrVal;
                     up[i] = (klines[i].close > prevUp) ? Math.max(upBase, prevUp) : upBase;
                     const dnBase = src[i] + multiplier * atrVal;
                     dn[i] = (klines[i].close < prevDn) ? Math.min(dnBase, prevDn) : dnBase;
-                    if (trend[i - 1] === -1 && klines[i].close > dn[i - 1]) trend[i] = 1;
-                    else if (trend[i - 1] === 1 && klines[i].close < up[i - 1]) trend[i] = -1;
-                    else trend[i] = trend[i - 1];
+                    if (trend[i-1] === -1 && klines[i].close > dn[i-1]) trend[i] = 1;
+                    else if (trend[i-1] === 1 && klines[i].close < up[i-1]) trend[i] = -1;
+                    else trend[i] = trend[i-1];
                 }
                 return { up, dn, trend };
             }
 
             function generateSignalPro(symbol, klines) {
                 if (!klines || klines.length < 200) return null;
-
+                
                 const superTrendResult = calcSuperTrend(klines, 10, 3.0);
                 if (!superTrendResult) return null;
                 const { trend } = superTrendResult;
@@ -1577,7 +807,7 @@
                 const entryPrice = lastClose;
                 const stopPct = CONFIG.STOP_PERCENT_MAX; // 0.5%
                 const targetPct = CONFIG.TARGET_PERCENT; // 1.5%
-
+                
                 let takeProfit, stopLoss;
                 if (direction === 'buy') {
                     takeProfit = entryPrice * (1 + targetPct);
@@ -1599,26 +829,13 @@
         🛑 <strong>وقف الخسارة:</strong> 0.5% (${fmtPrice(stopLoss)})
         📌 <strong>النظام:</strong> ${modeLabel}
                 `.trim();
-
+                
                 return {
-                    id: id(),
-                    symbol: symbol,
-                    direction: direction,
-                    entryPrice: entryPrice,
-                    takeProfit: takeProfit,
-                    stopLoss: stopLoss,
-                    confidence: confidence,
-                    analysis: analysisText,
-                    timestamp: now(),
-                    pattern: 'supertrend_adx_50x',
-                    ema: 0,
-                    stochasticK: 0,
-                    stochasticD: 0,
-                    adx: adxLast,
-                    isLocked: false,
-                    isClosed: false,
-                    closedAt: null,
-                    closedResult: null
+                    id: id(), symbol: symbol, direction: direction, entryPrice: entryPrice, 
+                    takeProfit: takeProfit, stopLoss: stopLoss, confidence: confidence, 
+                    analysis: analysisText, timestamp: now(), pattern: 'supertrend_adx_50x', 
+                    ema: 0, stochasticK: 0, stochasticD: 0, adx: adxLast, 
+                    isLocked: false, isClosed: false, closedAt: null, closedResult: null
                 };
             }
 
@@ -1638,13 +855,18 @@
             }
 
             // ============================================================
-            //  FETCH DATA
+            //  FETCH DATA (Improved with timeout & error handling)
             // ============================================================
             async function fetchKlinesWithRetry(symbol, interval, limit = CONFIG.KLINE_LIMIT, retries = 4) {
                 for (let i = 0; i < retries; i++) {
                     try {
-                        const resp = await fetch(
-                            `${CONFIG.BINANCE_BASE}/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`);
+                        const controller = new AbortController();
+                        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+                        const resp = await fetch(`${CONFIG.BINANCE_BASE}/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`, {
+                            signal: controller.signal
+                        });
+                        clearTimeout(timeoutId);
+                        
                         if (!resp.ok) {
                             if (resp.status === 429 || resp.status >= 500) {
                                 if (i < retries - 1) { await sleep(CONFIG.RETRY_DELAY_MS); continue; }
@@ -1652,9 +874,10 @@
                             throw new Error(`Binance API error: ${resp.status}`);
                         }
                         const data = await resp.json();
-                        return data.map(k => ({ time: k[0], open: parseFloat(k[1]), high: parseFloat(k[2]), low: parseFloat(
-                                k[3]), close: parseFloat(k[4]), volume: parseFloat(k[5]) }));
+                        return data.map(k => ({ time: k[0], open: parseFloat(k[1]), high: parseFloat(k[2]), low: parseFloat(k[3]), close: parseFloat(k[4]), volume: parseFloat(k[5]) }));
                     } catch (e) {
+                        if (e.name === 'AbortError') addLog(`⏱️ مهلة الاتصال لـ ${symbol} انتهت`, 'error');
+                        else addLog(`⚠️ فشل جلب بيانات ${symbol}: ${e.message} (المحاولة ${i+1})`, 'error');
                         if (i === retries - 1) throw e;
                         await sleep(CONFIG.RETRY_DELAY_MS);
                     }
@@ -1665,9 +888,12 @@
             async function fetchTickerPriceWithRetry(symbol, retries = 3) {
                 for (let i = 0; i < retries; i++) {
                     try {
-                        const resp = await fetch(`${CONFIG.BINANCE_BASE}/ticker/price?symbol=${symbol}`);
+                        const controller = new AbortController();
+                        const timeoutId = setTimeout(() => controller.abort(), 5000);
+                        const resp = await fetch(`${CONFIG.BINANCE_BASE}/ticker/price?symbol=${symbol}`, { signal: controller.signal });
+                        clearTimeout(timeoutId);
                         if (!resp.ok) throw new Error(`Binance ticker error: ${resp.status}`);
-                        const data = await resp.json();
+                        const data = await resp.json(); 
                         return parseFloat(data.price);
                     } catch (e) {
                         if (i === retries - 1) throw e;
@@ -1677,7 +903,7 @@
             }
 
             // ============================================================
-            //  CHART DRAWING (TradingView Lightweight Charts) — FIXED
+            //  CHART DRAWING (TradingView Lightweight Charts) - FIXED
             // ============================================================
             function createChart() {
                 if (!chartContainer) return null;
@@ -1687,7 +913,7 @@
                     state.chart = null;
                     state.chartSeries = null;
                 }
-                // Ensure container has dimensions
+                
                 const rect = chartContainer.getBoundingClientRect();
                 let w = rect.width || chartContainer.clientWidth || 400;
                 let h = rect.height || chartContainer.clientHeight || 260;
@@ -1710,10 +936,23 @@
                             timeVisible: true,
                             secondsVisible: false,
                             borderColor: '#374151',
+                            fixLeftEdge: true,
+                            fixRightEdge: true,
                         },
                         rightPriceScale: {
                             borderColor: '#374151',
                         },
+                        handleScroll: {
+                            horzTouchDrag: true,
+                            vertTouchDrag: true,
+                            mouseWheel: true,
+                            pressedMouseMove: true,
+                        },
+                        handleScale: {
+                            axisPressedMouseMove: true,
+                            mouseWheel: true,
+                            pinch: true,
+                        }
                     });
                     const series = chart.addCandlestickSeries({
                         upColor: '#10b981',
@@ -1743,10 +982,7 @@
                 }
                 const klines = state.klines[symbol];
                 if (!klines || klines.length < 2) {
-                    if (state.chartSeries) {
-                        try { state.chartSeries.setData([]); } catch (e) {}
-                    }
-                    addLog(`⚠️ لا توجد بيانات كافية للرسم البياني لـ ${symbol}`, 'info');
+                    addLog(`⚠️ لا توجد بيانات كافية لرسم الشموع لـ ${symbol} (العدد: ${klines ? klines.length : 0})`, 'info');
                     return;
                 }
                 try {
@@ -1779,7 +1015,6 @@
             }
 
             function ensureChartVisible() {
-                // If chart container has zero size, wait and retry
                 const rect = chartContainer.getBoundingClientRect();
                 if (rect.width < 10 || rect.height < 10) {
                     addLog('📐 الرسم البياني بحجم صغير، سيتم إعادة ضبطه...', 'info');
@@ -1815,12 +1050,10 @@
                     const fetchPromises = symbols.map(async sym => {
                         try {
                             const k = await fetchKlinesWithRetry(sym, CONFIG.INTERVAL_30M, CONFIG.KLINE_LIMIT);
-                            if (k) { allKlines30m[sym] = k; if (k.length > 0) allPrices[sym] = k[k.length - 1]
-                                    .close; }
+                            if (k) { allKlines30m[sym] = k; if (k.length > 0) allPrices[sym] = k[k.length - 1].close; }
                             return { sym, ok: true };
                         } catch (e) {
-                            try { const p = await fetchTickerPriceWithRetry(sym);
-                                allPrices[sym] = p; } catch (e2) {}
+                            try { const p = await fetchTickerPriceWithRetry(sym); allPrices[sym] = p; } catch (e2) {}
                             return { sym, ok: false };
                         }
                     });
@@ -1835,30 +1068,20 @@
                         if (currentPrice === undefined) continue;
                         const activeTrades = state.signals.filter(s => s.symbol === sym && !s.isClosed);
                         for (const trade of activeTrades) {
-                            let shouldClose = false,
-                                result = 'neutral';
+                            let shouldClose = false, result = 'neutral';
                             if (trade.direction === 'buy') {
-                                if (currentPrice >= trade.takeProfit) { shouldClose = true;
-                                    result = 'win'; } else if (currentPrice <= trade.stopLoss) { shouldClose =
-                                        true;
-                                    result = 'loss'; }
+                                if (currentPrice >= trade.takeProfit) { shouldClose = true; result = 'win'; }
+                                else if (currentPrice <= trade.stopLoss) { shouldClose = true; result = 'loss'; }
                             } else {
-                                if (currentPrice <= trade.takeProfit) { shouldClose = true;
-                                    result = 'win'; } else if (currentPrice >= trade.stopLoss) { shouldClose =
-                                        true;
-                                    result = 'loss'; }
+                                if (currentPrice <= trade.takeProfit) { shouldClose = true; result = 'win'; }
+                                else if (currentPrice >= trade.stopLoss) { shouldClose = true; result = 'loss'; }
                             }
                             if (shouldClose) {
-                                trade.isClosed = true;
-                                trade.closedAt = now();
-                                trade.closedResult = result;
-                                addLog(`✖️ إغلاق صفقة ${getSymbolDisplay(sym)}: ${result === 'win' ? 'ربح' : 'خسارة'}`,
-                                    result === 'win' ? 'success' : 'error');
+                                trade.isClosed = true; trade.closedAt = now(); trade.closedResult = result;
+                                addLog(`✖️ إغلاق صفقة ${getSymbolDisplay(sym)}: ${result === 'win' ? 'ربح' : 'خسارة'}`, result === 'win' ? 'success' : 'error');
                                 if (state.settings.autoSendTelegram) {
                                     try {
-                                        await sendTelegramMessage(
-                                            `🔔 إغلاق صفقة تلقائي\n💰 العملة: ${getSymbolDisplay(sym)}\n📉 النتيجة: ${result === 'win' ? '✅ ربح' : '❌ خسارة'}`
-                                            );
+                                        await sendTelegramMessage(`🔔 إغلاق صفقة تلقائي\n💰 العملة: ${getSymbolDisplay(sym)}\n📉 النتيجة: ${result === 'win' ? '✅ ربح' : '❌ خسارة'}`);
                                     } catch (e) {}
                                 }
                             }
@@ -1871,8 +1094,7 @@
                     if (btcKlines && btcKlines.length >= 200) {
                         const btcSignal = generateSignalPro('BTCUSDT', btcKlines);
                         if (btcSignal) btcDirection = btcSignal.direction;
-                        addLog(`📊 اتجاه البيتكوين الحالي: ${btcDirection === 'buy' ? 'صاعد' : btcDirection === 'sell' ? 'هابط' : 'محايد'}`,
-                            'info');
+                        addLog(`📊 اتجاه البيتكوين الحالي: ${btcDirection === 'buy' ? 'صاعد' : btcDirection === 'sell' ? 'هابط' : 'محايد'}`, 'info');
                     }
 
                     for (const sym of symbols) {
@@ -1909,12 +1131,9 @@
                                     else if (currentPrice >= existingOpen.stopLoss) result = 'loss';
                                 }
                             }
-                            existingOpen.isClosed = true;
-                            existingOpen.closedAt = now();
-                            existingOpen.closedResult = result;
+                            existingOpen.isClosed = true; existingOpen.closedAt = now(); existingOpen.closedResult = result;
                             state.signals.push(signal);
-                            addLog(`📈 انعكاس اتجاه: تم توليد إشارة جديدة لـ ${getSymbolDisplay(sym)} (${signal.direction})`,
-                                'success');
+                            addLog(`📈 انعكاس اتجاه: تم توليد إشارة جديدة لـ ${getSymbolDisplay(sym)} (${signal.direction})`, 'success');
                         } else {
                             state.signals.push(signal);
                             addLog(`📈 تم توليد إشارة جديدة لـ ${getSymbolDisplay(sym)} (${signal.direction})`, 'success');
@@ -1938,12 +1157,11 @@
                         sendLocalNotification(sig);
                     }
 
-                    state.lastUpdate = now();
-                    state.failureCount = 0;
+                    state.lastUpdate = now(); state.failureCount = 0;
                     persistState();
                     renderAll();
 
-                    // Update chart for selected symbol — with extra safety
+                    // Update chart for selected symbol
                     ensureChartVisible();
                     updateChart(chartSymbolSelect.value);
 
@@ -1970,10 +1188,8 @@
                     const price = state.prices[sym];
                     const display = getSymbolDisplay(sym);
                     const activeSig = state.signals.find(s => s.symbol === sym && !s.isClosed);
-                    let badge = activeSig ? `<span class="signal-badge ${activeSig.direction}">${activeSig.direction === 'buy' ? '🟢 شراء' : '🔴 بيع'}</span>` :
-                        `<span class="signal-badge neutral">● محايد</span>`;
-                    html +=
-                        `<div class="ticker-item"><span class="sym">${display}</span><span class="price">${price !== undefined ? fmtPrice(price) : '—'}</span>${badge}</div>`;
+                    let badge = activeSig ? `<span class="signal-badge ${activeSig.direction}">${activeSig.direction === 'buy' ? '🟢 شراء' : '🔴 بيع'}</span>` : `<span class="signal-badge neutral">● محايد</span>`;
+                    html += `<div class="ticker-item"><span class="sym">${display}</span><span class="price">${price !== undefined ? fmtPrice(price) : '—'}</span>${badge}</div>`;
                 }
                 tickerStrip.innerHTML = html;
             }
@@ -1981,8 +1197,7 @@
             function renderSignals() {
                 const active = state.signals.filter(s => !s.isClosed);
                 signalCount.textContent = active.length;
-                if (active.length === 0) { signalsContainer.innerHTML =
-                    `<div class="empty-state"><div class="icon">📊</div><h3>لا توجد إشارات نشطة حالياً</h3><p>جاري مراقبة الأسواق (فريم 30 دقيقة)...</p></div>`; return; }
+                if (active.length === 0) { signalsContainer.innerHTML = `<div class="empty-state"><div class="icon">📊</div><h3>لا توجد إشارات نشطة حالياً</h3><p>جاري مراقبة الأسواق (فريم 30 دقيقة)...</p></div>`; return; }
                 active.sort((a, b) => b.timestamp - a.timestamp);
                 let html = '<div class="signals-grid">';
                 for (const sig of active) {
@@ -2012,25 +1227,20 @@
                 }
                 html += '</div>';
                 signalsContainer.innerHTML = html;
-                signalsContainer.querySelectorAll('.btn-share').forEach(btn => btn.addEventListener('click', () =>
-                shareSignal(btn.dataset.id)));
-                signalsContainer.querySelectorAll('.btn-lock').forEach(btn => btn.addEventListener('click', () =>
-                toggleLock(btn.dataset.id)));
-                signalsContainer.querySelectorAll('.btn-close').forEach(btn => btn.addEventListener('click', () =>
-                closeTrade(btn.dataset.id)));
+                signalsContainer.querySelectorAll('.btn-share').forEach(btn => btn.addEventListener('click', () => shareSignal(btn.dataset.id)));
+                signalsContainer.querySelectorAll('.btn-lock').forEach(btn => btn.addEventListener('click', () => toggleLock(btn.dataset.id)));
+                signalsContainer.querySelectorAll('.btn-close').forEach(btn => btn.addEventListener('click', () => closeTrade(btn.dataset.id)));
             }
 
             function renderClosed() {
                 const closed = state.signals.filter(s => s.isClosed);
                 closedCount.textContent = closed.length;
-                if (closed.length === 0) { closedContainer.innerHTML =
-                    `<div class="empty-state"><div class="icon">📂</div><h3>لا توجد صفقات مغلقة بعد</h3></div>`; return; }
+                if (closed.length === 0) { closedContainer.innerHTML = `<div class="empty-state"><div class="icon">📂</div><h3>لا توجد صفقات مغلقة بعد</h3></div>`; return; }
                 closed.sort((a, b) => (b.closedAt || 0) - (a.closedAt || 0));
                 let html = '<div class="closed-grid">';
                 for (const sig of closed) {
                     const sym = getSymbolDisplay(sig.symbol);
-                    const resultLabel = sig.closedResult === 'win' ? '✅ ربح' : sig.closedResult === 'loss' ? '❌ خسارة' :
-                        '⚪ محايد';
+                    const resultLabel = sig.closedResult === 'win' ? '✅ ربح' : sig.closedResult === 'loss' ? '❌ خسارة' : '⚪ محايد';
                     html += `
                 <div class="closed-card">
                     <div class="header"><div class="symbol">${sym}</div><div class="result ${sig.closedResult || 'neutral'}">${resultLabel}</div></div>
@@ -2059,98 +1269,44 @@
                 statWinRate.textContent = total > 0 ? ((wins.length / total) * 100).toFixed(1) + '%' : '0%';
             }
 
-            function renderAll() { renderTicker();
-                renderSignals();
-                renderClosed();
-                renderStats();
-                updateBtcFilterButtonUI();
-                updateStrategyUI(); }
+            function renderAll() { renderTicker(); renderSignals(); renderClosed(); renderStats(); updateBtcFilterButtonUI(); updateStrategyUI(); }
 
             // ============================================================
             //  ACTIONS
             // ============================================================
             function updateBtcFilterButtonUI() {
-                if (state.btcFilterEnabled) { btcFilterLabel.textContent = 'BTC ON';
-                    btnBtcFilter.style.borderColor = 'var(--accent-green)';
-                    btnBtcFilter.style.color = 'var(--accent-green)'; } else { btcFilterLabel.textContent = 'BTC OFF';
-                    btnBtcFilter.style.borderColor = 'var(--accent-red)';
-                    btnBtcFilter.style.color = 'var(--accent-red)'; }
+                if (state.btcFilterEnabled) { btcFilterLabel.textContent = 'BTC ON'; btnBtcFilter.style.borderColor = 'var(--accent-green)'; btnBtcFilter.style.color = 'var(--accent-green)'; } 
+                else { btcFilterLabel.textContent = 'BTC OFF'; btnBtcFilter.style.borderColor = 'var(--accent-red)'; btnBtcFilter.style.color = 'var(--accent-red)'; }
             }
-
-            function toggleBtcFilter() { state.btcFilterEnabled = !state.btcFilterEnabled;
-                persistState();
-                updateBtcFilterButtonUI();
-                showToast(state.btcFilterEnabled ? '⚡ تم تفعيل فلتر البيتكوين' : '⚡ تم إيقاف فلتر البيتكوين', 'info');
-                updateAllData(true); }
-
+            function toggleBtcFilter() { state.btcFilterEnabled = !state.btcFilterEnabled; persistState(); updateBtcFilterButtonUI(); showToast(state.btcFilterEnabled ? '⚡ تم تفعيل فلتر البيتكوين' : '⚡ تم إيقاف فلتر البيتكوين', 'info'); updateAllData(true); }
             function shareSignal(id) {
                 const sig = state.signals.find(s => s.id === id);
                 if (!sig) return;
-                const text =
-                    `📈 إشارة تداول: ${getSymbolDisplay(sig.symbol)} - ${sig.direction === 'buy' ? 'شراء' : 'بيع'}\n💰 الدخول: ${fmtPrice(sig.entryPrice)}\n🎯 الهدف: ${fmtPrice(sig.takeProfit)}\n🛑 وقف: ${fmtPrice(sig.stopLoss)}\n⏱️ ${fmtDateFull(sig.timestamp)}`;
-                if (navigator.share) navigator.share({ title: `إشارة ${getSymbolDisplay(sig.symbol)}`, text: text }).catch((
-                ) => {});
-                else navigator.clipboard.writeText(text).then(() => showToast('📋 تم نسخ الإشارة', 'success')).catch(() =>
-                    showToast('⚠️ تعذر النسخ', 'error'));
+                const text = `📈 إشارة تداول: ${getSymbolDisplay(sig.symbol)} - ${sig.direction === 'buy' ? 'شراء' : 'بيع'}\n💰 الدخول: ${fmtPrice(sig.entryPrice)}\n🎯 الهدف: ${fmtPrice(sig.takeProfit)}\n🛑 وقف: ${fmtPrice(sig.stopLoss)}\n⏱️ ${fmtDateFull(sig.timestamp)}`;
+                if (navigator.share) navigator.share({ title: `إشارة ${getSymbolDisplay(sig.symbol)}`, text: text }).catch(() => {});
+                else navigator.clipboard.writeText(text).then(() => showToast('📋 تم نسخ الإشارة', 'success')).catch(() => showToast('⚠️ تعذر النسخ', 'error'));
             }
-
             function toggleLock(id) {
                 const sig = state.signals.find(s => s.id === id);
                 if (!sig || sig.isClosed) return;
                 sig.isLocked = !sig.isLocked;
-                persistState();
-                renderSignals();
+                persistState(); renderSignals();
                 showToast(sig.isLocked ? '🔒 تم قفل الصفقة' : '🔓 تم فتح الصفقة', 'info');
             }
-
             function closeTrade(id) {
                 const sig = state.signals.find(s => s.id === id);
                 if (!sig || sig.isClosed) return;
                 if (sig.isLocked) { showToast('🔒 الصفقة مقفولة', 'error'); return; }
-                sig.isClosed = true;
-                sig.closedAt = now();
-                sig.closedResult = 'neutral';
-                persistState();
-                renderAll();
+                sig.isClosed = true; sig.closedAt = now(); sig.closedResult = 'neutral';
+                persistState(); renderAll();
                 showToast('✖️ تم إغلاق الصفقة يدوياً', 'info');
             }
 
             function showToast(message, type = 'info') {
                 const toast = document.createElement('div');
-                toast.className = `toast ${type}`;
-                toast.textContent = message;
+                toast.className = `toast ${type}`; toast.textContent = message;
                 toastContainer.appendChild(toast);
-                setTimeout(() => { if (toast.parentNode) { toast.style.opacity = '0';
-                        setTimeout(() => { if (toast.parentNode) toast.remove(); }, 300); } }, 3500);
-            }
-
-            function exportHistory() {
-                const data = JSON.stringify(state.signals, null, 2);
-                const blob = new Blob([data], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `cryptosignal_history_${new Date().toISOString().slice(0,10)}.json`;
-                a.click();
-                URL.revokeObjectURL(url);
-                showToast('📥 تم تصدير السجل', 'success');
-            }
-
-            function clearHistory() {
-                if (state.signals.length === 0) { showToast('📂 السجل فارغ بالفعل', 'info'); return; }
-                if (!confirm('هل أنت متأكد من مسح جميع البيانات؟')) return;
-                state.signals = [];
-                state.closedTrades = [];
-                state.sentSignals = [];
-                persistState();
-                renderAll();
-                showToast('🗑️ تم مسح السجل', 'info');
-            }
-
-            function copySettings() {
-                const text = `توكن تليجرام: ${state.settings.telegramToken}\nمعرف الدردشة: ${state.settings.telegramChatId}\nالفاصل: ${state.settings.updateInterval} دقيقة\nإرسال تلقائي: ${state.settings.autoSendTelegram ? 'نعم' : 'لا'}`;
-                navigator.clipboard.writeText(text).then(() => showToast('📋 تم نسخ الإعدادات', 'success')).catch(() =>
-                    showToast('⚠️ تعذر النسخ', 'error'));
+                setTimeout(() => { if (toast.parentNode) { toast.style.opacity = '0'; setTimeout(() => { if (toast.parentNode) toast.remove(); }, 300); } }, 3500);
             }
 
             // ============================================================
@@ -2161,40 +1317,31 @@
                 settingsChatId.value = state.settings.telegramChatId || '';
                 settingsInterval.value = state.settings.updateInterval || CONFIG.UPDATE_INTERVAL_DEFAULT;
                 settingsAutoSend.checked = state.settings.autoSendTelegram !== false;
-                settingsStatus.className = 'status-msg';
-                settingsStatus.textContent = '';
+                settingsStatus.className = 'status-msg'; settingsStatus.textContent = '';
                 settingsModal.classList.add('active');
             }
-
             function closeSettings() { settingsModal.classList.remove('active'); }
-
             function saveSettings() {
                 state.settings.telegramToken = settingsToken.value.trim();
                 state.settings.telegramChatId = settingsChatId.value.trim();
-                state.settings.updateInterval = Math.max(1, Math.min(60, parseInt(settingsInterval.value) || CONFIG
-                    .UPDATE_INTERVAL_DEFAULT));
+                state.settings.updateInterval = Math.max(1, Math.min(60, parseInt(settingsInterval.value) || CONFIG.UPDATE_INTERVAL_DEFAULT));
                 state.settings.autoSendTelegram = settingsAutoSend.checked;
                 persistSettings();
                 if (state.updateTimer) clearInterval(state.updateTimer);
                 startUpdateTimer();
-                settingsStatus.className = 'status-msg success';
-                settingsStatus.textContent = '✅ تم حفظ الإعدادات';
+                settingsStatus.className = 'status-msg success'; settingsStatus.textContent = '✅ تم حفظ الإعدادات';
                 showToast('✅ تم حفظ الإعدادات', 'success');
             }
-
             async function testTelegram() {
-                const token = settingsToken.value.trim(),
-                    chatId = settingsChatId.value.trim();
-                if (!token || !chatId) { settingsStatus.className = 'status-msg error';
-                    settingsStatus.textContent = '⚠️ يرجى إدخال التوكن والمعرف'; return; }
+                const token = settingsToken.value.trim(), chatId = settingsChatId.value.trim();
+                if (!token || !chatId) { settingsStatus.className = 'status-msg error'; settingsStatus.textContent = '⚠️ يرجى إدخال التوكن والمعرف'; return; }
                 try {
                     await sendTelegramMessage('🧪 <b>اختبار اتصال</b>\nتم استلام الإعدادات بنجاح! 🚀');
-                    settingsStatus.className = 'status-msg success';
-                    settingsStatus.textContent = '✅ تم إرسال رسالة الاختبار!';
+                    settingsStatus.className = 'status-msg success'; settingsStatus.textContent = '✅ تم إرسال رسالة الاختبار!';
                     showToast('✅ رسالة اختبار أرسلت للتليجرام', 'success');
                 } catch (e) {
-                    settingsStatus.className = 'status-msg error';
-                    settingsStatus.textContent = '❌ فشل الإرسال: ' + e.message;
+                    settingsStatus.className = 'status-msg error'; 
+                    settingsStatus.textContent = '❌ فشل الإرسال: ' + e.message; 
                     showToast('❌ فشل الاختبار: ' + e.message, 'error');
                 }
             }
@@ -2224,28 +1371,27 @@
 
                 registerServiceWorker();
 
-                window.addEventListener('beforeinstallprompt', (e) => {
-                    e.preventDefault();
-                    state.installPrompt = e;
-                    btnInstall.style.display = 'flex';
+                window.addEventListener('beforeinstallprompt', (e) => { 
+                    e.preventDefault(); 
+                    state.installPrompt = e; 
+                    btnInstall.style.display = 'flex'; 
                     btnInstall.innerHTML = '📲 <span>تثبيت التطبيق</span>';
                 });
 
                 btnInstall.addEventListener('click', async () => {
                     if (state.installPrompt) {
-                        try {
-                            const result = await state.installPrompt.prompt();
-                            if (result.outcome === 'accepted') {
-                                showToast('✅ تم التثبيت!', 'success');
-                                btnInstall.style.display = 'none';
-                            }
-                            state.installPrompt = null;
-                        } catch (e) {
-                            showToast('⚠️ تعذر التثبيت', 'error');
+                        try { 
+                            const result = await state.installPrompt.prompt(); 
+                            if (result.outcome === 'accepted') { 
+                                showToast('✅ تم التثبيت!', 'success'); 
+                                btnInstall.style.display = 'none'; 
+                            } 
+                            state.installPrompt = null; 
+                        } catch (e) { 
+                            showToast('⚠️ تعذر التثبيت', 'error'); 
                         }
                     } else {
-                        showToast('📱 يمكنك تثبيت هذا التطبيق من قائمة المتصفح (إضافة إلى الشاشة الرئيسية)',
-                        'info');
+                        showToast('📱 يمكنك تثبيت هذا التطبيق من قائمة المتصفح (إضافة إلى الشاشة الرئيسية)', 'info');
                     }
                 });
 
@@ -2306,8 +1452,7 @@
                             if ('periodicSync' in navigator) {
                                 navigator.periodicSync.register('crypto-update', { minInterval: 60 * 1000 })
                                     .then(() => addLog('📡 تم تفعيل التزامن الدوري (Periodic Sync)', 'info'))
-                                    .catch(err => addLog(`⚠️ فشل تفعيل التزامن الدوري: ${err.message}`,
-                                    'error'));
+                                    .catch(err => addLog(`⚠️ فشل تفعيل التزامن الدوري: ${err.message}`, 'error'));
                             }
                         })
                         .catch(err => addLog(`⚠️ فشل تسجيل Service Worker: ${err.message}`, 'error'));
@@ -2341,7 +1486,7 @@
             }
 
             // ============================================================
-            //  WAKE LOCK & SILENT AUDIO (Prevent sleep)
+            //  WAKE LOCK & SILENT AUDIO
             // ============================================================
             async function requestWakeLock() {
                 try {
@@ -2373,7 +1518,6 @@
                     oscillator.connect(gainNode);
                     gainNode.connect(state.audioCtx.destination);
                     oscillator.start();
-
                     function keepAlive() {
                         if (state.audioCtx && state.audioCtx.state === 'suspended') {
                             state.audioCtx.resume();
@@ -2395,20 +1539,20 @@
             function scheduleNextUpdate() {
                 if (nextUpdateTimeout) clearTimeout(nextUpdateTimeout);
                 const interval = (state.settings.updateInterval || CONFIG.UPDATE_INTERVAL_DEFAULT) * 60 * 1000;
-                nextUpdateTimeout = setTimeout(() => {
-                    updateAllData(false);
-                    scheduleNextUpdate();
+                nextUpdateTimeout = setTimeout(() => { 
+                    updateAllData(false); 
+                    scheduleNextUpdate(); 
                 }, Math.max(15000, interval));
             }
 
             function startUpdateTimer() {
                 if (state.updateTimer) clearInterval(state.updateTimer);
                 scheduleNextUpdate();
-                document.addEventListener('visibilitychange', () => {
-                    if (!document.hidden) {
-                        updateAllData(false);
-                        scheduleNextUpdate();
-                    }
+                document.addEventListener('visibilitychange', () => { 
+                    if (!document.hidden) { 
+                        updateAllData(false); 
+                        scheduleNextUpdate(); 
+                    } 
                 });
             }
 
@@ -2426,7 +1570,7 @@
                 setupPWA();
                 requestNotificationPermission();
                 addLog('🚀 تم بدء تشغيل التطبيق التجاري بنجاح.', 'success');
-
+                
                 btnSettings.addEventListener('click', openSettings);
                 btnSettingsClose.addEventListener('click', closeSettings);
                 btnSettingsSave.addEventListener('click', saveSettings);
@@ -2438,36 +1582,42 @@
                 btnBtcFilter.addEventListener('click', toggleBtcFilter);
                 btnModeToggle.addEventListener('click', toggleMode);
                 btnStrategy.addEventListener('click', toggleStrategy);
+                
                 chartSymbolSelect.addEventListener('change', () => {
                     ensureChartVisible();
                     updateChart(chartSymbolSelect.value);
                     resizeChart();
                 });
-                window.addEventListener('resize', () => {
-                    setTimeout(resizeChart, 200);
-                });
+
+                // Resize Observer for better mobile support
+                if (window.ResizeObserver) {
+                    const ro = new ResizeObserver(() => { 
+                        setTimeout(resizeChart, 200); 
+                    });
+                    ro.observe(chartContainer);
+                    state.resizeObserver = ro;
+                }
+                window.addEventListener('resize', () => { setTimeout(resizeChart, 200); });
 
                 settingsModal.addEventListener('click', (e) => { if (e.target === settingsModal) closeSettings(); });
                 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSettings(); });
 
-                // Initialize chart with a small delay to ensure layout
+                // Initialize chart after layout
                 setTimeout(() => {
                     createChart();
                     ensureChartVisible();
-                    // Initial chart update
                     setTimeout(() => {
                         updateChart(chartSymbolSelect.value);
                         resizeChart();
-                    }, 200);
-                }, 300);
+                    }, 300);
+                }, 400);
 
                 await requestWakeLock();
                 startSilentAudioLoop();
                 startUpdateTimer();
                 await updateAllData(true);
-
-                window.addEventListener('online', () => { showToast('🌐 تم استعادة الاتصال', 'success');
-                    updateAllData(false); });
+                
+                window.addEventListener('online', () => { showToast('🌐 تم استعادة الاتصال', 'success'); updateAllData(false); });
                 window.addEventListener('offline', () => { showToast('📡 انقطع الاتصال', 'error'); });
 
                 setInterval(() => {
@@ -2482,10 +1632,8 @@
             if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
             else init();
 
-            // Export for debugging
-            window.__cryptoSignal = { state, updateAllData, renderAll, sendTelegramMessage, generateSignal, CONFIG,
-                currentMode, MODES };
+            window.__cryptoSignal = { state, updateAllData, renderAll, sendTelegramMessage, generateSignal, CONFIG, currentMode, MODES };
         })();
     </script>
 </body>
-    </html>
+                                                        </html>
