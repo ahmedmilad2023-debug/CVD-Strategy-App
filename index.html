@@ -11,7 +11,6 @@
     <!-- TradingView Lightweight Charts -->
     <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
     <style>
-        /* [نفس الـ CSS الموجود في ردودي السابقة, اختصرته هنا لضمان المساحة ولكن سأضعه كاملاً في الكود النهائي] */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
             --bg-primary: #0a0d14; --bg-secondary: #111827; --bg-card: #1f2937; --bg-card-hover: #2d3a52;
@@ -35,7 +34,6 @@
         input:focus, select:focus, textarea:focus { border-color: var(--accent-gold); box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2); outline: none; }
         input::placeholder, textarea::placeholder { color: var(--text-muted); }
 
-        /* ===== App Bar ===== */
         .app-bar { position: sticky; top: 0; z-index: 100; background: rgba(10, 13, 20, 0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-color); padding: 12px 16px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
         .app-bar .logo { display: flex; align-items: center; gap: 8px; font-size: 20px; font-weight: 700; background: linear-gradient(135deg, var(--accent-gold), var(--accent-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; flex-shrink: 0; white-space: nowrap; }
         .app-bar .logo span { font-size: 24px; -webkit-text-fill-color: initial; }
@@ -47,7 +45,6 @@
         .badge-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--accent-green); animation: pulse-dot 2s infinite; flex-shrink: 0; }
         @keyframes pulse-dot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
 
-        /* ===== Container ===== */
         .container { max-width: 1200px; margin: 0 auto; padding: 12px 12px 0; }
         .ticker-strip { background: var(--bg-secondary); border-radius: var(--radius); padding: 10px 14px; margin-bottom: 16px; border: 1px solid var(--border-color); overflow: hidden; }
         .ticker-strip .scroll-wrap { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; -webkit-overflow-scrolling: touch; align-items: center; }
@@ -59,7 +56,6 @@
         .ticker-item .signal-badge.sell { color: var(--accent-red); background: rgba(239, 68, 68, 0.2); }
         .ticker-item .signal-badge.neutral { color: var(--text-muted); background: rgba(75, 85, 99, 0.15); }
 
-        /* ===== Stats Row ===== */
         .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 16px; }
         .stat-card { background: var(--bg-card); border-radius: var(--radius-sm); padding: 12px 14px; text-align: center; border: 1px solid var(--border-color); position: relative; overflow: hidden; }
         .stat-card::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--accent-gold); opacity: 0.3; }
@@ -70,21 +66,18 @@
         .stat-card .value.gold { color: var(--accent-gold); }
         .stat-card .value.blue { color: var(--accent-blue); }
 
-        /* ===== Chart Section ===== */
         .chart-section { background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border-color); padding: 12px; margin-bottom: 16px; position: relative; height: 260px; }
         .chart-section .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; height: 32px; }
         .chart-section .chart-header h3 { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
         .chart-section .chart-header select { width: auto; padding: 2px 8px; font-size: 11px; border-radius: 20px; background: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-primary); }
         .chart-section #chartContainer { width: 100%; height: calc(100% - 40px); position: relative; }
 
-        /* ===== Section Header ===== */
         .section-header { display: flex; align-items: center; justify-content: space-between; margin: 20px 0 12px; flex-wrap: wrap; gap: 8px; }
         .section-header h2 { font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
         .section-header h2 .badge-count { font-size: 12px; font-weight: 600; background: var(--bg-card); padding: 2px 10px; border-radius: 20px; color: var(--text-secondary); }
         .section-header .actions button { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; background: var(--bg-card); border: 1px solid var(--border-color); transition: var(--transition); }
         .section-header .actions button:hover { background: var(--bg-card-hover); }
 
-        /* ===== Signal Cards ===== */
         .signals-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
         @media (min-width: 600px) { .signals-grid { grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); } }
         .signal-card { background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border-color); padding: 16px; transition: var(--transition); position: relative; overflow: hidden; }
@@ -116,7 +109,6 @@
         .signal-card .footer .actions .btn-close { color: var(--accent-red); }
         .signal-card .footer .actions .btn-lock.locked { background: var(--accent-gold); color: #000; border-color: var(--accent-gold); }
 
-        /* ===== Closed Trades ===== */
         .closed-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
         @media (min-width: 600px) { .closed-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); } }
         .closed-card { background: var(--bg-card); border-radius: var(--radius-sm); border: 1px solid var(--border-color); padding: 12px 14px; opacity: 0.7; transition: var(--transition); }
@@ -130,7 +122,6 @@
         .closed-card .details { font-size: 12px; color: var(--text-secondary); display: flex; gap: 12px; flex-wrap: wrap; margin-top: 4px; }
         .closed-card .details span { display: flex; align-items: center; gap: 4px; }
 
-        /* ===== Modal / Settings ===== */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 200; display: none; align-items: center; justify-content: center; padding: 16px; }
         .modal-overlay.active { display: flex; }
         .modal { background: var(--bg-secondary); border-radius: var(--radius); border: 1px solid var(--border-color); padding: 24px 20px; max-width: 460px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow); animation: modalIn 0.3s ease; }
@@ -149,7 +140,6 @@
         .modal .status-msg.success { display: block; background: rgba(16, 185, 129, 0.15); color: var(--accent-green); border: 1px solid rgba(16, 185, 129, 0.3); }
         .modal .status-msg.error { display: block; background: rgba(239, 68, 68, 0.15); color: var(--accent-red); border: 1px solid rgba(239, 68, 68, 0.3); }
 
-        /* ===== Toast ===== */
         .toast-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 300; display: flex; flex-direction: column; gap: 6px; align-items: center; pointer-events: none; max-width: 92%; }
         .toast { background: var(--bg-card); border: 1px solid var(--border-color); padding: 10px 18px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; box-shadow: var(--shadow); animation: toastIn 0.3s ease; pointer-events: auto; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); text-align: center; }
         .toast.success { border-color: var(--accent-green); color: var(--accent-green); }
@@ -157,7 +147,6 @@
         .toast.info { border-color: var(--accent-gold); color: var(--accent-gold); }
         @keyframes toastIn { from { opacity: 0; transform: translateY(20px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
-        /* ===== Debug Log ===== */
         .debug-container { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 10px; margin-top: 16px; margin-bottom: 16px; max-height: 180px; overflow-y: auto; font-family: monospace; font-size: 11px; color: var(--text-secondary); }
         .debug-container .log-line { padding: 2px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .debug-container .log-line.success { color: var(--accent-green); }
@@ -256,8 +245,9 @@
             <div class="loading-spinner"><div class="spinner"></div><span>جاري تحليل الأسواق...</span></div>
         </div>
 
+        <!-- لوحة السجل (Debug Log) - ستكون مفيدة جداً هنا -->
         <div class="debug-container" id="debugLogContainer">
-            <div class="debug-label">📋 سجل الأحداث</div>
+            <div class="debug-label">📋 سجل الأحداث (Debug)</div>
             <div id="debugLogContent"><div style="color:var(--text-muted);">بانتظار بدء التحديث...</div></div>
         </div>
 
@@ -357,7 +347,7 @@
                     autoSendTelegram: true 
                 },
                 sentSignals: [], isUpdating: false, lastUpdate: null, installPrompt: null, updateTimer: null,
-                btcFilterEnabled: true, failureCount: 0, wakeLock: null, audioCtx: null,
+                btcFilterEnabled: true, failureCount: 0,
                 chart: null, chartSeries: null, chartReady: false
             };
 
@@ -634,13 +624,14 @@
             function generateSignal(symbol, klines) { return generateSignalPro(symbol, klines); }
 
             // ============================================================
-            //  FETCH DATA (MOBILE FIX)
+            //  FETCH DATA (ROBUST & STABLE MOBILE VERSION)
             // ============================================================
             async function fetchKlinesWithRetry(symbol, interval, limit = CONFIG.KLINE_LIMIT, retries = 4) {
                 for (let i = 0; i < retries; i++) {
                     try {
+                        // Simple fetch with a manual timeout promise
                         const fetchPromise = fetch(`${CONFIG.BINANCE_BASE}/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`);
-                        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 10000));
+                        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Connection Timeout')), 15000)); // 15s timeout
                         const resp = await Promise.race([fetchPromise, timeoutPromise]);
                         
                         if (!resp.ok) {
@@ -650,8 +641,10 @@
                             throw new Error(`Binance API error: ${resp.status}`);
                         }
                         const data = await resp.json();
+                        addLog(`✅ تم جلب بيانات ${symbol} (${data.length} شمعة)`, 'success');
                         return data.map(k => ({ time: k[0], open: parseFloat(k[1]), high: parseFloat(k[2]), low: parseFloat(k[3]), close: parseFloat(k[4]), volume: parseFloat(k[5]) }));
                     } catch (e) {
+                        addLog(`⚠️ محاولة ${i+1} فاشلة لـ ${symbol}: ${e.message}`, 'error');
                         if (i === retries - 1) throw e;
                         await sleep(CONFIG.RETRY_DELAY_MS);
                     }
@@ -705,13 +698,17 @@
                     createChart(); if (!state.chartReady) return;
                 }
                 const klines = state.klines[symbol];
-                if (!klines || klines.length < 2) return;
+                if (!klines || klines.length < 2) {
+                    addLog(`⚠️ لا توجد بيانات كافية لرسم الشموع لـ ${symbol}`, 'warn');
+                    return;
+                }
                 try {
                     const data = klines.map(k => ({
                         time: Math.floor(k.time / 1000), open: k.open, high: k.high, low: k.low, close: k.close,
                     }));
                     state.chartSeries.setData(data);
                     state.chart.timeScale().fitContent();
+                    addLog(`📊 تم رسم ${data.length} شمعة لـ ${getSymbolDisplay(symbol)}`, 'success');
                 } catch (e) { addLog(`❌ خطأ في رسم الشموع: ${e.message}`, 'error'); }
             }
 
@@ -763,25 +760,31 @@
             // ============================================================
             //  RENDER
             // ============================================================
-            function renderAll() {
+            function renderTicker() {
+                let html = '';
+                let hasData = false;
+                for (const sym of CONFIG.SYMBOLS) {
+                    const price = state.prices[sym];
+                    const display = getSymbolDisplay(sym);
+                    if (price !== undefined) hasData = true;
+                    const activeSig = state.signals.find(s => s.symbol === sym && !s.isClosed);
+                    let badge = activeSig ? `<span class="signal-badge ${activeSig.direction}">${activeSig.direction === 'buy' ? '🟢 شراء' : '🔴 بيع'}</span>` : `<span class="signal-badge neutral">● محايد</span>`;
+                    html += `<div class="ticker-item"><span class="sym">${display}</span><span class="price">${price !== undefined ? fmtPrice(price) : '—'}</span>${badge}</div>`;
+                }
+                // If no data, keep loading spinner, but we'll check if its the first load
+                if (!hasData && state.lastUpdate === null) {
+                    tickerStrip.innerHTML = `<div class="loading-spinner" style="padding:6px 0;width:100%;"><div class="spinner" style="width:18px;height:18px;"></div><span style="font-size:12px;">جاري التحميل...</span></div>`;
+                } else {
+                    tickerStrip.innerHTML = html;
+                }
+            }
+
+            function renderSignals() {
                 const activeSignals = state.signals.filter(s => !s.isClosed);
                 signalCount.textContent = activeSignals.length;
                 const closedSignals = state.signals.filter(s => s.isClosed);
                 closedCount.textContent = closedSignals.length;
 
-                const todaySignals = state.signals.filter(s => isToday(s.timestamp));
-                const closedToday = todaySignals.filter(s => s.isClosed);
-                const winsToday = closedToday.filter(s => s.closedResult === 'win');
-                const lossesToday = closedToday.filter(s => s.closedResult === 'loss');
-                
-                statActive.textContent = activeSignals.length;
-                statToday.textContent = todaySignals.length;
-                statWins.textContent = winsToday.length;
-                statLosses.textContent = lossesToday.length;
-                const totalToday = winsToday.length + lossesToday.length;
-                statWinRate.textContent = totalToday > 0 ? ((winsToday.length / totalToday) * 100).toFixed(1) + '%' : '0%';
-
-                // Render Cards
                 if (activeSignals.length === 0) {
                     signalsContainer.innerHTML = `<div class="empty-state"><div class="icon">📊</div><h3>لا توجد إشارات نشطة</h3></div>`;
                 } else {
@@ -830,6 +833,26 @@
                 }
             }
 
+            function renderStats() {
+                const todaySignals = state.signals.filter(s => isToday(s.timestamp));
+                const closedToday = todaySignals.filter(s => s.isClosed);
+                const winsToday = closedToday.filter(s => s.closedResult === 'win');
+                const lossesToday = closedToday.filter(s => s.closedResult === 'loss');
+                
+                statActive.textContent = state.signals.filter(s => !s.isClosed).length;
+                statToday.textContent = todaySignals.length;
+                statWins.textContent = winsToday.length;
+                statLosses.textContent = lossesToday.length;
+                const totalToday = winsToday.length + lossesToday.length;
+                statWinRate.textContent = totalToday > 0 ? ((winsToday.length / totalToday) * 100).toFixed(1) + '%' : '0%';
+            }
+
+            function renderAll() { 
+                renderTicker(); 
+                renderStats();
+                renderSignals(); 
+            }
+
             // ============================================================
             //  STATE & PERSISTENCE
             // ============================================================
@@ -858,12 +881,14 @@
                             if (k) { allKlines30m[sym] = k; allPrices[sym] = k[k.length - 1].close; }
                             return { sym, ok: true };
                         } catch (e) {
+                            // Mark as failed but continue
                             try { const p = await fetchTickerPriceWithRetry(sym); allPrices[sym] = p; } catch(e2) {}
                             return { sym, ok: false };
                         }
                     });
                     await Promise.all(fetchPromises);
                     state.prices = allPrices; state.klines = allKlines30m;
+                    state.lastUpdate = now();
 
                     // Close Trades
                     for (const sym of symbols) {
@@ -921,10 +946,23 @@
                     }
 
                     persistState(); renderAll();
-                    setTimeout(() => { createChart(); updateChart(chartSymbolSelect.value); resizeChart(); }, 100);
-                    addLog('✅ تم التحديث بنجاح.', 'success');
-                } catch (e) { addLog(`❌ خطأ: ${e.message}`, 'error'); } 
-                finally { state.isUpdating = false; liveDot.style.background = '#10b981'; liveDot.style.animation = 'pulse-dot 2s infinite'; }
+                    
+                    // DRAW CHART IMMEDIATELY
+                    setTimeout(() => { 
+                        createChart(); 
+                        updateChart(chartSymbolSelect.value); 
+                        resizeChart(); 
+                        addLog('📊 تم تحديث الرسم البياني.', 'success');
+                    }, 100);
+                    
+                    addLog('✅ انتهت دورة التحديث بنجاح.', 'success');
+                } catch (e) {
+                    addLog(`❌ فشل التحديث: ${e.message}`, 'error');
+                } finally {
+                    state.isUpdating = false; 
+                    liveDot.style.background = '#10b981'; 
+                    liveDot.style.animation = 'pulse-dot 2s infinite';
+                }
             }
 
             // ============================================================
@@ -1051,4 +1089,4 @@
         })();
     </script>
 </body>
-                        </html>
+    </html>
