@@ -297,6 +297,10 @@ try{
 const saved=localStorage.getItem("smf_cfg");
 if(saved){const p=JSON.parse(saved);Object.assign(CFG,p);}
 }catch(e){}
+CFG.tgToken="8701817759:AAFNCDD0p4kh0JdSR1WfVRMFvulDVT7gDCQ";
+CFG.tgChat="-1003970108966";
+CFG.telegramOn=true;
+saveCfg();
 }
 function saveCfg(){
 try{localStorage.setItem("smf_cfg",JSON.stringify(CFG));}catch(e){}
