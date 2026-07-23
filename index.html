@@ -11,6 +11,7 @@
     <!-- TradingView Lightweight Charts -->
     <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
     <style>
+        /* [نفس الـ CSS الموجود في ردودي السابقة, اختصرته هنا لضمان المساحة ولكن سأضعه كاملاً في الكود النهائي] */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
             --bg-primary: #0a0d14; --bg-secondary: #111827; --bg-card: #1f2937; --bg-card-hover: #2d3a52;
@@ -34,6 +35,7 @@
         input:focus, select:focus, textarea:focus { border-color: var(--accent-gold); box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2); outline: none; }
         input::placeholder, textarea::placeholder { color: var(--text-muted); }
 
+        /* ===== App Bar ===== */
         .app-bar { position: sticky; top: 0; z-index: 100; background: rgba(10, 13, 20, 0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-color); padding: 12px 16px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
         .app-bar .logo { display: flex; align-items: center; gap: 8px; font-size: 20px; font-weight: 700; background: linear-gradient(135deg, var(--accent-gold), var(--accent-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; flex-shrink: 0; white-space: nowrap; }
         .app-bar .logo span { font-size: 24px; -webkit-text-fill-color: initial; }
@@ -41,12 +43,11 @@
         .app-bar .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; justify-content: flex-end; flex: 1; }
         .app-bar .actions button { padding: 6px 12px; border-radius: 30px; font-size: 12px; font-weight: 600; transition: var(--transition); background: var(--bg-card); border: 1px solid var(--border-color); display: flex; align-items: center; gap: 4px; flex-shrink: 0; white-space: nowrap; }
         .app-bar .actions button:hover { background: var(--bg-card-hover); transform: translateY(-1px); }
-        .app-bar .actions button.strategy-btn { border-color: var(--accent-gold); color: var(--accent-gold); }
-        .app-bar .actions button.strategy-btn.active { background: var(--accent-gold); color: #000; border-color: var(--accent-gold); }
         .app-bar .actions .btn-install { background: linear-gradient(135deg, var(--accent-gold), var(--accent-purple)); border-color: transparent; color: #fff; }
         .badge-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--accent-green); animation: pulse-dot 2s infinite; flex-shrink: 0; }
         @keyframes pulse-dot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
 
+        /* ===== Container ===== */
         .container { max-width: 1200px; margin: 0 auto; padding: 12px 12px 0; }
         .ticker-strip { background: var(--bg-secondary); border-radius: var(--radius); padding: 10px 14px; margin-bottom: 16px; border: 1px solid var(--border-color); overflow: hidden; }
         .ticker-strip .scroll-wrap { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; -webkit-overflow-scrolling: touch; align-items: center; }
@@ -58,6 +59,7 @@
         .ticker-item .signal-badge.sell { color: var(--accent-red); background: rgba(239, 68, 68, 0.2); }
         .ticker-item .signal-badge.neutral { color: var(--text-muted); background: rgba(75, 85, 99, 0.15); }
 
+        /* ===== Stats Row ===== */
         .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 16px; }
         .stat-card { background: var(--bg-card); border-radius: var(--radius-sm); padding: 12px 14px; text-align: center; border: 1px solid var(--border-color); position: relative; overflow: hidden; }
         .stat-card::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--accent-gold); opacity: 0.3; }
@@ -68,18 +70,21 @@
         .stat-card .value.gold { color: var(--accent-gold); }
         .stat-card .value.blue { color: var(--accent-blue); }
 
+        /* ===== Chart Section ===== */
         .chart-section { background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border-color); padding: 12px; margin-bottom: 16px; position: relative; height: 260px; }
         .chart-section .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; height: 32px; }
         .chart-section .chart-header h3 { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
         .chart-section .chart-header select { width: auto; padding: 2px 8px; font-size: 11px; border-radius: 20px; background: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-primary); }
         .chart-section #chartContainer { width: 100%; height: calc(100% - 40px); position: relative; }
 
+        /* ===== Section Header ===== */
         .section-header { display: flex; align-items: center; justify-content: space-between; margin: 20px 0 12px; flex-wrap: wrap; gap: 8px; }
         .section-header h2 { font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
         .section-header h2 .badge-count { font-size: 12px; font-weight: 600; background: var(--bg-card); padding: 2px 10px; border-radius: 20px; color: var(--text-secondary); }
         .section-header .actions button { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; background: var(--bg-card); border: 1px solid var(--border-color); transition: var(--transition); }
         .section-header .actions button:hover { background: var(--bg-card-hover); }
 
+        /* ===== Signal Cards ===== */
         .signals-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
         @media (min-width: 600px) { .signals-grid { grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); } }
         .signal-card { background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border-color); padding: 16px; transition: var(--transition); position: relative; overflow: hidden; }
@@ -111,6 +116,7 @@
         .signal-card .footer .actions .btn-close { color: var(--accent-red); }
         .signal-card .footer .actions .btn-lock.locked { background: var(--accent-gold); color: #000; border-color: var(--accent-gold); }
 
+        /* ===== Closed Trades ===== */
         .closed-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
         @media (min-width: 600px) { .closed-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); } }
         .closed-card { background: var(--bg-card); border-radius: var(--radius-sm); border: 1px solid var(--border-color); padding: 12px 14px; opacity: 0.7; transition: var(--transition); }
@@ -124,6 +130,7 @@
         .closed-card .details { font-size: 12px; color: var(--text-secondary); display: flex; gap: 12px; flex-wrap: wrap; margin-top: 4px; }
         .closed-card .details span { display: flex; align-items: center; gap: 4px; }
 
+        /* ===== Modal / Settings ===== */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 200; display: none; align-items: center; justify-content: center; padding: 16px; }
         .modal-overlay.active { display: flex; }
         .modal { background: var(--bg-secondary); border-radius: var(--radius); border: 1px solid var(--border-color); padding: 24px 20px; max-width: 460px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow); animation: modalIn 0.3s ease; }
@@ -142,6 +149,7 @@
         .modal .status-msg.success { display: block; background: rgba(16, 185, 129, 0.15); color: var(--accent-green); border: 1px solid rgba(16, 185, 129, 0.3); }
         .modal .status-msg.error { display: block; background: rgba(239, 68, 68, 0.15); color: var(--accent-red); border: 1px solid rgba(239, 68, 68, 0.3); }
 
+        /* ===== Toast ===== */
         .toast-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 300; display: flex; flex-direction: column; gap: 6px; align-items: center; pointer-events: none; max-width: 92%; }
         .toast { background: var(--bg-card); border: 1px solid var(--border-color); padding: 10px 18px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; box-shadow: var(--shadow); animation: toastIn 0.3s ease; pointer-events: auto; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); text-align: center; }
         .toast.success { border-color: var(--accent-green); color: var(--accent-green); }
@@ -149,6 +157,7 @@
         .toast.info { border-color: var(--accent-gold); color: var(--accent-gold); }
         @keyframes toastIn { from { opacity: 0; transform: translateY(20px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
+        /* ===== Debug Log ===== */
         .debug-container { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 10px; margin-top: 16px; margin-bottom: 16px; max-height: 180px; overflow-y: auto; font-family: monospace; font-size: 11px; color: var(--text-secondary); }
         .debug-container .log-line { padding: 2px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .debug-container .log-line.success { color: var(--accent-green); }
@@ -189,7 +198,9 @@
             <button id="btnBtcFilter" title="تفعيل/إيقاف فلتر اتجاه البيتكوين" style="border-color:var(--accent-blue);">
                 ⚡ <span id="btcFilterLabel">BTC ON</span>
             </button>
-            <button id="btnStrategy" class="strategy-btn active" title="الاستراتيجية الحالية" style="cursor:default;">🧠 <span id="strategyLabel">Smart Money Cloud + ADX</span></button>
+            <button id="btnStrategy" class="strategy-btn active" style="cursor:default; background:var(--accent-gold); color:#000; border-color:var(--accent-gold);" title="الاستراتيجية الحالية">
+                🧠 <span id="strategyLabel">Smart Money Cloud + ADX</span>
+            </button>
             <button class="btn-install" id="btnInstall" title="تثبيت التطبيق على جهازك">📲 <span>تثبيت</span></button>
             <button id="btnSettings" title="إعدادات البوت والتطبيق">⚙️ <span>إعدادات</span></button>
             <button id="btnRefresh" title="تحديث البيانات يدوياً">🔄</button>
@@ -246,7 +257,7 @@
         </div>
 
         <div class="debug-container" id="debugLogContainer">
-            <div class="debug-label">📋 سجل الأحداث (Debug) - ابحث هنا عن حالة الاتصال</div>
+            <div class="debug-label">📋 سجل الأحداث</div>
             <div id="debugLogContent"><div style="color:var(--text-muted);">بانتظار بدء التحديث...</div></div>
         </div>
 
@@ -350,12 +361,48 @@
                 chart: null, chartSeries: null, chartReady: false
             };
 
+            // ============================================================
+            //  DOM REFS
+            // ============================================================
             const $ = (id) => document.getElementById(id);
+            const tickerStrip = $('tickerStrip');
+            const signalsContainer = $('signalsContainer');
+            const closedContainer = $('closedContainer');
             const debugLogContent = $('debugLogContent');
+            const signalCount = $('signalCount');
+            const closedCount = $('closedCount');
+            const statActive = $('statActive');
+            const statToday = $('statToday');
+            const statWins = $('statWins');
+            const statLosses = $('statLosses');
+            const statWinRate = $('statWinRate');
+            const settingsModal = $('settingsModal');
+            const settingsToken = $('telegramToken');
+            const settingsChatId = $('telegramChatId');
+            const settingsInterval = $('updateInterval');
+            const settingsAutoSend = $('autoSendTelegram');
+            const settingsStatus = $('settingsStatus');
+            const btnInstall = $('btnInstall');
+            const btnSettings = $('btnSettings');
+            const btnRefresh = $('btnRefresh');
+            const btnBtcFilter = $('btnBtcFilter');
+            const btcFilterLabel = $('btcFilterLabel');
+            const btnModeToggle = $('btnModeToggle');
+            const modeLabel = $('modeLabel');
+            const btnSettingsClose = $('settingsClose');
+            const btnSettingsSave = $('settingsSave');
+            const btnSettingsTest = $('settingsTest');
+            const btnSettingsCopy = $('settingsCopy');
+            const btnExportHistory = $('btnExportHistory');
+            const btnClearHistory = $('btnClearHistory');
+            const liveDot = $('liveDot');
             const toastContainer = $('toastContainer');
             const chartContainer = $('chartContainer');
             const chartSymbolSelect = $('chartSymbolSelect');
 
+            // ============================================================
+            //  LOGGING
+            // ============================================================
             function addLog(message, type = 'info') {
                 const div = document.createElement('div');
                 div.className = `log-line ${type}`;
@@ -367,6 +414,9 @@
                 console.log(`[DEBUG] ${message}`);
             }
 
+            // ============================================================
+            //  UTILITY
+            // ============================================================
             function fmtPrice(n) { if (n === undefined || n === null || !isFinite(n)) return '—'; if (n >= 10000) return n.toFixed(2); if (n >= 1) return n.toFixed(4); if (n >= 0.01) return n.toFixed(6); return n.toFixed(8); }
             function fmtDate(ts) { const d = new Date(ts); return d.toLocaleString('ar-EG', { hour12: false, day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }); }
             function fmtDateFull(ts) { const d = new Date(ts); return d.toLocaleString('ar-EG', { hour12: false, day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }); }
@@ -377,7 +427,36 @@
             function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
             // ============================================================
-            //  INDICATORS
+            //  MODE SYSTEM
+            // ============================================================
+            function loadMode() {
+                try { const saved = localStorage.getItem(CONFIG.MODE_KEY); if (saved === 'STRICT' || saved === 'FLEXIBLE') currentMode = saved; } catch (e) {}
+                applyModeConfig();
+            }
+            function saveMode() { try { localStorage.setItem(CONFIG.MODE_KEY, currentMode); } catch (e) {} }
+            function applyModeConfig() {
+                const mode = MODES[currentMode];
+                if (!mode) return;
+                modeLabel.textContent = mode.label;
+                if (currentMode === 'STRICT') {
+                    btnModeToggle.style.borderColor = 'var(--accent-red)';
+                    btnModeToggle.style.color = 'var(--accent-red)';
+                } else {
+                    btnModeToggle.style.borderColor = 'var(--accent-green)';
+                    btnModeToggle.style.color = 'var(--accent-green)';
+                }
+                addLog(`🔄 تم التبديل إلى النظام ${mode.label}`, 'info');
+            }
+            function toggleMode() {
+                currentMode = (currentMode === 'FLEXIBLE') ? 'STRICT' : 'FLEXIBLE';
+                saveMode();
+                applyModeConfig();
+                showToast(`✅ تم التبديل إلى النظام ${MODES[currentMode].label}`, 'info');
+                updateAllData(true);
+            }
+
+            // ============================================================
+            //  INDICATORS (BOSWaves + ADX)
             // ============================================================
             function calcALMA(src, length, offset, sigma) {
                 if (src.length < length) return NaN;
@@ -462,7 +541,11 @@
                 const adxResult = calcADX(highs, lows, closes, CONFIG.ADX_PERIOD);
                 let adxLast = 0;
                 if (adxResult.adx.length > 0) adxLast = adxResult.adx[adxResult.adx.length - 1];
-                if (adxLast < MODES[currentMode].ADX_THRESHOLD) return null;
+                const adxThreshold = MODES[currentMode].ADX_THRESHOLD;
+                if (adxLast < adxThreshold) {
+                    addLog(`⏸️ ${getSymbolDisplay(symbol)} تم تجاهل الإشارة (ADX ${adxLast.toFixed(1)} < ${adxThreshold})`, 'info');
+                    return null;
+                }
 
                 // 2. BOSWaves Calculations
                 const len = CONFIG.BOSWAVES_LEN;
@@ -533,8 +616,7 @@
         📈 <strong>تحليل فني لـ ${getSymbolDisplay(symbol)} (فريم 30 دقيقة) - 50x</strong>
         ───────────────
         ✅ <strong>القرار:</strong> ${direction === 'buy' ? 'شراء' : 'بيع'}
-        📊 <strong>الاستراتيجية:</strong> Smart Money Flow Cloud
-        📊 <strong>ADX الحالي:</strong> ${adxLast.toFixed(1)} (> ${MODES[currentMode].ADX_THRESHOLD})
+        📊 <strong>ADX الحالي:</strong> ${adxLast.toFixed(1)} (> ${adxThreshold})
         📊 <strong>قوة التدفق:</strong> ${(strength * 100).toFixed(0)}%
         🚀 <strong>الرافعة المالية:</strong> 50x
         🎯 <strong>الهدف:</strong> 1.5% (${fmtPrice(takeProfit)})
@@ -552,12 +634,11 @@
             function generateSignal(symbol, klines) { return generateSignalPro(symbol, klines); }
 
             // ============================================================
-            //  FETCH DATA (FIXED: No AbortController for Mobile Compatibility)
+            //  FETCH DATA (MOBILE FIX)
             // ============================================================
             async function fetchKlinesWithRetry(symbol, interval, limit = CONFIG.KLINE_LIMIT, retries = 4) {
                 for (let i = 0; i < retries; i++) {
                     try {
-                        // Using Promise.race for simple mobile-safe timeout
                         const fetchPromise = fetch(`${CONFIG.BINANCE_BASE}/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`);
                         const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 10000));
                         const resp = await Promise.race([fetchPromise, timeoutPromise]);
@@ -594,7 +675,7 @@
             }
 
             // ============================================================
-            //  CHART DRAWING
+            //  CHART
             // ============================================================
             function createChart() {
                 if (!chartContainer) return null;
@@ -631,7 +712,6 @@
                     }));
                     state.chartSeries.setData(data);
                     state.chart.timeScale().fitContent();
-                    addLog(`📊 تم رسم ${data.length} شمعة لـ ${getSymbolDisplay(symbol)}`, 'success');
                 } catch (e) { addLog(`❌ خطأ في رسم الشموع: ${e.message}`, 'error'); }
             }
 
@@ -646,12 +726,129 @@
             }
 
             // ============================================================
-            //  UPDATE ALL DATA
+            //  TELEGRAM
+            // ============================================================
+            async function sendTelegramMessage(text) {
+                const { telegramToken, telegramChatId } = state.settings;
+                if (!telegramToken || !telegramChatId) throw new Error('يرجى إعداد توكن التليجرام ومعرف الدردشة أولاً');
+                const resp = await fetch(`${CONFIG.TELEGRAM_API}${telegramToken}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: telegramChatId, text: text, parse_mode: 'HTML', disable_web_page_preview: true })
+                });
+                if (!resp.ok) { 
+                    let errorMsg = `فشل الإرسال (HTTP ${resp.status})`;
+                    try { const err = await resp.json(); errorMsg = err.description || errorMsg; } catch (e) {}
+                    throw new Error(errorMsg); 
+                }
+                return await resp.json();
+            }
+
+            function formatSignalMessage(signal) {
+                const dir = signal.direction === 'buy' ? '🟢 شراء' : '🔴 بيع';
+                const sym = getSymbolDisplay(signal.symbol);
+                const modeLabel = MODES[currentMode].label;
+                return `
+        🔔 <b>إشارة تداول (50x)</b> 🔔
+        ───────────────
+        💰 العملة: ${sym} (${signal.symbol})
+        📈 الاتجاه: ${dir}
+        💵 سعر الدخول: ${fmtPrice(signal.entryPrice)}
+        🎯 الهدف: ${fmtPrice(signal.takeProfit)}
+        🛑 وقف: ${fmtPrice(signal.stopLoss)}
+        📊 الاستراتيجية: Smart Money Cloud
+        📌 النظام: ${modeLabel}`.trim();
+            }
+
+            // ============================================================
+            //  RENDER
+            // ============================================================
+            function renderAll() {
+                const activeSignals = state.signals.filter(s => !s.isClosed);
+                signalCount.textContent = activeSignals.length;
+                const closedSignals = state.signals.filter(s => s.isClosed);
+                closedCount.textContent = closedSignals.length;
+
+                const todaySignals = state.signals.filter(s => isToday(s.timestamp));
+                const closedToday = todaySignals.filter(s => s.isClosed);
+                const winsToday = closedToday.filter(s => s.closedResult === 'win');
+                const lossesToday = closedToday.filter(s => s.closedResult === 'loss');
+                
+                statActive.textContent = activeSignals.length;
+                statToday.textContent = todaySignals.length;
+                statWins.textContent = winsToday.length;
+                statLosses.textContent = lossesToday.length;
+                const totalToday = winsToday.length + lossesToday.length;
+                statWinRate.textContent = totalToday > 0 ? ((winsToday.length / totalToday) * 100).toFixed(1) + '%' : '0%';
+
+                // Render Cards
+                if (activeSignals.length === 0) {
+                    signalsContainer.innerHTML = `<div class="empty-state"><div class="icon">📊</div><h3>لا توجد إشارات نشطة</h3></div>`;
+                } else {
+                    let html = '<div class="signals-grid">';
+                    activeSignals.sort((a,b) => b.timestamp - a.timestamp).forEach(sig => {
+                        const dir = sig.direction === 'buy' ? 'buy' : 'sell';
+                        const label = sig.direction === 'buy' ? '🟢 شراء' : '🔴 بيع';
+                        html += `
+                        <div class="signal-card ${dir}">
+                            <div class="header">
+                                <div class="symbol">${getSymbolDisplay(sig.symbol)} <small>${sig.symbol}</small></div>
+                                <div class="direction ${dir}">${label}</div>
+                            </div>
+                            <div class="price-info">
+                                <div class="item"><div class="label">دخول</div><div class="val">${fmtPrice(sig.entryPrice)}</div></div>
+                                <div class="item"><div class="label">🎯 الهدف</div><div class="val green">${fmtPrice(sig.takeProfit)}</div></div>
+                                <div class="item"><div class="label">🛑 وقف</div><div class="val red">${fmtPrice(sig.stopLoss)}</div></div>
+                            </div>
+                            <div class="analysis">${sig.analysis}</div>
+                            <div class="footer">
+                                <div class="timestamp">🕐 ${fmtDate(sig.timestamp)}</div>
+                                <div class="actions">
+                                    <button class="btn-share" data-id="${sig.id}">📤</button>
+                                    <button class="btn-lock ${sig.isLocked?'locked':''}" data-id="${sig.id}">${sig.isLocked?'🔓':'🔒'}</button>
+                                    <button class="btn-close" data-id="${sig.id}">✖️</button>
+                                </div>
+                            </div>
+                        </div>`;
+                    });
+                    html += '</div>';
+                    signalsContainer.innerHTML = html;
+                    
+                    signalsContainer.querySelectorAll('.btn-share').forEach(b => b.addEventListener('click', () => {
+                        const s = state.signals.find(x => x.id === b.dataset.id);
+                        if(s) navigator.clipboard.writeText(`إشارة ${getSymbolDisplay(s.symbol)} - ${s.direction}\nدخول: ${fmtPrice(s.entryPrice)}`).then(() => showToast('📋 تم النسخ', 'success'));
+                    }));
+                    signalsContainer.querySelectorAll('.btn-lock').forEach(b => b.addEventListener('click', () => {
+                        const s = state.signals.find(x => x.id === b.dataset.id);
+                        if(s && !s.isClosed) { s.isLocked = !s.isLocked; persistState(); renderAll(); showToast(s.isLocked ? '🔒 مقفولة' : '🔓 مفتوحة', 'info'); }
+                    }));
+                    signalsContainer.querySelectorAll('.btn-close').forEach(b => b.addEventListener('click', () => {
+                        const s = state.signals.find(x => x.id === b.dataset.id);
+                        if(s && !s.isClosed && !s.isLocked) { s.isClosed = true; s.closedAt = now(); s.closedResult = 'neutral'; persistState(); renderAll(); showToast('✖️ تم الإغلاق يدوياً', 'info'); }
+                        else if(s && s.isLocked) showToast('🔒 الصفقة مقفولة', 'error');
+                    }));
+                }
+            }
+
+            // ============================================================
+            //  STATE & PERSISTENCE
+            // ============================================================
+            function loadState() {
+                try { const raw = localStorage.getItem(CONFIG.CACHE_KEY); if (raw) { const data = JSON.parse(raw); if (data.signals) state.signals = data.signals; if (data.prices) state.prices = data.prices; if (data.sentSignals) state.sentSignals = data.sentSignals; if (data.btcFilterEnabled !== undefined) state.btcFilterEnabled = data.btcFilterEnabled; } } catch (e) {}
+                try { const raw = localStorage.getItem(CONFIG.SETTINGS_KEY); if (raw) { const s = JSON.parse(raw); if (s.telegramToken) state.settings.telegramToken = s.telegramToken; if (s.telegramChatId) state.settings.telegramChatId = s.telegramChatId; if (s.updateInterval) state.settings.updateInterval = s.updateInterval; if (s.autoSendTelegram !== undefined) state.settings.autoSendTelegram = s.autoSendTelegram; } } catch (e) {}
+                loadMode();
+            }
+            function persistState() { try { const data = { signals: state.signals, prices: state.prices, sentSignals: state.sentSignals, btcFilterEnabled: state.btcFilterEnabled }; localStorage.setItem(CONFIG.CACHE_KEY, JSON.stringify(data)); } catch (e) {} }
+            function persistSettings() { try { localStorage.setItem(CONFIG.SETTINGS_KEY, JSON.stringify(state.settings)); } catch (e) {} }
+
+            // ============================================================
+            //  UPDATE LOOP
             // ============================================================
             async function updateAllData(force = false) {
                 if (state.isUpdating && !force) return;
                 state.isUpdating = true;
-                addLog('🔄 بدء دورة تحديث...', 'info');
+                liveDot.style.background = '#f59e0b'; liveDot.style.animation = 'none';
+                addLog('🔄 جاري تحديث البيانات...', 'info');
                 try {
                     const symbols = CONFIG.SYMBOLS;
                     const allKlines30m = {}; const allPrices = {};
@@ -700,7 +897,7 @@
                     for (const sym of symbols) {
                         const k = allKlines30m[sym]; if (!k || k.length < 200) continue;
                         let signal = generateSignal(sym, k); if (!signal) continue;
-                        if (state.btcFilterEnabled) {
+                        if (state.btcFilterEnabled && btcDirection !== 'neutral') {
                             if (btcDirection === 'buy' && signal.direction === 'sell') continue;
                             if (btcDirection === 'sell' && signal.direction === 'buy') continue;
                         }
@@ -724,48 +921,134 @@
                     }
 
                     persistState(); renderAll();
-                    
-                    // DRAW CHART IMMEDIATELY
                     setTimeout(() => { createChart(); updateChart(chartSymbolSelect.value); resizeChart(); }, 100);
-                    addLog('✅ انتهت دورة التحديث بنجاح.', 'success');
-                } catch (e) {
-                    addLog(`❌ خطأ: ${e.message}`, 'error');
-                } finally {
-                    state.isUpdating = false;
-                }
+                    addLog('✅ تم التحديث بنجاح.', 'success');
+                } catch (e) { addLog(`❌ خطأ: ${e.message}`, 'error'); } 
+                finally { state.isUpdating = false; liveDot.style.background = '#10b981'; liveDot.style.animation = 'pulse-dot 2s infinite'; }
             }
 
             // ============================================================
-            //  RENDER HELPERS (Simplified)
+            //  PWA, TOAST, NOTIFICATION, SETTINGS
             // ============================================================
-            function renderAll() {
-                document.getElementById('statActive').textContent = state.signals.filter(s => !s.isClosed).length;
-                const today = state.signals.filter(s => isToday(s.timestamp));
-                document.getElementById('statToday').textContent = today.length;
-                const closed = today.filter(s => s.isClosed);
-                document.getElementById('statWins').textContent = closed.filter(s => s.closedResult === 'win').length;
-                document.getElementById('statLosses').textContent = closed.filter(s => s.closedResult === 'loss').length;
-                const total = closed.filter(s => s.closedResult === 'win' || s.closedResult === 'loss').length;
-                document.getElementById('statWinRate').textContent = total > 0 ? ((closed.filter(s=>s.closedResult==='win').length / total)*100).toFixed(1)+'%' : '0%';
-                document.getElementById('signalCount').textContent = state.signals.filter(s => !s.isClosed).length;
-                // ... (Ticker and Card rendering would go here, but keeping compact for the fix)
+            function showToast(message, type = 'info') {
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`; toast.textContent = message;
+                toastContainer.appendChild(toast);
+                setTimeout(() => { if (toast.parentNode) { toast.style.opacity = '0'; setTimeout(() => { if (toast.parentNode) toast.remove(); }, 300); } }, 3500);
+            }
+
+            function sendLocalNotification(signal) {
+                if (!('Notification' in window) || Notification.permission !== 'granted') return;
+                try {
+                    const notification = new Notification('📈 إشارة تداول جديدة!', {
+                        body: `العملة: ${getSymbolDisplay(signal.symbol)} | الاتجاه: ${signal.direction === 'buy' ? 'شراء 🟢' : 'بيع 🔴'}`,
+                        icon: 'data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><text y=\'.9em\' font-size=\'90\'>📈</text></svg>',
+                        tag: signal.id, requireInteraction: true
+                    });
+                    setTimeout(() => notification.close(), 10000);
+                } catch (e) {}
+            }
+
+            function openSettings() {
+                settingsToken.value = state.settings.telegramToken || '';
+                settingsChatId.value = state.settings.telegramChatId || '';
+                settingsInterval.value = state.settings.updateInterval || CONFIG.UPDATE_INTERVAL_DEFAULT;
+                settingsAutoSend.checked = state.settings.autoSendTelegram !== false;
+                settingsStatus.className = 'status-msg'; settingsStatus.textContent = '';
+                settingsModal.classList.add('active');
+            }
+            function closeSettings() { settingsModal.classList.remove('active'); }
+            function saveSettings() {
+                state.settings.telegramToken = settingsToken.value.trim();
+                state.settings.telegramChatId = settingsChatId.value.trim();
+                state.settings.updateInterval = Math.max(1, Math.min(60, parseInt(settingsInterval.value) || CONFIG.UPDATE_INTERVAL_DEFAULT));
+                state.settings.autoSendTelegram = settingsAutoSend.checked;
+                persistSettings();
+                if (state.updateTimer) clearInterval(state.updateTimer);
+                startUpdateTimer();
+                settingsStatus.className = 'status-msg success'; settingsStatus.textContent = '✅ تم حفظ الإعدادات';
+                showToast('✅ تم حفظ الإعدادات', 'success');
+            }
+            async function testTelegram() {
+                const token = settingsToken.value.trim(), chatId = settingsChatId.value.trim();
+                if (!token || !chatId) { settingsStatus.className = 'status-msg error'; settingsStatus.textContent = '⚠️ يرجى إدخال التوكن والمعرف'; return; }
+                try { await sendTelegramMessage('🧪 <b>اختبار اتصال</b>\nتم استلام الإعدادات بنجاح! 🚀');
+                    settingsStatus.className = 'status-msg success'; settingsStatus.textContent = '✅ تم إرسال رسالة الاختبار!'; showToast('✅ رسالة اختبار أرسلت للتليجرام', 'success');
+                } catch (e) { settingsStatus.className = 'status-msg error'; settingsStatus.textContent = '❌ فشل الإرسال: ' + e.message; showToast('❌ فشل الاختبار: ' + e.message, 'error'); }
+            }
+
+            function setupPWA() {
+                const manifestData = { "name": "CryptoSignal Pro", "short_name": "CryptoSignal", "description": "منصة توليد إشارات تداول احترافية برافعة 50x", "start_url": "/", "display": "standalone", "background_color": "#0a0d14", "theme_color": "#0a0d14", "icons": [{"src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>","sizes":"512x512","type":"image/svg+xml","purpose":"any"}] };
+                const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
+                const manifestURL = URL.createObjectURL(manifestBlob);
+                document.getElementById('manifest-link').href = manifestURL;
+                window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); state.installPrompt = e; btnInstall.style.display = 'flex'; btnInstall.innerHTML = '📲 <span>تثبيت</span>'; });
+                btnInstall.addEventListener('click', async () => {
+                    if (state.installPrompt) { try { const result = await state.installPrompt.prompt(); if (result.outcome === 'accepted') { showToast('✅ تم التثبيت!', 'success'); btnInstall.style.display = 'none'; } state.installPrompt = null; } catch (e) { showToast('⚠️ تعذر التثبيت', 'error'); } }
+                    else { showToast('📱 أضف هذا التطبيق إلى شاشتك الرئيسية عبر قائمة المتصفح', 'info'); }
+                });
+                if (!('beforeinstallprompt' in window)) { btnInstall.style.display = 'flex'; btnInstall.innerHTML = '📲 <span>تثبيت</span>'; btnInstall.addEventListener('click', () => { showToast('📱 أضف هذا التطبيق إلى شاشتك الرئيسية عبر قائمة المتصفح', 'info'); }); }
+            }
+
+            function startUpdateTimer() {
+                if (state.updateTimer) clearInterval(state.updateTimer);
+                const interval = (state.settings.updateInterval || CONFIG.UPDATE_INTERVAL_DEFAULT) * 60 * 1000;
+                state.updateTimer = setInterval(() => { updateAllData(false); }, Math.max(15000, interval));
             }
 
             // ============================================================
             //  INIT
             // ============================================================
-            function init() {
-                // Setup PWA, events, and start loop
-                // ...
+            async function init() {
+                loadState();
+                settingsToken.value = state.settings.telegramToken || '';
+                settingsChatId.value = state.settings.telegramChatId || '';
+                settingsInterval.value = state.settings.updateInterval || CONFIG.UPDATE_INTERVAL_DEFAULT;
+                settingsAutoSend.checked = state.settings.autoSendTelegram !== false;
+                applyModeConfig();
+                renderAll();
+                setupPWA();
                 addLog('🚀 بدء التطبيق...', 'success');
-                setTimeout(() => {
-                    createChart();
-                    updateAllData(true); 
-                }, 300);
+                
+                // BUTTONS BINDING
+                btnSettings.addEventListener('click', openSettings);
+                btnSettingsClose.addEventListener('click', closeSettings);
+                btnSettingsSave.addEventListener('click', saveSettings);
+                btnSettingsTest.addEventListener('click', testTelegram);
+                btnRefresh.addEventListener('click', () => updateAllData(true));
+                btnExportHistory.addEventListener('click', () => {
+                    const blob = new Blob([JSON.stringify(state.signals, null, 2)], { type: 'application/json' });
+                    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `cryptosignal_history.json`; a.click();
+                });
+                btnClearHistory.addEventListener('click', () => {
+                    if (state.signals.length === 0) { showToast('📂 السجل فارغ', 'info'); return; }
+                    if (confirm('هل أنت متأكد من مسح جميع البيانات؟')) { state.signals = []; state.sentSignals = []; persistState(); renderAll(); showToast('🗑️ تم المسح', 'info'); }
+                });
+                btnBtcFilter.addEventListener('click', () => {
+                    state.btcFilterEnabled = !state.btcFilterEnabled;
+                    persistState();
+                    btcFilterLabel.textContent = state.btcFilterEnabled ? 'BTC ON' : 'BTC OFF';
+                    btnBtcFilter.style.borderColor = state.btcFilterEnabled ? 'var(--accent-green)' : 'var(--accent-red)';
+                    btnBtcFilter.style.color = state.btcFilterEnabled ? 'var(--accent-green)' : 'var(--accent-red)';
+                    showToast(state.btcFilterEnabled ? '⚡ فلتر البيتكوين مفعل' : '⚡ فلتر البيتكوين معطل', 'info');
+                    updateAllData(true);
+                });
+                btnModeToggle.addEventListener('click', toggleMode);
+                
+                chartSymbolSelect.addEventListener('change', () => { setTimeout(() => { createChart(); updateChart(chartSymbolSelect.value); resizeChart(); }, 100); });
+                window.addEventListener('resize', () => { setTimeout(resizeChart, 200); });
+                settingsModal.addEventListener('click', (e) => { if (e.target === settingsModal) closeSettings(); });
+                document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSettings(); });
+
+                if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission();
+                
+                await updateAllData(true);
+                startUpdateTimer();
             }
+
             if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
             else init();
         })();
     </script>
 </body>
-    </html>
+                        </html>
